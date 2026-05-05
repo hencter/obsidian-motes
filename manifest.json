@@ -1,7 +1,7 @@
 {
   "id": "memoria",
   "name": "Memoria",
-  "version": "1.4.17",
+  "version": "1.5.0",
   "minAppVersion": "1.4.0",
   "description": "浮墨式碎片笔记瀑布流，数据永远是纯 Markdown，自由属于你。",
   "author": "i-iooi-i",
