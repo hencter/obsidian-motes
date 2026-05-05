@@ -1,9 +1,9 @@
 {
   "id": "memoria",
   "name": "Memoria",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "minAppVersion": "1.4.0",
-  "description": "浮墨式碎片笔记瀑布流，数据永远是纯 Markdown，自由属于你。",
+  "description": "Waterfall-style memo plugin for flomo-like fleeting thoughts, stored as plain Markdown.",
   "author": "i-iooi-i",
   "authorUrl": "https://github.com/i-iooi-i",
   "fundingUrl": "https://github.com/i-iooi-i/obsidian-memoria",

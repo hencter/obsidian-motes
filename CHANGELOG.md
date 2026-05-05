@@ -6,6 +6,23 @@
 
 ---
 
+## v1.5.1（2026-05-06 凌晨）
+
+### 🏪 配合 Obsidian 商店规范
+
+这一版没有功能变化，专门为提交 Obsidian 官方社区插件商店做两项合规调整：
+
+1. **manifest.json 的 `description` 改为英文**  
+   原：`浮墨式碎片笔记瀑布流，数据永远是纯 Markdown，自由属于你。`  
+   新：`Waterfall-style memo plugin for flomo-like fleeting thoughts, stored as plain Markdown.`  
+   原因：Obsidian 商店 CI 会校验 `community-plugins.json` 里的描述和 `manifest.json` 里必须**完全一致**。我们在 community-plugins.json 用了英文，manifest.json 也同步为英文。
+
+2. **tag 去掉 `v` 前缀**  
+   从此之后所有 git tag 和 Release 都是纯版本号 `1.5.1` / `1.5.2` / ... 而不是 `v1.5.1`。Obsidian 商店 CI 要求 `tag_name` 与 `manifest.json` 里的 `version` 完全一致（不允许前缀）。  
+   `publish.ps1` 脚本已同步更新。
+
+---
+
 ## v1.5.0（2026-05-06 凌晨）
 
 ### ✅ 新功能：「待办」视图

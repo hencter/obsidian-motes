@@ -141,7 +141,7 @@ $manifestPath = Join-Path $ReleaseDir 'manifest.json'
 $manifestRaw = Get-Content $manifestPath -Encoding UTF8 -Raw
 $manifest = $manifestRaw | ConvertFrom-Json
 $version = $manifest.version
-$tag = "v" + $version
+$tag = $version
 Write-Info ("版本号：" + $version + "  ->  tag: " + $tag) 'Green'
 
 # ============ Step 5. Git commit + tag + push ============
