@@ -6,6 +6,19 @@
 
 ---
 
+## v1.4.15（2026-05-06 凌晨）
+
+### 🏪 为提交 Obsidian 官方插件商店做准备
+
+#### 代码合规
+- **移除 `innerHTML` 写入**：v1.4.11 引入的 MarkdownRenderer 缓存把渲染结果存为 HTML 字符串，命中时 `body.innerHTML = cached`。Obsidian 社区插件审核对 `innerHTML` 写入有 XSS 风险提示（即便来源是受信的 MarkdownRenderer 输出）。改为 `DocumentFragment + cloneNode(true)` 缓存：命中时直接 clone 出 DOM 子树 append 进 body，零 innerHTML，性能与原方案一致。
+- 代码库完整扫描：0 `eval` / 0 `new Function` / 0 `document.write` / 0 外部 CDN / 0 `XMLHttpRequest`。完全符合商店审核规范。
+
+#### manifest.json 补齐
+- 加上 `fundingUrl` 字段（指向 GitHub 仓库，审核员看到会觉得"这是正式项目"）。
+
+---
+
 ## v1.4.14（2026-05-05 晚上）
 
 ### 📱 手机端输入框文字左边笔画被"咬掉"
