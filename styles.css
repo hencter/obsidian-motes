@@ -947,6 +947,13 @@
 .memoria-card-tags {
   display: flex;
   flex-wrap: wrap;
+  /* v1.4.12: 加 align-items: center。
+     原因：v1.3.6 起"全文"折叠按钮会被 appendChild 到这个 tagRow 容器里，
+     按钮高度（含 12px SVG 图标 + padding + 1.4 行高）比标签胶囊（font-size:11px + padding:2px 10px）
+     略高 ~5-8px。flex 默认 align-items:stretch 会把胶囊拉伸到和按钮同高，
+     borderRadius:999px 的胶囊被撑成细长椭圆，视觉突兀。
+     改成 center：胶囊按自然高度居中显示，按钮也居中，两者互不影响。 */
+  align-items: center;
   gap: 6px;
   margin-top: 10px;
 }

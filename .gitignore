@@ -1,6 +1,9 @@
 # Memoria release 目录 —— 只提交 Obsidian 插件必需的发布产物 + 文档
 # 源码在 C:\Users\zololiu\Desktop\memoria-v1.1.1-source，不在这里
 
+# Release Notes 文件是本地用来拷贝到 GitHub Release 页的，不入仓库
+RELEASE_NOTES_*.md
+
 # 系统 / 编辑器噪音
 .DS_Store
 Thumbs.db
