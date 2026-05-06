@@ -3327,6 +3327,10 @@
 .memoria-card.memoria-mood-touched {
   box-shadow: inset 3px 0 0 0 #e88eb4;
 }
+/* v2.0.2: 新增 inspired（鼓励/励志/加油） */
+.memoria-card.memoria-mood-inspired {
+  box-shadow: inset 3px 0 0 0 #e89a5c;
+}
 .memoria-card.memoria-mood-sad {
   box-shadow: inset 3px 0 0 0 #7a93b0;
 }
