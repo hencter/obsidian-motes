@@ -1245,6 +1245,32 @@
   gap: 8px;
   align-items: center;
 }
+
+/* v1.6.0: 编辑模式的时间选择器
+ *   只有进入编辑模式才显示。原生 datetime-local：
+ *   - PC 端 Chromium：日历弹窗 + 时间选择
+ *   - iOS Safari：滚轮选择器（体验非常好）
+ *   - Android Chrome：material datetime picker
+ *   保持视觉风格与 cancel-btn 一致：低调灰边框，hover 加深。
+ */
+.memoria-edit-datetime {
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: var(--font-text);
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+.memoria-edit-datetime:hover,
+.memoria-edit-datetime:focus {
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
 .memoria-cancel-btn {
   padding: 5px 14px;
   border: 1px solid var(--background-modifier-border) !important;
