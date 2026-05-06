@@ -3308,3 +3308,124 @@
 }
 
 
+
+/* ==================== v2.0.0 鏂板鏍峰紡 ==================== */
+
+/* 鎼滅储鍛戒腑楂樹寒 */
+.memoria-search-hit {
+  background: var(--text-highlight-bg, rgba(255, 208, 0, 0.35));
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
+/* 鎯呮劅鑹插僵鍙鍖栵細鍗＄墖宸﹁竟鑹叉潯
+   color-coding 鏄惎鍙戝紡鍒ゆ柇锛岄粯璁ゅ叧闂紝寮€鍚悗鑹叉潯鍙湪鍛戒腑鍏抽敭璇嶆椂鍑虹幇 */
+.memoria-card.memoria-mood-happy {
+  box-shadow: inset 3px 0 0 0 #f5c76a;
+}
+.memoria-card.memoria-mood-touched {
+  box-shadow: inset 3px 0 0 0 #e88eb4;
+}
+.memoria-card.memoria-mood-sad {
+  box-shadow: inset 3px 0 0 0 #7a93b0;
+}
+.memoria-card.memoria-mood-angry {
+  box-shadow: inset 3px 0 0 0 #c77764;
+}
+/* 缃《 / 鏀惰棌宸茬粡鏈?box-shadow锛屽拰 mood 鍙兘鍐茬獊銆俶ood 鐢?left-inset锛?   缃《鐢?border-top锛屼笉鍐茬獊锛涘拰 is-pinned 骞跺垪鏃朵紭鍏?mood 鐨勫乏鑹叉潯銆?*/
+
+/* 绱у噾瑙嗗浘妯″紡锛氶檺鍒舵瘡寮犲崱姝ｆ枃楂樺害 + 鍥剧墖缂╁皬 */
+.memoria-list.is-compact .memoria-card-body {
+  max-height: 6em;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+.memoria-list.is-compact .memoria-card {
+  padding: 10px 14px;
+}
+.memoria-list.is-compact .memoria-img-grid {
+  max-height: 80px;
+  overflow: hidden;
+}
+.memoria-list.is-compact .memoria-card-body p {
+  margin: 0.3em 0;
+}
+
+/* Vim 閫変腑鎬?*/
+.memoria-card.is-vim-selected {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+  transform: translateX(2px);
+  transition: transform 0.08s, outline 0.1s;
+}
+
+/* 鐑姏鍥惧寮?tooltip */
+.memoria-heatmap-tooltip {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 180px;
+  max-width: 280px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  font-size: 12px;
+  color: var(--text-normal);
+  pointer-events: none;
+  animation: memoria-tip-in 0.12s ease;
+}
+@keyframes memoria-tip-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.memoria-heatmap-tooltip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--background-modifier-border);
+}
+.memoria-heatmap-tooltip-count {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.memoria-heatmap-tooltip-row {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0;
+  line-height: 1.5;
+}
+.memoria-heatmap-tooltip-time {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 11px;
+}
+.memoria-heatmap-tooltip-text {
+  color: var(--text-normal);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.memoria-heatmap-tooltip-more {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* 鐑姏鍥炬牸瀛?hover 鏀惧ぇ鏁堟灉 */
+.memoria-heatmap-cell {
+  transition: transform 0.08s, filter 0.1s;
+}
+.memoria-heatmap-cell:hover {
+  transform: scale(1.35);
+  filter: brightness(1.15);
+  z-index: 2;
+  position: relative;
+}
