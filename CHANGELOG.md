@@ -6,6 +6,40 @@
 
 ---
 
+## v2.0.7（2026-05-06 傍晚）
+
+### 🔍 全量代码审查 + 5 处高价值修复
+
+用户要求整体过一遍代码做发版前体检。启动 code-explorer 对全部 17 个 .ts 源文件扫描了 7 类问题（IME/资源泄漏/空值/i18n/性能/边界/类型），报告显示代码整体质量较高（`any` 零滥用、事件清理到位、缓存策略合理），挑出 **5 个高价值问题**一并修复：
+
+#### 1. 两处 IME 兼容性孪生漏网之鱼（和 v2.0.6 同构）
+- **`tag-suggest.ts`** 的标签联想面板 keydown：中文输入法打 `#xxx` 时按 Enter 上屏拼音会被联想面板的"选中候选"抢走
+- **`main.ts` quickCapture** 的弹窗 textarea：中文输入法下的 Enter / Esc 可能被抢
+- 修复：两处都加上 `if (e.isComposing || e.keyCode === 229) return;`
+
+#### 2. main.ts 的 Ribbon / 命令 / Notice / confirm 走 i18n
+之前英文用户点开命令面板会看到"打开 Memoria 面板""快速记录（弹窗）""正在规范化…"这些中文。这次把以下全部走 i18n：
+- 5 个 Command name
+- Ribbon 图标 tooltip
+- 规范化命令的 confirm 文案 + 3 个 Notice
+- QuickCapture 弹窗的标题 / placeholder / 取消 / 发送按钮 / Notice
+
+新增 i18n 字典条目 17 条（双语）。
+
+#### 3. store.ts 的 throw Error 走 i18n
+3 处核心异常文案（文件变更未找到 / 原笔记文件不存在 / 内容不能为空）走 i18n。这些错误会通过 Notice 冒泡到用户，之前英文用户会看到中文报错。
+
+#### 4. export.ts 的"没有可导出的笔记"走 i18n
+利旧 `notice.exportEmpty` 键，修掉最后一个硬编码中文。
+
+#### 5. 搜索输入加 180ms debounce
+view.ts 第 181 行搜索框 input 事件之前每按一键都触发 `matchesQuery + renderList`，大 vault (10k+ memos) 下能感知到输入延迟。用 Obsidian 内置的 `debounce` 包一层，180ms 停顿后才真正搜索。
+
+### 📋 审查结论
+本次审查发现的其他 Low/Medium 级问题（如个别 `as HTMLElement` 类型强转、stats.ts 有若干字面量中文在诗意文案池里——用户已决定英文模式显示占位不强翻译）都是经过评估的刻意设计，不构成问题。代码整体质量较高，`any` 零滥用，事件清理到位，缓存策略合理。
+
+---
+
 ## v2.0.6（2026-05-06 深夜）
 
 ### 🐛 修复中文输入法下待办行输入英文变两行的 bug
