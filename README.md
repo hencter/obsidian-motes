@@ -11,6 +11,8 @@
 [![license](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![obsidian](https://img.shields.io/badge/Obsidian-1.4.0%2B-purple)](https://obsidian.md)
 
+**简体中文** · [English](./README.en.md)
+
 </div>
 
 ---
