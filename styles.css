@@ -1313,7 +1313,14 @@
     row-gap: 8px;
   }
   .memoria-input-card.is-editing .memoria-edit-datetime {
-    /* datetime 独占第一行，左对齐（flex-basis:100% 铺满后自身内容就是左起） */
+    /* datetime 独占第一行，左对齐
+     *   v2.0.10: iOS Safari 对 input[type="datetime-local"] 有特殊处理，
+     *   会忽略 flex-basis 按内容宽度渲染，导致 datetime 视觉上居中/偏右。
+     *   用 width: 100% 强制铺满 + box-sizing: border-box 避免 padding 撑破，
+     *   再用 display: block 彻底脱离 flex 自适应，保证左缘与工具列对齐。 */
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
     flex-basis: 100%;
     order: -1;
     padding: 8px 10px;

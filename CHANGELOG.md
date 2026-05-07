@@ -6,6 +6,26 @@
 
 ---
 
+## v2.0.10（2026-05-07 下午）
+
+### 🐛 v2.0.9 移动端真机两个回归 bug
+
+用户 iOS 真机测完截图反馈，v2.0.9 出现两个问题：
+
+#### 1. datetime 没左对齐，反而看起来居中偏右
+
+根因：iOS Safari 对 `<input type="datetime-local">` 有特殊处理，**会忽略 `flex-basis: 100%` 按内容宽度渲染**（一条窄窄的只有"2026年5月7日 00:42"那么宽）。这是老生常谈的 iOS form 控件 quirk。
+
+修复：强制 `display: block + width: 100% + box-sizing: border-box`，让它彻底脱离 flex 布局按块级元素铺满整行。左缘立刻与下方工具列对齐。
+
+#### 2. iOS 键盘弹出时遮挡「取消/发送」按钮
+
+根因：iOS Safari 聚焦 textarea 弹出键盘后，默认只保证聚焦元素自己可见，不会滚动它下方的兄弟元素进入视口，所以 submit-wrap 被键盘盖住。
+
+修复：给 `inputEl` 加 `focus` 监听，移动端下延迟 300ms（等 iOS 键盘弹出动画结束）把 `.memoria-input-card` 底部 `scrollIntoView({ block: "end" })`。这样键盘弹出后，按钮正好贴在键盘上方露出可见。桌面端不生效。
+
+---
+
 ## v2.0.9（2026-05-07 下午）
 
 ### 🎨 移动端编辑模式 datetime 与底栏工具列左对齐
