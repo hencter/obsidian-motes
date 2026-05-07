@@ -1287,60 +1287,31 @@
   color: var(--text-normal);
 }
 
-/* v2.0.8: 移动端编辑模式下，datetime-local 输入框在窄屏会挤占"取消/发送"按钮的位置，
- *   导致按钮被遮挡或挤出视口。只在进入编辑模式下把 datetime-input 换行到上方
- *   自成一行，两个按钮保持右对齐，手机端稳定可见。桌面端保持原样单行布局。
+/* v2.0.8: 移动端编辑模式下，datetime-local 输入框在窄屏会挤占"取消/发送"按钮
+ *   的位置，导致按钮被遮挡或挤出视口。把 datetime-input 换行到上方一行，
+ *   按钮独占第二行右对齐，手机端两个按钮稳定可见。桌面端保持原样单行布局。
  *
- * v2.0.9: 上一版 datetime 独占一行但仍在 submit-wrap 内部（submit-wrap 被父
- *   `justify-content: space-between` 推到最右），导致 datetime 视觉上贴右、
- *   和下方左对齐的工具列错位。
- *   最终方案：用已有的 .memoria-input-card.is-editing 类（进入编辑模式时会加）
- *   作为选择器前缀（兼容老 WebView，不依赖 :has()）。
- *   编辑模式下 toolbar 允许 wrap，submit-wrap 独占满宽一行，
- *   datetime 左对齐（和下方工具列左缘对齐），「取消/发送」独占第二行右对齐。
+ * v2.0.12: v2.0.9~2.0.11 尝试让 datetime 与下方工具列左对齐（视觉更工整），但
+ *   iOS Safari 对 input[type="datetime-local"] 有 3 个联合 quirk
+ *   （-webkit-appearance / flex min-width: auto / 默认 margin），即便都规避后
+ *   真机表现仍不稳定。**改回 v2.0.8 的简单方案**：datetime 在 submit-wrap 内
+ *   按其自然宽度贴右排列（iOS 默认行为），上下两行布局清晰，按钮永远可见。
+ *   视觉上不与左侧工具列左对齐，但稳定、跨平台一致、零 quirk。
  */
 @media (max-width: 680px) {
-  .memoria-input-card.is-editing .memoria-input-toolbar {
-    /* 让 toolbar 可换行，submit-wrap 整块下移到第二行 */
-    flex-wrap: wrap;
-    row-gap: 6px;
-  }
-  .memoria-input-card.is-editing .memoria-submit-wrap {
-    /* 独占整行，内部再 wrap 一次：datetime 一行、按钮一行 */
-    width: 100%;
+  .memoria-submit-wrap {
     flex-wrap: wrap;
     justify-content: flex-end;
-    row-gap: 6px;
+    row-gap: 8px;
   }
-  .memoria-input-card.is-editing .memoria-edit-datetime {
-    /* datetime 独占第一行，左对齐
-     *   v2.0.10: iOS Safari 对 input[type="datetime-local"] 有特殊处理，
-     *   会忽略 flex-basis 按内容宽度渲染，导致 datetime 视觉上居中/偏右。
-     *
-     *   v2.0.11: 上一版只设 display: block + width: 100% 仍然被 iOS
-     *   默认的 -webkit-appearance 撑回内容宽度。真正关键是：
-     *     1. -webkit-appearance: none  ← 拿掉 iOS 原生外观让 width 生效
-     *     2. min-width: 0              ← flex 子项默认 min-width: auto
-     *                                    （= 内容宽度），这个才是"怎么也撑不开"
-     *                                    的根本元凶
-     *     3. width: 100% + box-sizing: border-box  ← 真正铺满整行
-     *     4. margin: 0                 ← iOS 的 form 控件默认有 2-3px 外边距
-     *                                    导致上下看起来有空白 */
-    -webkit-appearance: none;
-    appearance: none;
-    display: block;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
+  .memoria-edit-datetime:not(.memoria-hidden) {
+    /* 编辑态下整体换行到 submit-wrap 第一行（按钮在第二行）
+     *   不强求 width: 100%，让 iOS 按内容宽度自然渲染（贴右） */
     flex-basis: 100%;
     order: -1;
-    margin: 0;
-    padding: 8px 10px;
-    font-size: 14px;
-    /* 触控友好：最小高度 36px 保证好点 */
-    min-height: 36px;
-    /* 让文字内容左起（iOS 对 datetime 默认可能居中） */
-    text-align: left;
+    padding: 6px 10px;
+    font-size: 13px;
+    min-height: 32px;
   }
 }
 
