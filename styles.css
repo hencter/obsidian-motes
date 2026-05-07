@@ -1303,30 +1303,44 @@
   .memoria-input-card.is-editing .memoria-input-toolbar {
     /* 让 toolbar 可换行，submit-wrap 整块下移到第二行 */
     flex-wrap: wrap;
-    row-gap: 8px;
+    row-gap: 6px;
   }
   .memoria-input-card.is-editing .memoria-submit-wrap {
     /* 独占整行，内部再 wrap 一次：datetime 一行、按钮一行 */
     width: 100%;
     flex-wrap: wrap;
     justify-content: flex-end;
-    row-gap: 8px;
+    row-gap: 6px;
   }
   .memoria-input-card.is-editing .memoria-edit-datetime {
     /* datetime 独占第一行，左对齐
      *   v2.0.10: iOS Safari 对 input[type="datetime-local"] 有特殊处理，
      *   会忽略 flex-basis 按内容宽度渲染，导致 datetime 视觉上居中/偏右。
-     *   用 width: 100% 强制铺满 + box-sizing: border-box 避免 padding 撑破，
-     *   再用 display: block 彻底脱离 flex 自适应，保证左缘与工具列对齐。 */
+     *
+     *   v2.0.11: 上一版只设 display: block + width: 100% 仍然被 iOS
+     *   默认的 -webkit-appearance 撑回内容宽度。真正关键是：
+     *     1. -webkit-appearance: none  ← 拿掉 iOS 原生外观让 width 生效
+     *     2. min-width: 0              ← flex 子项默认 min-width: auto
+     *                                    （= 内容宽度），这个才是"怎么也撑不开"
+     *                                    的根本元凶
+     *     3. width: 100% + box-sizing: border-box  ← 真正铺满整行
+     *     4. margin: 0                 ← iOS 的 form 控件默认有 2-3px 外边距
+     *                                    导致上下看起来有空白 */
+    -webkit-appearance: none;
+    appearance: none;
     display: block;
     width: 100%;
+    min-width: 0;
     box-sizing: border-box;
     flex-basis: 100%;
     order: -1;
+    margin: 0;
     padding: 8px 10px;
     font-size: 14px;
     /* 触控友好：最小高度 36px 保证好点 */
     min-height: 36px;
+    /* 让文字内容左起（iOS 对 datetime 默认可能居中） */
+    text-align: left;
   }
 }
 

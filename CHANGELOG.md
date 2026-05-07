@@ -6,6 +6,26 @@
 
 ---
 
+## v2.0.11（2026-05-07 下午）
+
+### 🐛 iOS datetime-local 的真正根治
+
+v2.0.10 设了 `display: block + width: 100%` 但 iOS 真机测还是居中一小条 + 上下有空白。
+
+#### 真正的元凶（这次是 3 个联合锁死）
+
+1. **iOS Safari 的 `-webkit-appearance`**：iOS 对 `<input type="datetime-local">` 默认带原生外观样式，会**无视 CSS 的 width**按内容宽度 shrink-wrap。必须 `-webkit-appearance: none` 才能让 width 生效。
+2. **Flex 子项的 `min-width: auto`**：flex 布局里子元素默认 `min-width: auto`（＝内容宽度），这是"怎么设 width: 100% 都撑不开"的**真正根本原因**。必须显式 `min-width: 0` 才能让 flex-basis / width 真正生效。
+3. **iOS form 控件默认 margin**：datetime-local 自带 2-3px 外边距，造成截图里明显的上下空白。必须 `margin: 0`。
+
+三个一起加才能让 datetime 真·铺满整行 + 无多余空白。
+
+#### 附加调整
+- toolbar 和 submit-wrap 的 `row-gap` 从 8px 降到 6px，视觉更紧凑
+- 明确 `text-align: left`，iOS 某些场景下 datetime value 会居中显示
+
+---
+
 ## v2.0.10（2026-05-07 下午）
 
 ### 🐛 v2.0.9 移动端真机两个回归 bug
