@@ -6,6 +6,96 @@
 
 ---
 
+## v2.0.20（2026-05-09 深夜 · 新功能 + code review 清扫）
+
+两件事一次发：一个是用户提出的新 feature（侧栏默认视图可配），一个是我自己对着代码树过 code review 发现的一圈小问题。
+
+### ✨ 新增：设置「侧栏默认视图」
+
+之前侧栏顶部默认是"热力图"，想看月历的用户每次打开 Memoria 都要点一次切换按钮。加个设置项解决：
+
+**设置 → Memoria → 侧栏默认视图**（新）
+- 🔥 热力图（默认，沿用老行为）
+- 📅 月历
+
+**交互细节**：临时切换（点切换按钮）**只在当前会话生效**，不回写设置。想清楚以下 3 种典型场景都要符合直觉：
+
+- 用户设置了默认"月历"，想临时看下热力图 → 点切换 → 看完 → 下次打开还是月历 ✓
+- 用户在已打开的 Memoria 里改设置默认值 → 视图立即跟随变化 ✓
+- 用户先手动切到了月历，然后去设置页把默认改成热力图 → 当前已切到月历的视图**保持月历不变**（尊重用户的当前选择），直到下次重开 view ✓
+
+实现上用了一个 `overviewModeOverridden` flag：`false`（默认）→ 跟随 `settings.defaultOverviewMode`；用户点切换按钮一次后变 `true` → 当前会话锁定不再跟随设置。
+
+---
+
+### 🐛 修复：智能回顾的情感配对可能算错（`smart-review.ts`）
+
+v2.0.0 引入 7 种 mood 后，`dominantMood` 的 `count` 对象只初始化了 5 个 key（漏了 `inspired` / `fear` / `tired`）。当 `detectMood` 返回这三种之一时：
+
+- `count[mood]++` 把 `undefined` 变成 `NaN`
+- 后续 `sort((a, b) => b[1] - a[1])` 对 NaN 的行为不定
+- 结果：智能回顾在这三种主导情绪下的"情感配对加分"可能没加到位
+
+**为啥 TS 没报错**：`tsconfig.json` 没开 `"strict": true`，`Record<Mood, number>` 缺 key 编译不拦。这次先补全 8 个 mood key，`strict` 改造留到下一次。
+
+### 🐛 修复：设置页顶部多了一个冗余 `<h2>` 标题
+
+`settings.ts` 第一行 `containerEl.createEl("h2", { text: t("settings.title") })`——插件名本身已经是 Obsidian 设置页的标题，再加 h2 是商店审核明确不鼓励的做法。v1.4.15 清理商店合规时漏了这处，这次删掉。
+
+### 🐛 修复：搜索高亮对含 HTML 特殊字符的关键词失效（`search.ts#highlightTerms`）
+
+原逻辑是先 `escapeHtml(text)`（`<` → `&lt;`）再用**未 escape 的 term** 构造正则。用户搜 `<script>` 之类的关键词永远匹配不到（目标文本里已经是 `&lt;script&gt;`）。现在对 term 也先 escapeHtml 后再 escapeRegExp，保证同域匹配。
+
+注：`view.ts` 的另一套 DOM 文本节点高亮路径（卡片内的搜索命中染色）没这个问题，所以 UI 观感上感知不到，但 API 导出路径会更一致。
+
+### 🐛 修复：导出同一分钟内连点两次会抛 "File exists"（`export.ts`）
+
+`memoria-export-20260509-0130.md` 文件名精度到分钟，同一分钟第二次点"导出为 md"必抛错。现在文件名加 4 位随机后缀 `memoria-export-20260509-0130-a3f2.md`，同一分钟连点多次也互不冲突。
+
+### 🐛 修复：确认对话框的 mouseup listener 可能残留（`view.ts`）
+
+和 `main.ts` quickCapture 的 v1.4.11 修复思路一致——如果用户 mousedown 后把鼠标拖出浏览器窗口松开，mouseup 永远触发不了，listener 就挂在 document 上回不来。之前 delete 对话框（`confirm()`）有同款问题，这次补上 `pendingMouseUp` slot + close 时统一清理。
+
+虽然实际影响非常小（close 后 backdrop 已 remove，listener 里的 `ev.target === backdrop` 永远 false，不会错关），但仍算一处泄漏，顺手补了。
+
+### 🌍 i18n 补齐：英文用户看到的中文角落
+
+之前 i18n 架构已经覆盖了 90% 的界面，但有几处"不常被英文用户看到"的地方漏翻了，这次一起补：
+
+| 位置 | 原 | 修复后 |
+|---|---|---|
+| 长笔记折叠按钮 | "全文" / "收起" | `card.collapseFull` / `card.collapseFold` |
+| 侧栏月历星期头 | `["日","一","二",...]` 硬编码数组 | `calendar.weekday.0-6`（含英文 `S M T W T F S`） |
+| 侧栏月历 aria-label | "上个月" / "下个月" | `calendar.prevMonth` / `calendar.nextMonth` |
+| 侧栏月历标题 | `${year}年${m+1}月` | `calendar.monthTitle`（英文 `m/year`） |
+| 侧栏月历 hover | `${key}  ${count} 条` | `calendar.dayCount` |
+| 图片 lightbox aria-label | "关闭" / "上一张" / "下一张" | `lightbox.close` / `prev` / `next` |
+| 年度热力图按钮 | `${year} 年` | `stats.yearBtn` |
+| 年度热力图 hover | `${key}  未来` / `${key}  N 条` | `stats.heatmap.future` / `stats.heatmap.dayCount` |
+| 月度柱图 hover | `${mo.key}: ${n} 条` | `stats.monthlyBarRange` |
+| 标签云 tooltip | `${c} 条` | 复用 `list.totalCount` |
+| 年度全景 day hover | `${key}  ${t("list.totalCount")}` | `year.dayHover` |
+| 导出文件 filter 描述 | `"今天"/"本周"/"${year} 年"/"全部笔记"` | 走 i18n（`export.desc.all` + 现有 sidebar key） |
+
+导出文件的 filter 描述影响最大——之前英文用户导出的 md/html/json 里 filter 字段永远是中文，这次修掉。
+
+### 🛡️ 防御性：`t()` 翻译函数对 `$&` / `$1` 的保护
+
+`i18n.ts` 的 `t()` 用 `text.replace(regex, String(v))` 做参数替换。如果 `v` 恰好含 `$&` / `$1` 等 replace 的回溯引用，会被当作引用输出乱码。当前所有调用点都传数字/标签名，没风险；但 `t("notice.saveFailed", { msg: err.message })` 这种用法已经存在，某天 err.message 里含 `$` 就会中招。
+
+改用 `replace(re, () => String(v))` 函数形式的 replacer，从根上避免回溯引用被解释。
+
+### 🧹 小优化
+
+- `stats.ts` 年度热力图 weeks 计算改用 `floor(…+0.5)`，跨 DST（欧美夏令时）时更稳（国内没 DST，视觉上感知不到）
+
+### 已知未修（优先级更低，留给下次）
+
+- `tsconfig.json` 没开 `strict: true`。这次的 `dominantMood` 漏 key 就是这个留下的口子。开 strict 会一次性暴露一批问题，改动面大，下一版单独处理
+- `image-grid.ts` 的 `openLightbox` 挂到 `document.body` 且 keydown listener 不走插件 `this.register()`。场景：用户打开 lightbox 后立刻禁用 Memoria，keydown listener 残留。影响微乎其微，涉及改接口签名，暂搁置
+
+---
+
 ## v2.0.18（2026-05-09 凌晨 · 收尾打磨）
 
 接着 v2.0.17 发版后用户反馈的几个细节问题，做一轮收尾打磨。三个看似无关的小修，根因恰好串起了"渲染 / 解析 / 视觉"三条不同维度。
