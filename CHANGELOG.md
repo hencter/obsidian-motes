@@ -6,6 +6,29 @@
 
 ---
 
+## v2.0.14（2026-05-08 傍晚）
+
+### 🐛 修复 Ctrl/Cmd+Enter 发送快捷键失效
+
+用户反馈：桌面端在输入框打完内容按 `Ctrl+Enter` 发送没反应。
+
+#### 根因
+Obsidian 默认把 `Ctrl/Cmd+Enter` 绑给全局命令「**在新标签页打开光标下的链接**」（Open link under cursor in new tab）。Obsidian 的全局 hotkey 通过 Scope API 注册，**优先级高于 DOM 层的 addEventListener**。当用户在 textarea 里输入内容里含有链接，按 Ctrl+Enter 时，Obsidian 的全局 hotkey 抢先触发，我们挂在 textarea 上的 keydown 根本没机会响应。
+
+#### 修复
+改用 Obsidian 自家的 Scope API 注册快捷键：
+```ts
+this.scope.register(["Mod"], "Enter", ...)
+```
+Scope 注册的快捷键在视图聚焦时**优先级高于全局 hotkey**，彻底解决被抢的问题。
+
+同时做了 3 个小保护：
+- 只有焦点在 Memoria 视图内才响应（避免在瀑布流滚动时误触）
+- IME 组合态不响应（中文输入法 Enter 是确认候选）
+- 原有 DOM keydown 逻辑加 `stopImmediatePropagation` 作为双保险
+
+---
+
 ## v2.0.13（2026-05-07 下午）
 
 ### 🚨 严重 BUG 修复：全选 + 列表/标签按钮会清空内容
