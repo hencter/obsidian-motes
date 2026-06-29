@@ -99,6 +99,18 @@ function Copy-One {
   Copy-Item -Force -Path $From -Destination $To
 }
 
+function Copy-Tree {
+  param([string]$From, [string]$To)
+  if ($DryRun) {
+    Write-Info ("[DRY] Copy tree " + $From + " -> " + $To) 'DarkGray'
+    return
+  }
+  if (-not (Test-Path $To)) {
+    New-Item -ItemType Directory -Path $To | Out-Null
+  }
+  Copy-Item -Force -Recurse -Path (Join-Path $From '*') -Destination $To
+}
+
 # ============ Step 1. Build ============
 Set-Location $ReleaseDir
 
@@ -120,11 +132,18 @@ if (-not $SkipBuild) {
 }
 
 # ============ Step 2. 同步三件套到 release 目录 ============
-Write-Step "Step 2/6  同步三件套 + CHANGELOG 到 release 目录"
+Write-Step "Step 2/6  同步发布文件、源码与工程配置到 release 目录"
 Copy-One (Join-Path $SourceDir 'main.js')       (Join-Path $ReleaseDir 'main.js')
 Copy-One (Join-Path $SourceDir 'manifest.json') (Join-Path $ReleaseDir 'manifest.json')
 Copy-One (Join-Path $SourceDir 'styles.css')    (Join-Path $ReleaseDir 'styles.css')
 Copy-One (Join-Path $SourceDir 'CHANGELOG.md')  (Join-Path $ReleaseDir 'CHANGELOG.md')
+Copy-One (Join-Path $SourceDir 'package.json')  (Join-Path $ReleaseDir 'package.json')
+Copy-One (Join-Path $SourceDir 'package-lock.json') (Join-Path $ReleaseDir 'package-lock.json')
+Copy-One (Join-Path $SourceDir 'versions.json') (Join-Path $ReleaseDir 'versions.json')
+Copy-One (Join-Path $SourceDir 'esbuild.config.mjs') (Join-Path $ReleaseDir 'esbuild.config.mjs')
+Copy-One (Join-Path $SourceDir 'eslint.config.mjs') (Join-Path $ReleaseDir 'eslint.config.mjs')
+Copy-One (Join-Path $SourceDir 'tsconfig.json') (Join-Path $ReleaseDir 'tsconfig.json')
+Copy-Tree (Join-Path $SourceDir 'src') (Join-Path $ReleaseDir 'src')
 
 # ============ Step 3. 同步到 Obsidian vault ============
 Write-Step ("Step 3/6  同步到 Obsidian vault (" + $VaultDir + ")")

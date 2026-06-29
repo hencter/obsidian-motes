@@ -134,7 +134,7 @@ export function renderImageGrid(
  */
 export function openLightbox(images: ImageRef[], startIndex: number): void {
   let cur = startIndex;
-  const backdrop = document.body.createDiv({ cls: "memoria-lightbox" });
+  const backdrop = activeDocument.body.createDiv({ cls: "memoria-lightbox" });
   const stage = backdrop.createDiv({ cls: "memoria-lightbox-stage" });
   const imgEl = stage.createEl("img", { cls: "memoria-lightbox-img" });
   const counter = backdrop.createDiv({ cls: "memoria-lightbox-counter" });
@@ -167,7 +167,7 @@ export function openLightbox(images: ImageRef[], startIndex: number): void {
 
   const close = () => {
     backdrop.remove();
-    document.removeEventListener("keydown", onKey);
+    activeDocument.removeEventListener("keydown", onKey);
   };
   const prev = () => {
     if (cur > 0) {
@@ -205,5 +205,5 @@ export function openLightbox(images: ImageRef[], startIndex: number): void {
     else if (e.key === "ArrowLeft") prev();
     else if (e.key === "ArrowRight") next();
   };
-  document.addEventListener("keydown", onKey);
+  activeDocument.addEventListener("keydown", onKey);
 }

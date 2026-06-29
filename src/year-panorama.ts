@@ -172,7 +172,9 @@ export class YearPanoramaView extends ItemView {
         });
         if (!isOut && count > 0) {
           cell.setAttr("aria-label", t("year.dayHover", { date: key, n: count }));
-          cell.addEventListener("click", () => this.jumpToDate(key));
+          cell.addEventListener("click", () => {
+            void this.jumpToDate(key);
+          });
         } else if (!isOut) {
           cell.setAttr("aria-label", key);
         }
@@ -210,7 +212,7 @@ export class YearPanoramaView extends ItemView {
         active: true,
       });
     }
-    this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.revealLeaf(leaf);
 
     const view = leaf.view;
     if (view instanceof MemoriaView) {

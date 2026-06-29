@@ -317,7 +317,7 @@ export function renderEgg(
     if (!v) {
       input.focus();
       input.classList.add("is-error");
-      setTimeout(() => input.classList.remove("is-error"), 600);
+      window.setTimeout(() => input.classList.remove("is-error"), 600);
       return;
     }
     hatching = true;
@@ -331,5 +331,5 @@ export function renderEgg(
       submit();
     }
   });
-  setTimeout(() => input.focus(), 50);
+  window.setTimeout(() => input.focus(), 50);
 }

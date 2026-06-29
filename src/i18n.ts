@@ -1041,7 +1041,7 @@ export function initLocale(setting: LocaleKey): void {
   currentDict = resolved === "en-US" ? enUS : zhCN;
 }
 
-/** 把 "auto" 映射到具体语言：检测 Obsidian 的 moment.locale() 或 document lang */
+/** 把 "auto" 映射到具体语言：检测 Obsidian 的 moment.locale() 或 activeDocument lang */
 function resolveLocale(setting: LocaleKey): "zh-CN" | "en-US" {
   if (setting === "zh-CN") return "zh-CN";
   if (setting === "en-US") return "en-US";
@@ -1056,11 +1056,11 @@ function resolveLocale(setting: LocaleKey): "zh-CN" | "en-US" {
     /* moment 不可用 */
   }
   try {
-    const lang = document.documentElement.lang.toLowerCase();
+    const lang = activeDocument.documentElement.lang.toLowerCase();
     if (lang.startsWith("zh")) return "zh-CN";
     if (lang.startsWith("en")) return "en-US";
   } catch {
-    /* document 不可用 */
+    /* activeDocument 不可用 */
   }
   // 默认中文（因为 Memoria 最初是中文插件，保持兼容）
   return "zh-CN";

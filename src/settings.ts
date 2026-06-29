@@ -211,7 +211,9 @@ export class MemoriaSettingTab extends PluginSettingTab {
           })
       );
 
-    containerEl.createEl("h3", { text: t("settings.heading.newFeatures") });
+    new Setting(containerEl)
+      .setName(t("settings.heading.newFeatures"))
+      .setHeading();
 
     new Setting(containerEl)
       .setName(t("settings.density.name"))
@@ -309,7 +311,9 @@ export class MemoriaSettingTab extends PluginSettingTab {
           })
       );
 
-    containerEl.createEl("h3", { text: t("settings.heading.about") });
+    new Setting(containerEl)
+      .setName(t("settings.heading.about"))
+      .setHeading();
     const p = containerEl.createEl("p", {
       cls: "setting-item-description",
     });

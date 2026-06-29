@@ -62,7 +62,7 @@ export function replaceTextareaRange(
   try {
     el.focus();
     el.setSelectionRange(start, end);
-    if (document.execCommand("insertText", false, newText)) {
+    if (activeDocument.execCommand("insertText", false, newText)) {
       // execCommand 会触发 input 事件，无需手动派发
       return;
     }

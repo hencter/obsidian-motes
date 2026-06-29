@@ -163,8 +163,10 @@ function loadRecentShown(): string[] {
   try {
     const raw = window.localStorage.getItem(RECENT_SHOWN_KEY);
     if (!raw) return [];
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr.filter((x) => typeof x === "string") : [];
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed.filter((x): x is string => typeof x === "string")
+      : [];
   } catch {
     return [];
   }

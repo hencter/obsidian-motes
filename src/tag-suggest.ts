@@ -69,7 +69,7 @@ export class TagSuggest {
 
   private handleBlur = (): void => {
     // 延迟，给 mousedown 一个机会触发选择
-    setTimeout(() => this.close(), 150);
+    window.setTimeout(() => this.close(), 150);
   };
 
   private handleKeydown = (e: KeyboardEvent): void => {
@@ -197,7 +197,7 @@ export class TagSuggest {
 
   private render(): void {
     if (!this.dropdown) {
-      this.dropdown = document.body.createDiv({ cls: "memoria-tag-suggest" });
+      this.dropdown = activeDocument.body.createDiv({ cls: "memoria-tag-suggest" });
       // 阻止点击下拉框时 textarea 的 blur 抢先关闭
       this.dropdown.addEventListener("mousedown", (e) => e.preventDefault());
     }

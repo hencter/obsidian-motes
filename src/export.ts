@@ -61,7 +61,7 @@ export async function exportMemos(app: App, opts: ExportOptions): Promise<string
       content = renderJson(memos, filterDesc);
       break;
     default:
-      throw new Error(`Unknown format: ${format}`);
+      throw new Error("Unknown export format");
   }
 
   await app.vault.create(filePath, content);

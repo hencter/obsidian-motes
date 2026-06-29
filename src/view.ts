@@ -55,6 +55,7 @@ interface Filter {
 }
 
 export class MemoriaView extends ItemView {
+  private workspaceLeafEl: HTMLElement | null = null;
   private filter: Filter = {
     tag: null,
     year: null,
@@ -160,6 +161,8 @@ export class MemoriaView extends ItemView {
   }
 
   async onOpen(): Promise<void> {
+    this.workspaceLeafEl = this.contentEl.closest(".workspace-leaf");
+    this.workspaceLeafEl?.addClass("memoria-workspace-leaf");
     this.contentEl.addClass("memoria-root");
     this.buildLayout();
     this.unsubscribe = this.store.onChange(() => this.renderAll());
@@ -173,7 +176,7 @@ export class MemoriaView extends ItemView {
       this.contentEl,
       "keydown",
       (evt) => {
-        const active = document.activeElement;
+        const active = activeDocument.activeElement;
         const insideView =
           active instanceof HTMLElement && this.contentEl.contains(active);
         if (!insideView) return;
@@ -181,7 +184,7 @@ export class MemoriaView extends ItemView {
           evt.preventDefault();
           evt.stopPropagation();
           evt.stopImmediatePropagation();
-          this.submitMemo();
+          void this.submitMemo();
         }
       },
       true // capture 阶段
@@ -203,6 +206,8 @@ export class MemoriaView extends ItemView {
   }
 
   async onClose(): Promise<void> {
+    this.workspaceLeafEl?.removeClass("memoria-workspace-leaf");
+    this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
     if (this.tagSuggest) {
       this.tagSuggest.destroy();
@@ -327,7 +332,7 @@ export class MemoriaView extends ItemView {
         VIEW_TYPE_MEMORIA_YEAR
       );
       if (existing.length) {
-        this.app.workspace.revealLeaf(existing[0]);
+        await this.app.workspace.revealLeaf(existing[0]);
         return;
       }
       const leaf = this.app.workspace.getLeaf("tab");
@@ -335,7 +340,7 @@ export class MemoriaView extends ItemView {
         type: VIEW_TYPE_MEMORIA_YEAR,
         active: true,
       });
-      this.app.workspace.revealLeaf(leaf);
+      await this.app.workspace.revealLeaf(leaf);
     });
 
     const statsBtn = tools.createEl("button", {
@@ -349,7 +354,7 @@ export class MemoriaView extends ItemView {
         VIEW_TYPE_MEMORIA_STATS
       );
       if (existing.length) {
-        this.app.workspace.revealLeaf(existing[0]);
+        await this.app.workspace.revealLeaf(existing[0]);
         return;
       }
       const leaf = this.app.workspace.getLeaf("tab");
@@ -357,7 +362,7 @@ export class MemoriaView extends ItemView {
         type: VIEW_TYPE_MEMORIA_STATS,
         active: true,
       });
-      this.app.workspace.revealLeaf(leaf);
+      await this.app.workspace.revealLeaf(leaf);
     });
 
     // 移动端折叠侧栏按钮
@@ -397,8 +402,8 @@ export class MemoriaView extends ItemView {
       const target = e.target as HTMLElement;
       // 在输入控件聚焦时不拦截（正常打字）
       if (
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
+        target.instanceOf(HTMLInputElement) ||
+        target.instanceOf(HTMLTextAreaElement) ||
         target.isContentEditable
       ) {
         return;
@@ -436,7 +441,7 @@ export class MemoriaView extends ItemView {
     // 输入卡片内的关闭按钮（fab 模式下才显示，CSS 控制可见性）
     const inputCard = this.inputEl?.closest(
       ".memoria-input-card"
-    ) as HTMLElement | null;
+    );
     if (inputCard) {
       const closeBtn = inputCard.createEl("button", {
         cls: "memoria-input-close",
@@ -476,8 +481,8 @@ export class MemoriaView extends ItemView {
   private expandFabInput(): void {
     this.contentEl.addClass("is-fab-expanded");
     // 等待 CSS 过渡帧再聚焦，让动画与键盘弹起更同步
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
         this.inputEl?.focus();
         // v2.3.3: 展开长草稿时把光标移到末尾（接着上次写）。
         //   定位不再靠 JS scrollIntoView —— 改用 CSS 把 FAB 展开态的输入卡片
@@ -547,7 +552,7 @@ export class MemoriaView extends ItemView {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        this.submitMemo();
+        void this.submitMemo();
         return;
       }
       // IME 组合态守卫（只保护下面的 Escape / Tab / 列表续行，不影响发送）
@@ -724,7 +729,9 @@ export class MemoriaView extends ItemView {
       cls: "memoria-submit-btn",
     });
     submitBtn.setText(t("input.submit"));
-    submitBtn.addEventListener("click", () => this.submitMemo());
+    submitBtn.addEventListener("click", () => {
+      void this.submitMemo();
+    });
   }
 
   /** 在光标处插入文本。
@@ -776,14 +783,14 @@ export class MemoriaView extends ItemView {
     //
     //   只要 value 为空，无论字体多大都肯定不需要撑高，直接清 inline 即可。
     if (el.value.length === 0) {
-      el.style.height = "";
-      requestAnimationFrame(() => {
+      el.setCssStyles({ height: "" });
+      window.requestAnimationFrame(() => {
         el.classList.remove("memoria-no-transition");
       });
       return;
     }
 
-    el.style.height = "auto";
+    el.setCssStyles({ height: "auto" });
     // 加 2px 吸收边界误差，避免 scrollHeight 比实际需要略小导致行末被裁
     const contentHeight = el.scrollHeight + 2;
     // v2.0.17: 渐进式披露的收起/展开态由 CSS 的 min-height 负责过渡动画
@@ -795,13 +802,13 @@ export class MemoriaView extends ItemView {
     const expandedMin = Platform.isMobile ? 56 : 96;
     if (contentHeight <= expandedMin) {
       // 内容不够撑高，让 CSS min-height 掌控（收起时 40，展开时 96）
-      el.style.height = "";
+      el.setCssStyles({ height: "" });
     } else {
       // 内容超过展开态最小值，按 scrollHeight 撑高
-      el.style.height = `${contentHeight}px`;
+      el.setCssStyles({ height: `${contentHeight}px` });
     }
     // 下一帧恢复 transition（hover/focus 切换时动画正常）
-    requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       el.classList.remove("memoria-no-transition");
     });
   }
@@ -819,7 +826,7 @@ export class MemoriaView extends ItemView {
    */
   private syncInputCardContentState(): void {
     if (!this.inputEl) return;
-    const card = this.inputEl.closest(".memoria-input-card") as HTMLElement | null;
+    const card = this.inputEl.closest(".memoria-input-card");
     if (!card) return;
     const hasContent = this.inputEl.value.length > 0;
     card.toggleClass("has-content", hasContent);
@@ -1075,7 +1082,7 @@ export class MemoriaView extends ItemView {
    */
   private showTablePicker(anchor: HTMLElement): void {
     // 若已有弹层则关闭
-    const existing = document.querySelector(".memoria-table-picker");
+    const existing = activeDocument.querySelector(".memoria-table-picker");
     if (existing) {
       existing.remove();
       return;
@@ -1086,7 +1093,7 @@ export class MemoriaView extends ItemView {
     //   - 手机 8×8 32px → 5×5 36px（更大的点击热区 + 5×5 在任何手机上都放得下，不再溢出屏幕）
     const isMobile = Platform.isMobile;
     const MAX = isMobile ? 5 : 6;
-    const pop = document.body.createDiv({
+    const pop = activeDocument.body.createDiv({
       cls: "memoria-table-picker" + (isMobile ? " is-mobile" : ""),
     });
 
@@ -1166,25 +1173,29 @@ export class MemoriaView extends ItemView {
     //   - 手机：直接屏幕居中（原来贴按钮，按钮在工具栏中右部，弹层会溢出屏幕右边）
     //   都要等一帧再测量（让 grid 渲染完拿到真实尺寸）
     if (isMobile) {
-      pop.style.left = "50%";
-      pop.style.top = "50%";
-      pop.style.transform = "translate(-50%, -50%)";
+      pop.setCssStyles({
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+      });
     } else {
       const rect = anchor.getBoundingClientRect();
       // 先放到按钮下方
-      pop.style.left = `${Math.round(rect.left)}px`;
-      pop.style.top = `${Math.round(rect.bottom + 6)}px`;
+      pop.setCssStyles({
+        left: `${Math.round(rect.left)}px`,
+        top: `${Math.round(rect.bottom + 6)}px`,
+      });
       // 下一帧根据实际尺寸夹紧（避免右侧溢出）
-      requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
         const pr = pop.getBoundingClientRect();
-        const vw = document.documentElement.clientWidth;
-        const vh = document.documentElement.clientHeight;
+        const vw = activeDocument.documentElement.clientWidth;
+        const vh = activeDocument.documentElement.clientHeight;
         if (pr.right > vw - 8) {
-          pop.style.left = `${Math.max(8, vw - pr.width - 8)}px`;
+          pop.setCssStyles({ left: `${Math.max(8, vw - pr.width - 8)}px` });
         }
         if (pr.bottom > vh - 8) {
           // 下方放不下 → 翻到按钮上方
-          pop.style.top = `${Math.max(8, rect.top - pr.height - 6)}px`;
+          pop.setCssStyles({ top: `${Math.max(8, rect.top - pr.height - 6)}px` });
         }
       });
     }
@@ -1194,20 +1205,20 @@ export class MemoriaView extends ItemView {
       const t = e.target as Node;
       if (!pop.contains(t) && t !== anchor) {
         pop.remove();
-        document.removeEventListener("mousedown", closeOnOutside, true);
-        document.removeEventListener("touchstart", closeOnOutside, true);
+        activeDocument.removeEventListener("mousedown", closeOnOutside, true);
+        activeDocument.removeEventListener("touchstart", closeOnOutside, true);
       }
     };
     // 延后一帧注册，避免和当前点击事件冲突
-    setTimeout(() => {
-      document.addEventListener("mousedown", closeOnOutside, true);
-      document.addEventListener("touchstart", closeOnOutside, true);
+    window.setTimeout(() => {
+      activeDocument.addEventListener("mousedown", closeOnOutside, true);
+      activeDocument.addEventListener("touchstart", closeOnOutside, true);
     }, 0);
     // v1.1.15: 视图关闭时清理残留弹层（防止切视图后还挂在 body 上）
     this.register(() => {
       pop.remove();
-      document.removeEventListener("mousedown", closeOnOutside, true);
-      document.removeEventListener("touchstart", closeOnOutside, true);
+      activeDocument.removeEventListener("mousedown", closeOnOutside, true);
+      activeDocument.removeEventListener("touchstart", closeOnOutside, true);
     });
   }
 
@@ -1242,7 +1253,7 @@ export class MemoriaView extends ItemView {
 
   /** 用浏览器 file picker 选图片 */
   private pickImageFromDisk(): void {
-    const inp = document.createElement("input");
+    const inp = activeDocument.createElement("input");
     inp.type = "file";
     inp.accept = "image/*";
     inp.multiple = true;
@@ -2022,7 +2033,7 @@ export class MemoriaView extends ItemView {
   /** v2.1.0-iter10: 异步输入弹窗（基于 confirmAsync 改造）—— 比浏览器原生 prompt() 不劫持焦点 */
   private promptAsync(title: string, defaultValue: string): Promise<string | null> {
     return new Promise((resolve) => {
-      const backdrop = document.body.createDiv({ cls: "memoria-modal-backdrop" });
+      const backdrop = activeDocument.body.createDiv({ cls: "memoria-modal-backdrop" });
       const box = backdrop.createDiv({ cls: "memoria-modal memoria-confirm" });
       box.createDiv({ cls: "memoria-modal-title", text: title });
       const input = box.createEl("input", {
@@ -2040,7 +2051,7 @@ export class MemoriaView extends ItemView {
       let pendingMouseUp: ((ev: MouseEvent) => void) | null = null;
       const cleanup = () => {
         if (pendingMouseUp) {
-          document.removeEventListener("mouseup", pendingMouseUp, true);
+          activeDocument.removeEventListener("mouseup", pendingMouseUp, true);
           pendingMouseUp = null;
         }
       };
@@ -2048,17 +2059,17 @@ export class MemoriaView extends ItemView {
         if (settled) return;
         settled = true;
         backdrop.remove();
-        document.removeEventListener("keydown", onKey, true);
+        activeDocument.removeEventListener("keydown", onKey, true);
         cleanup();
-        setTimeout(() => resolve(null), 0);
+        window.setTimeout(() => resolve(null), 0);
       });
       const close = (result: string | null) => {
         if (settled) return;
         settled = true;
         backdrop.remove();
-        document.removeEventListener("keydown", onKey, true);
+        activeDocument.removeEventListener("keydown", onKey, true);
         cleanup();
-        setTimeout(() => resolve(result), 0);
+        window.setTimeout(() => resolve(result), 0);
       };
       const onKey = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
@@ -2075,16 +2086,16 @@ export class MemoriaView extends ItemView {
         if (e.target !== backdrop) return;
         cleanup();
         const up = (ev: MouseEvent) => {
-          document.removeEventListener("mouseup", up, true);
+          activeDocument.removeEventListener("mouseup", up, true);
           pendingMouseUp = null;
           if (ev.target === backdrop) close(null);
         };
         pendingMouseUp = up;
-        document.addEventListener("mouseup", up, true);
+        activeDocument.addEventListener("mouseup", up, true);
       });
-      document.addEventListener("keydown", onKey, true);
+      activeDocument.addEventListener("keydown", onKey, true);
       // 自动聚焦 + 全选（方便直接覆盖）
-      setTimeout(() => {
+      window.setTimeout(() => {
         input.focus();
         input.select();
       }, 50);
@@ -2114,7 +2125,7 @@ export class MemoriaView extends ItemView {
     if (isDone && this.dailyGoalNoticedDate !== todayStr) {
       this.dailyGoalNoticedDate = todayStr;
       // 延迟一点让 Notice 显示在侧栏渲染完成之后（避免和初始化的其他 Notice 挤在一起）
-      setTimeout(() => {
+      window.setTimeout(() => {
         new Notice(t("notice.dailyGoalDone", { n: todayCount }));
       }, 200);
     }
@@ -2250,7 +2261,7 @@ export class MemoriaView extends ItemView {
             this.filter.preset = "all";
             this.renderList();
           });
-          cell.style.cursor = "pointer";
+          cell.addClass("memoria-clickable");
         } else {
           cell.setAttr(
             "title",
@@ -2269,7 +2280,7 @@ export class MemoriaView extends ItemView {
     memos: Memo[]
   ): void {
     this.hideHeatmapTooltip();
-    const tip = document.body.createDiv({ cls: "memoria-heatmap-tooltip" });
+    const tip = activeDocument.body.createDiv({ cls: "memoria-heatmap-tooltip" });
     const head = tip.createDiv({ cls: "memoria-heatmap-tooltip-head" });
     head.createSpan({ text: dateKey });
     head.createSpan({
@@ -2304,10 +2315,12 @@ export class MemoriaView extends ItemView {
 
     // 定位：在格子右上方显示，视口边缘防溢出
     const rect = anchor.getBoundingClientRect();
-    tip.style.position = "fixed";
-    tip.style.left = Math.min(rect.right + 8, window.innerWidth - 280) + "px";
-    tip.style.top = Math.max(8, rect.top - 4) + "px";
-    tip.style.zIndex = "1000";
+    tip.setCssStyles({
+      position: "fixed",
+      left: Math.min(rect.right + 8, window.innerWidth - 280) + "px",
+      top: Math.max(8, rect.top - 4) + "px",
+      zIndex: "1000",
+    });
     this.heatmapTooltipEl = tip;
   }
   private hideHeatmapTooltip(): void {
@@ -2777,7 +2790,7 @@ export class MemoriaView extends ItemView {
       let startY = 0;
       const cancel = () => {
         if (pressTimer !== null) {
-          clearTimeout(pressTimer);
+          window.clearTimeout(pressTimer);
           pressTimer = null;
         }
       };
@@ -2893,7 +2906,7 @@ export class MemoriaView extends ItemView {
         ).then(() => {
           // render 是异步的，完成后把当前 body 里的所有子节点克隆一份存到缓存。
           // 用 DocumentFragment 承载（轻量，没有多余包装元素）。
-          const frag = document.createDocumentFragment();
+          const frag = activeDocument.createDocumentFragment();
           for (const child of Array.from(body.childNodes)) {
             frag.appendChild(child.cloneNode(true));
           }
@@ -2948,7 +2961,7 @@ export class MemoriaView extends ItemView {
     //   改到最后调用 —— 这样按钮能放到 card 的最后一个元素（tagRow 或 imgGrid）里做水平对齐，
     //   不会因为"body 后面还有图片/标签"而错位。
     if (textForMd.trim()) {
-      const body = card.querySelector(".memoria-card-body") as HTMLElement | null;
+      const body = card.querySelector(".memoria-card-body");
       if (body) this.applyCollapseIfNeeded(body, card);
     }
   }
@@ -2996,7 +3009,7 @@ export class MemoriaView extends ItemView {
 
     boxes.forEach((box, i) => {
       box.disabled = false;
-      box.style.cursor = "pointer";
+      box.addClass("memoria-clickable");
       box.addEventListener("click", async (e) => {
         e.stopPropagation();
         const lineNum = taskLineNums[i];
@@ -3069,10 +3082,10 @@ export class MemoriaView extends ItemView {
         if (!href) return;
         // 按住 Ctrl/Cmd 或中键 → 新 tab 打开；否则当前 tab
         const newLeaf =
-          (e as MouseEvent).ctrlKey ||
-          (e as MouseEvent).metaKey ||
-          (e as MouseEvent).button === 1;
-        this.app.workspace.openLinkText(href, memo.file, newLeaf);
+          (e).ctrlKey ||
+          (e).metaKey ||
+          (e).button === 1;
+        void this.app.workspace.openLinkText(href, memo.file, newLeaf);
         return;
       }
 
@@ -3139,23 +3152,23 @@ export class MemoriaView extends ItemView {
         if (!re.test(text)) return;
         re.lastIndex = 0;
         // 把命中位置切开，在命中处插入 <mark>
-        const frag = document.createDocumentFragment();
+        const frag = activeDocument.createDocumentFragment();
         let lastIdx = 0;
         let m: RegExpExecArray | null;
         while ((m = re.exec(text)) !== null) {
           if (m.index > lastIdx) {
             frag.appendChild(
-              document.createTextNode(text.slice(lastIdx, m.index))
+              activeDocument.createTextNode(text.slice(lastIdx, m.index))
             );
           }
-          const mark = document.createElement("mark");
+          const mark = activeDocument.createElement("mark");
           mark.className = "memoria-search-hit";
           mark.textContent = m[0];
           frag.appendChild(mark);
           lastIdx = m.index + m[0].length;
         }
         if (lastIdx < text.length) {
-          frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+          frag.appendChild(activeDocument.createTextNode(text.slice(lastIdx)));
         }
         node.parentNode?.replaceChild(frag, node);
         return;
@@ -3190,8 +3203,8 @@ export class MemoriaView extends ItemView {
     if (lineLimit <= 0) return;
 
     // 等两帧让 markdown / 代码块 / 表格 都 layout 完
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
         const style = window.getComputedStyle(body);
         let lineH = parseFloat(style.lineHeight);
         if (!isFinite(lineH) || lineH <= 0) {
@@ -3230,7 +3243,7 @@ export class MemoriaView extends ItemView {
         const placeBtn = () => {
           const tagRow = card.querySelector(
             ".memoria-card-tags"
-          ) as HTMLElement | null;
+          );
           if (tagRow) {
             // 标签行：appendChild 让按钮成为标签的最后一个 flex 子元素
             // CSS .memoria-collapse-toggle { margin-left: auto } 推到行尾右对齐
@@ -3351,7 +3364,7 @@ export class MemoriaView extends ItemView {
         .onClick(async () => {
           // 使用自定义确认浮层（替代浏览器原生 confirm()）
           // 原因：原生 confirm() 是 modal blocking 弹窗，关闭后会把焦点还给
-          //       document.body，导致输入框 textarea 需要再点击一次才能获得光标。
+          //       activeDocument.body，导致输入框 textarea 需要再点击一次才能获得光标。
           const ok = await this.confirmAsync(t("notice.confirmDelete"));
           if (!ok) return;
           await this.store.deleteMemo(memo);
@@ -3373,7 +3386,7 @@ export class MemoriaView extends ItemView {
    */
   private confirmAsync(message: string): Promise<boolean> {
     return new Promise((resolve) => {
-      const backdrop = document.body.createDiv({
+      const backdrop = activeDocument.body.createDiv({
         cls: "memoria-modal-backdrop",
       });
       const box = backdrop.createDiv({ cls: "memoria-modal memoria-confirm" });
@@ -3386,12 +3399,12 @@ export class MemoriaView extends ItemView {
       //   backdrop 会作为幽灵蒙版留在 DOM 上。
       // v2.0.19: 同时清理 mousedown 里挂出的 pending mouseup listener
       //   （场景同 main.ts quickCapture 的 v1.4.11 修复：用户 mousedown 后拖出窗口
-      //   松开，mouseup 永远触发不了；原实现会导致这个 listener 永久残留在 document 上）
+      //   松开，mouseup 永远触发不了；原实现会导致这个 listener 永久残留在 activeDocument 上）
       let settled = false;
       let pendingMouseUp: ((ev: MouseEvent) => void) | null = null;
       const cleanupPendingMouseUp = () => {
         if (pendingMouseUp) {
-          document.removeEventListener("mouseup", pendingMouseUp, true);
+          activeDocument.removeEventListener("mouseup", pendingMouseUp, true);
           pendingMouseUp = null;
         }
       };
@@ -3399,19 +3412,19 @@ export class MemoriaView extends ItemView {
         if (settled) return;
         settled = true;
         backdrop.remove();
-        document.removeEventListener("keydown", onKey, true);
+        activeDocument.removeEventListener("keydown", onKey, true);
         cleanupPendingMouseUp();
-        setTimeout(() => resolve(false), 0);
+        window.setTimeout(() => resolve(false), 0);
       });
 
       const close = (result: boolean) => {
         if (settled) return;
         settled = true;
         backdrop.remove();
-        document.removeEventListener("keydown", onKey, true);
+        activeDocument.removeEventListener("keydown", onKey, true);
         cleanupPendingMouseUp();
         // 延后一帧再 resolve，确保 DOM 卸载完成
-        setTimeout(() => resolve(result), 0);
+        window.setTimeout(() => resolve(result), 0);
       };
       const onKey = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
@@ -3434,16 +3447,16 @@ export class MemoriaView extends ItemView {
         if (e.target !== backdrop) return;
         cleanupPendingMouseUp();
         const up = (ev: MouseEvent) => {
-          document.removeEventListener("mouseup", up, true);
+          activeDocument.removeEventListener("mouseup", up, true);
           pendingMouseUp = null;
           if (ev.target === backdrop) close(false);
         };
         pendingMouseUp = up;
-        document.addEventListener("mouseup", up, true);
+        activeDocument.addEventListener("mouseup", up, true);
       });
-      document.addEventListener("keydown", onKey, true);
+      activeDocument.addEventListener("keydown", onKey, true);
       // 默认聚焦「确认」按钮，方便键盘 Enter
-      setTimeout(() => ok.focus(), 20);
+      window.setTimeout(() => ok.focus(), 20);
     });
   }
 
@@ -3458,15 +3471,19 @@ export class MemoriaView extends ItemView {
     if (!this.inputEl) return;
     try {
       this.inputEl.blur();
-    } catch {}
-    setTimeout(() => {
+    } catch {
+      // Best effort only; the element may already be detached.
+    }
+    window.setTimeout(() => {
       try {
         // 不强抢焦点，只是"激活"一次 textarea 让它后续能正常响应
         this.inputEl.setSelectionRange(
           this.inputEl.value.length,
           this.inputEl.value.length
         );
-      } catch {}
+      } catch {
+        // Best effort only; the view may close before this timer runs.
+      }
     }, 20);
   }
 
@@ -3534,8 +3551,8 @@ export class MemoriaView extends ItemView {
     const PAD_BOTTOM = 40;
 
     const isDark =
-      document.body.hasClass("theme-dark") ||
-      document.documentElement.hasClass("theme-dark");
+      activeDocument.body.hasClass("theme-dark") ||
+      activeDocument.documentElement.hasClass("theme-dark");
 
     // ========== 主题色板（v1.2.3） ==========
     type Palette = {
@@ -4415,57 +4432,51 @@ export class MemoriaView extends ItemView {
   }
 
   /** SVG 字符串 → PNG Blob（可能因 tainted canvas 抛错） */
-  private svgToPngBlob(
+  private async svgToPngBlob(
     svg: string,
     width: number,
     height: number,
     scale: number
   ): Promise<Blob> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const img = new Image();
-        img.width = width;
-        img.height = height;
-        await new Promise<void>((res, rej) => {
-          img.onload = () => res();
-          img.onerror = () => rej(new Error("SVG 渲染失败"));
-          img.src = url;
-        });
-        const canvas = document.createElement("canvas");
-        canvas.width = width * scale;
-        canvas.height = height * scale;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          URL.revokeObjectURL(url);
-          return reject(new Error("canvas 不可用"));
-        }
-        ctx.scale(scale, scale);
-        ctx.drawImage(img, 0, 0, width, height);
-        URL.revokeObjectURL(url);
-
-        // 这里是关键 —— toBlob 会在 tainted 时抛 SecurityError
-        canvas.toBlob((b) => {
-          if (b) resolve(b);
+    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    try {
+      const img = new Image();
+      img.width = width;
+      img.height = height;
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("SVG 渲染失败"));
+        img.src = url;
+      });
+      const canvas = activeDocument.createElement("canvas");
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("canvas 不可用");
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0, width, height);
+      return await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((result) => {
+          if (result) resolve(result);
           else reject(new Error("canvas.toBlob 返回 null（通常是 tainted canvas）"));
         }, "image/png");
-      } catch (e) {
-        reject(e);
-      }
-    });
+      });
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   /** 触发浏览器下载一个 Blob */
   private downloadBlob(blob: Blob, filename: string): void {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = activeDocument.createElement("a");
     a.href = url;
     a.download = filename;
-    document.body.appendChild(a);
+    activeDocument.body.appendChild(a);
     a.click();
     a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 }
 

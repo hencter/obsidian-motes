@@ -8,6 +8,7 @@ import { t, getCurrentLocale } from "./i18n";
 export class StatsView extends ItemView {
   private memos: Memo[] = [];
   private unsubscribe: (() => void) | null = null;
+  private workspaceLeafEl: HTMLElement | null = null;
 
   constructor(leaf: WorkspaceLeaf, private store: MemoStore) {
     super(leaf);
@@ -26,6 +27,8 @@ export class StatsView extends ItemView {
   }
 
   async onOpen(): Promise<void> {
+    this.workspaceLeafEl = this.contentEl.closest(".workspace-leaf");
+    this.workspaceLeafEl?.addClass("memoria-stats-workspace-leaf");
     this.contentEl.addClass("memoria-stats-view");
     this.memos = this.store.getAll();
     this.render();
@@ -36,6 +39,8 @@ export class StatsView extends ItemView {
   }
 
   async onClose(): Promise<void> {
+    this.workspaceLeafEl?.removeClass("memoria-stats-workspace-leaf");
+    this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
   }
 
@@ -242,7 +247,7 @@ export class StatsView extends ItemView {
                 : t("stats.heatmap.dayCount", { date: key, n: count }),
             },
           });
-          if (level === -1) cell.style.visibility = "hidden";
+          if (level === -1) cell.addClass("is-outside-range");
         }
       }
 
@@ -415,7 +420,7 @@ export class StatsView extends ItemView {
       text: t("stats.hourly.subtitle", { n: this.memos.length }),
     });
 
-    const buckets = new Array(24).fill(0);
+    const buckets: number[] = Array.from({ length: 24 }, () => 0);
     for (const m of this.memos) buckets[m.datetime.getHours()]++;
     const max = Math.max(1, ...buckets);
 
@@ -552,7 +557,7 @@ export class StatsView extends ItemView {
     );
 
     // ===== 最常写的星期几 =====
-    const weekdayCounter = new Array(7).fill(0);
+    const weekdayCounter: number[] = Array.from({ length: 7 }, () => 0);
     for (const m of this.memos) weekdayCounter[m.datetime.getDay()]++;
     const wdMax = Math.max(...weekdayCounter);
     const wdIdx = weekdayCounter.indexOf(wdMax);

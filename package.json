@@ -1,11 +1,12 @@
 {
   "name": "memoria",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "Memoria - Obsidian memos plugin with pure markdown storage",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
-    "build": "node esbuild.config.mjs production"
+    "build": "node esbuild.config.mjs production",
+    "lint": "eslint src"
   },
   "keywords": [
     "obsidian",
@@ -17,8 +18,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "builtin-modules": "^3.3.0",
-    "esbuild": "0.24.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "esbuild": "^0.28.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-obsidianmd": "^0.3.0",
     "obsidian": "latest",
     "tslib": "2.8.1",
     "typescript": "5.7.2"

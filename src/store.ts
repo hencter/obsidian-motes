@@ -182,8 +182,8 @@ export class MemoStore {
       );
       await this.app.vault.modify(file, next);
     }
-    const f = this.app.vault.getAbstractFileByPath(filePath) as TFile;
-    if (f) await this.reloadFile(f);
+    const f = this.app.vault.getAbstractFileByPath(filePath);
+    if (f instanceof TFile) await this.reloadFile(f);
   }
 
   /** 编辑一条 memo

@@ -48,46 +48,56 @@ export default class MemoriaPlugin extends Plugin {
     );
 
     // Ribbon 按钮
-    this.addRibbonIcon("feather", t("ribbon.openMemoria"), () => this.activateView());
+    this.addRibbonIcon("feather", t("ribbon.openMemoria"), () => {
+      void this.activateView();
+    });
 
     // 命令
     this.addCommand({
       id: "open-memoria",
       name: t("command.openMemoria"),
-      callback: () => this.activateView(),
+      callback: () => {
+        void this.activateView();
+      },
     });
 
     this.addCommand({
       id: "open-memoria-stats",
       name: t("command.openStats"),
-      callback: () => this.activateStatsView(),
+      callback: () => {
+        void this.activateStatsView();
+      },
     });
 
     this.addCommand({
       id: "open-memoria-year",
       name: t("command.openYear"),
-      callback: () => this.activateYearView(),
+      callback: () => {
+        void this.activateYearView();
+      },
     });
 
     this.addCommand({
       id: "memoria-quick-capture",
       name: t("command.quickCapture"),
-      // v1.1.9: 默认全局快捷键 Ctrl/Cmd+Shift+M —— 随时随地速记，不用进 Memoria 主界面
-      hotkeys: [{ modifiers: ["Mod", "Shift"], key: "M" }],
-      callback: () => this.quickCapture(),
+      callback: () => {
+        void this.quickCapture();
+      },
     });
 
     this.addCommand({
       id: "memoria-normalize-all",
       name: t("command.normalizeAll"),
-      callback: () => this.normalizeAll(),
+      callback: () => {
+        void this.normalizeAll();
+      },
     });
 
     // 文件变化监听
     this.registerEvent(
       this.app.vault.on("modify", (f) => {
         if (f instanceof TFile && this.store.isInFolder(f)) {
-          this.store.reloadFile(f);
+          void this.store.reloadFile(f);
         }
       })
     );
@@ -99,7 +109,7 @@ export default class MemoriaPlugin extends Plugin {
     this.registerEvent(
       this.app.vault.on("create", (f) => {
         if (f instanceof TFile && this.store.isInFolder(f)) {
-          this.store.reloadFile(f);
+          void this.store.reloadFile(f);
         }
       })
     );
@@ -107,7 +117,7 @@ export default class MemoriaPlugin extends Plugin {
       this.app.vault.on("rename", (f, old) => {
         this.store.removeFile(old);
         if (f instanceof TFile && this.store.isInFolder(f)) {
-          this.store.reloadFile(f);
+          void this.store.reloadFile(f);
         }
       })
     );
@@ -115,16 +125,17 @@ export default class MemoriaPlugin extends Plugin {
     this.addSettingTab(new MemoriaSettingTab(this.app, this));
   }
 
-  async onunload(): Promise<void> {
+  onunload(): void {
     // 由 Obsidian 自动清理视图
   }
 
   async loadSettings(): Promise<void> {
-    this.settings = Object.assign(
-      {},
-      DEFAULT_SETTINGS,
-      await this.loadData()
-    );
+    const loaded: unknown = await this.loadData();
+    const persisted =
+      typeof loaded === "object" && loaded !== null
+        ? (loaded as Partial<MemoriaSettings>)
+        : {};
+    this.settings = { ...DEFAULT_SETTINGS, ...persisted };
   }
 
   async saveSettings(): Promise<void> {
@@ -136,7 +147,7 @@ export default class MemoriaPlugin extends Plugin {
   async activateView(): Promise<void> {
     const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA);
     if (existing.length) {
-      this.app.workspace.revealLeaf(existing[0]);
+      await this.app.workspace.revealLeaf(existing[0]);
       return;
     }
     const leaf = this.app.workspace.getLeaf("tab");
@@ -144,7 +155,7 @@ export default class MemoriaPlugin extends Plugin {
       type: VIEW_TYPE_MEMORIA,
       active: true,
     });
-    this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.revealLeaf(leaf);
   }
 
   async activateStatsView(): Promise<void> {
@@ -152,7 +163,7 @@ export default class MemoriaPlugin extends Plugin {
       VIEW_TYPE_MEMORIA_STATS
     );
     if (existing.length) {
-      this.app.workspace.revealLeaf(existing[0]);
+      await this.app.workspace.revealLeaf(existing[0]);
       return;
     }
     const leaf = this.app.workspace.getLeaf("tab");
@@ -160,7 +171,7 @@ export default class MemoriaPlugin extends Plugin {
       type: VIEW_TYPE_MEMORIA_STATS,
       active: true,
     });
-    this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.revealLeaf(leaf);
   }
 
   async activateYearView(): Promise<void> {
@@ -168,7 +179,7 @@ export default class MemoriaPlugin extends Plugin {
       VIEW_TYPE_MEMORIA_YEAR
     );
     if (existing.length) {
-      this.app.workspace.revealLeaf(existing[0]);
+      await this.app.workspace.revealLeaf(existing[0]);
       return;
     }
     const leaf = this.app.workspace.getLeaf("tab");
@@ -176,7 +187,7 @@ export default class MemoriaPlugin extends Plugin {
       type: VIEW_TYPE_MEMORIA_YEAR,
       active: true,
     });
-    this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.revealLeaf(leaf);
   }
 
   /**
@@ -229,16 +240,16 @@ export default class MemoriaPlugin extends Plugin {
   private async quickCapture(): Promise<void> {
     // v1.1.15: 防重复打开 —— 连按两次 Ctrl+Shift+M 之前会挂两层 backdrop，
     //   第一次关只能关最上层，底下一层变成拦截所有点击的"幽灵蒙版"。
-    const existing = document.querySelector(
+    const existing = activeDocument.querySelector(
       ".memoria-modal-backdrop"
-    ) as HTMLElement | null;
+    );
     if (existing) {
       const ta0 = existing.querySelector<HTMLTextAreaElement>("textarea");
       if (ta0) ta0.focus();
       return;
     }
 
-    const backdrop = document.createElement("div");
+    const backdrop = activeDocument.createElement("div");
     backdrop.addClass("memoria-modal-backdrop");
     const box = backdrop.createDiv({ cls: "memoria-modal" });
     box.createDiv({
@@ -255,26 +266,26 @@ export default class MemoriaPlugin extends Plugin {
       text: t("quickCapture.send"),
       cls: "mod-cta",
     });
-    document.body.appendChild(backdrop);
+    activeDocument.body.appendChild(backdrop);
     // v1.1.15: 插件卸载 / 禁用时自动清理弹窗（避免残留蒙版和 listener）
     // v1.4.11: 同时清理 mousedown 里挂出的全局 mouseup listener（见下方 pendingMouseUp）
     let pendingMouseUp: ((ev: MouseEvent) => void) | null = null;
     this.register(() => {
       backdrop.remove();
       if (pendingMouseUp) {
-        document.removeEventListener("mouseup", pendingMouseUp, true);
+        activeDocument.removeEventListener("mouseup", pendingMouseUp, true);
         pendingMouseUp = null;
       }
     });
-    setTimeout(() => ta.focus(), 20);
+    window.setTimeout(() => ta.focus(), 20);
 
     // v1.1.10: textarea 高度自适应（和主输入框行为一致）
     const autoResize = () => {
-      ta.style.height = "auto";
-      ta.style.height = `${ta.scrollHeight + 2}px`;
+      ta.setCssStyles({ height: "auto" });
+      ta.setCssStyles({ height: `${ta.scrollHeight + 2}px` });
     };
     ta.addEventListener("input", autoResize);
-    setTimeout(autoResize, 0);
+    window.setTimeout(autoResize, 0);
 
     const close = () => backdrop.remove();
     const submit = async () => {
@@ -297,23 +308,23 @@ export default class MemoriaPlugin extends Plugin {
     //   "在 textarea 右下角 resize 拖拽时松手到 backdrop 上" 误判为点击，
     //   导致速记弹窗无故消失。改为更严格的 mousedown 起点判定 —— 只有
     //   "按下时就在 backdrop 自身"（不是从 box / textarea 拖出来的）才关闭。
-    // v1.4.11: 原实现每次 mousedown 都 document.addEventListener("mouseup",...)
+    // v1.4.11: 原实现每次 mousedown 都 activeDocument.addEventListener("mouseup",...)
     //   如果 mousedown 后用户把鼠标拖出浏览器窗口松手，mouseup 拿不到事件，
-    //   这个 listener 就永久挂在 document 上。现在用 pendingMouseUp 作为 slot，
+    //   这个 listener 就永久挂在 activeDocument 上。现在用 pendingMouseUp 作为 slot，
     //   新的 mousedown 覆盖前会先清理上一个。
     backdrop.addEventListener("mousedown", (e) => {
       if (e.target === backdrop) {
         // 清掉可能遗留的上一个 mouseup
         if (pendingMouseUp) {
-          document.removeEventListener("mouseup", pendingMouseUp, true);
+          activeDocument.removeEventListener("mouseup", pendingMouseUp, true);
         }
         const up = (ev: MouseEvent) => {
-          document.removeEventListener("mouseup", up, true);
+          activeDocument.removeEventListener("mouseup", up, true);
           pendingMouseUp = null;
           if (ev.target === backdrop) close();
         };
         pendingMouseUp = up;
-        document.addEventListener("mouseup", up, true);
+        activeDocument.addEventListener("mouseup", up, true);
       }
     });
     ta.addEventListener("keydown", (e) => {
@@ -326,10 +337,7 @@ export default class MemoriaPlugin extends Plugin {
         const isShift = e.shiftKey;
         if (mode === "enter" && !isMod && !isShift) {
           // 纯 Enter：IME 组合态下是"确认候选"，不发送
-          if (
-            !e.isComposing &&
-            (e as KeyboardEvent & { keyCode?: number }).keyCode !== 229
-          ) {
+          if (!e.isComposing) {
             e.preventDefault();
             void submit();
             return;
@@ -341,13 +349,15 @@ export default class MemoriaPlugin extends Plugin {
         }
       }
       // 其他 IME 组合态按键直接放过
-      if (e.isComposing || (e as KeyboardEvent & { keyCode?: number }).keyCode === 229) {
+      if (e.isComposing) {
         return;
       }
       if (e.key === "Escape") {
         close();
       }
     });
-    save.addEventListener("click", submit);
+    save.addEventListener("click", () => {
+      void submit();
+    });
   }
 }

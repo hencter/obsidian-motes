@@ -20,18 +20,18 @@
 .memoria-root button.memoria-tool-btn,
 .memoria-root button.memoria-cal-nav,
 .memoria-root button.memoria-overview-btn {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 /* 让视图的 contentEl 填满整个面板，清除 Obsidian 默认 padding */
 .workspace-leaf-content[data-type="memoria-view"] .view-content {
-  padding: 0 !important;
+  padding: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--background-primary) !important;
+  background: var(--background-primary);
 }
 
 .memoria-root,
@@ -89,16 +89,16 @@
 }
 /* 视图切换按钮：贴在统计条右侧 */
 .memoria-stats-switch {
-  flex: 0 0 auto !important;
+  flex: 0 0 auto;
   width: 28px;
   height: 28px;
-  padding: 4px !important;
+  padding: 4px;
   margin-left: 4px;
   color: var(--text-faint);
   align-self: center;
 }
 .memoria-stats-switch:hover {
-  color: var(--interactive-accent) !important;
+  color: var(--interactive-accent);
 }
 
 /* 热力图 */
@@ -145,7 +145,7 @@
   opacity: 1;
 }
 .memoria-heatmap-cell.future {
-  opacity: 0.15 !important;
+  opacity: 0.15;
 }
 
 /* 侧栏分区标题 */
@@ -328,25 +328,25 @@
 .memoria-search {
   width: 200px;
   padding: 6px 4px;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  border: none;
+  background: transparent;
+  box-shadow: none;
   color: var(--text-normal);
   font-size: 13px;
-  outline: none !important;
+  outline: none;
 }
 .memoria-search:focus,
 .memoria-search:hover,
 .memoria-search:active {
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  outline: none !important;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
 }
-.memoria-icon-btn {
+.memoria-root button.memoria-icon-btn {
   padding: 4px 8px;
-  border: none !important;
-  background: transparent !important;
+  border: none;
+  background: transparent;
   /* v1.4.9: 颜色从 --text-muted 降到 --text-faint，整体界面更柔和、不突兀。
    *   与打卡条靶心/视图切换、侧栏活跃度切换按钮同一色阶，全局视觉统一。 */
   color: var(--text-faint);
@@ -356,25 +356,25 @@
   align-items: center;
   justify-content: center;
   transition: background 0.12s, color 0.12s;
-  box-shadow: none !important;
+  box-shadow: none;
 }
-.memoria-icon-btn:hover {
-  background: var(--background-modifier-hover) !important;
+.memoria-root button.memoria-icon-btn:hover {
+  background: var(--background-modifier-hover);
   /* v1.4.9: hover 改为 accent 色，与打卡条和切换按钮的 hover 行为一致，
    *   给"这个东西可点击"的强反馈，代替原来变 --text-normal 的弱反馈。 */
-  color: var(--interactive-accent) !important;
+  color: var(--interactive-accent);
 }
-.memoria-icon-btn .svg-icon {
+.memoria-root button.memoria-icon-btn .svg-icon {
   width: 14px;
   height: 14px;
 }
 
 /* v1.1.2: 刷新按钮点击后转圈动画 */
-.memoria-icon-btn.is-spinning {
+.memoria-root button.memoria-icon-btn.is-spinning {
   pointer-events: none;
   opacity: 0.8;
 }
-.memoria-icon-btn.is-spinning .svg-icon {
+.memoria-root button.memoria-icon-btn.is-spinning .svg-icon {
   animation: memoria-spin 0.8s linear infinite;
 }
 @keyframes memoria-spin {
@@ -438,7 +438,7 @@
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
-.memoria-input {
+.memoria-root textarea.memoria-input {
   /* v2.0.17: 渐进式披露 —— 收起态 40px ↔ 展开态 96px 的过渡。
    *   使用 Material Design 标准缓动曲线，前段稍慢、后段顺滑收尾，丝滑悠闲感。
    *   同时覆盖 min-height + height：
@@ -447,23 +447,23 @@
    *       瞬时完成的（不跟随 min-height 过渡）。这是 textarea 特有的行为。
    *   为避免 JS autoResizeInput 设置 inline height 时触发慢动画，打字阶段 JS 会在
    *   设置前临时禁用 transition（transitions-none class，见下方）。
-   *   v2.0.17-iter12: !important —— Obsidian 主题（如 ITS Theme / AnuPpuccin 等）
+   *   v2.0.17-iter12: —— Obsidian 主题（如 ITS Theme / AnuPpuccin 等）
    *     会用 `textarea { transition: box-shadow ... }` 这种基础 type 选择器
    *     覆盖我们的 transition（实测权重比 .memoria-input 高，因为主题用了
    *     `body.theme-light textarea` 这种链式选择器，权重 0,0,1,1 > 0,0,1,0）。
-   *     不加 !important 时 getComputedStyle 显示 transition 变成主题的
+   *     不加 时 getComputedStyle 显示 transition 变成主题的
    *     `box-shadow, border 0.15s`，min-height 0s 就触发瞬时跳变。
    *   v2.0.17-iter13: 时长 1.1s → 0.7s，看得出动画但不拖沓。
    */
   transition:
     min-height 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-    height 0.7s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* v2.0.17: 输入时（input 事件触发 autoResizeInput）临时禁用动画，
  *   避免 textarea 随内容长高时被 0.7s 慢动画拖住手感。
  *   JS 会在设 inline height 前加这个 class，一帧后移除。 */
-.memoria-input.memoria-no-transition {
-  transition: none !important;
+.memoria-root textarea.memoria-input.memoria-no-transition {
+  transition: none;
 }
 .memoria-input-toolbar {
   /* v2.0.17: 工具栏整体淡入淡出 */
@@ -471,12 +471,12 @@
     opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
     border-top-color 0.7s ease;
 }
-.memoria-submit-btn {
+.memoria-root button.memoria-submit-btn {
   /* v2.0.17: 发送按钮饱和度淡入 */
   transition:
     background 0.12s,
     filter 0.7s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 收起态（默认）—— textarea 收矮 + 工具栏淡化 + 发送按钮褪色
@@ -496,7 +496,7 @@
   opacity: 0.55;
   border-top-color: color-mix(in srgb, var(--background-modifier-border) 50%, transparent);
 }
-.memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-submit-btn {
+.memoria-root .memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) button.memoria-submit-btn {
   opacity: 0.7;
   filter: saturate(0.7);
 }
@@ -521,18 +521,18 @@
   min-height: 96px;
   /* v1.1.8: max-height 用 vh 自适应，避免小屏上输入框撑满整个视口 */
   max-height: 40vh;
-  padding: 0 !important;
+  padding: 0;
   margin: 0;
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  border: none;
+  background: transparent;
+  box-shadow: none;
   color: var(--text-normal);
   font-family: var(--font-text);
   font-size: 14px;
   line-height: 1.6;
   /* v1.1.8: 关掉浏览器原生 resize 拉手，高度由 JS 动态控制；超出 max-height 才出现滚动条 */
   resize: none;
-  outline: none !important;
+  outline: none;
   overflow-y: auto;
   /* v2.0.17: 原 `transition: height 0.08s ease` 已移到上方的 .memoria-input 规则块里，
    *   并改为 min-height + height 0.7s（渐进式披露动画）。如果这里再声明 transition，会把
@@ -542,18 +542,18 @@
 .memoria-input:focus,
 .memoria-input:hover,
 .memoria-input:active {
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  outline: none !important;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
 }
 .memoria-input::placeholder {
   color: var(--text-faint);
 }
 .memoria-input.dragging {
-  background: var(--background-modifier-hover) !important;
+  background: var(--background-modifier-hover);
   border-radius: 6px;
-  box-shadow: inset 0 0 0 2px var(--interactive-accent) !important;
+  box-shadow: inset 0 0 0 2px var(--interactive-accent);
 }
 .memoria-input-toolbar {
   display: flex;
@@ -568,10 +568,10 @@
   align-items: center;
   gap: 2px;
 }
-.memoria-tool-btn {
+.memoria-root button.memoria-tool-btn {
   padding: 4px 8px;
-  border: none !important;
-  background: transparent !important;
+  border: none;
+  background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   border-radius: 4px;
@@ -579,13 +579,13 @@
   align-items: center;
   justify-content: center;
   transition: background 0.12s, color 0.12s;
-  box-shadow: none !important;
+  box-shadow: none;
 }
-.memoria-tool-btn:hover {
-  background: var(--background-modifier-hover) !important;
+.memoria-root button.memoria-tool-btn:hover {
+  background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-tool-btn .svg-icon {
+.memoria-root button.memoria-tool-btn .svg-icon {
   width: 15px;
   height: 15px;
 }
@@ -594,21 +594,21 @@
   font-size: 11px;
   color: var(--text-faint);
 }
-.memoria-submit-btn {
+.memoria-root button.memoria-submit-btn {
   padding: 5px 18px;
-  border: none !important;
-  /* v1.4.2: 用主题 accent 色 + !important 对抗某些主题对 button 的全局背景覆盖 */
-  background: var(--interactive-accent) !important;
-  color: var(--text-on-accent) !important;
+  border: none;
+  /* v1.4.2: 用主题 accent 色 + 对抗某些主题对 button 的全局背景覆盖 */
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
   font-size: 13px;
   font-weight: 500;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.12s, filter 0.12s;
-  box-shadow: none !important;
+  box-shadow: none;
 }
-.memoria-submit-btn:hover {
-  background: var(--interactive-accent-hover) !important;
+.memoria-root button.memoria-submit-btn:hover {
+  background: var(--interactive-accent-hover);
   /* 有些主题没定义 --interactive-accent-hover，fallback 用 filter 做微变亮 */
   filter: brightness(1.05);
 }
@@ -628,7 +628,7 @@
   color: var(--text-faint);
   font-size: 12px;
 }
-.memoria-meta-btn {
+.memoria-root button.memoria-meta-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -641,11 +641,11 @@
   font-size: 12px;
   transition: background 0.12s;
 }
-.memoria-meta-btn:hover {
+.memoria-root button.memoria-meta-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-meta-btn .svg-icon {
+.memoria-root button.memoria-meta-btn .svg-icon {
   width: 12px;
   height: 12px;
 }
@@ -846,19 +846,19 @@
 .memoria-card-body pre .copy-code-button,
 .memoria-card-body pre > button,
 .memoria-card-body pre .code-copy-button {
-  position: absolute !important;
-  top: 6px !important;
-  right: 6px !important;
-  left: auto !important;
-  bottom: auto !important;
-  margin: 0 !important;
-  padding: 4px 8px !important;
-  font-size: 11px !important;
-  color: var(--text-muted) !important;
-  background: color-mix(in srgb, var(--background-modifier-hover) 80%, transparent) !important;
-  border: 1px solid var(--background-modifier-border) !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  left: auto;
+  bottom: auto;
+  margin: 0;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--background-modifier-hover) 80%, transparent);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  cursor: pointer;
   opacity: 0;
   transition: opacity 0.12s ease;
 }
@@ -1136,7 +1136,7 @@
   justify-content: flex-end;
   gap: 8px;
 }
-.memoria-modal-btns button {
+.memoria-modal .memoria-modal-btns button {
   padding: 6px 16px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
@@ -1146,15 +1146,15 @@
   font-size: 13px;
   transition: background 0.12s;
 }
-.memoria-modal-btns button:hover {
+.memoria-modal .memoria-modal-btns button:hover {
   background: var(--background-modifier-hover);
 }
-.memoria-modal-btns button.mod-cta {
+.memoria-modal .memoria-modal-btns button.mod-cta {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   border-color: var(--interactive-accent);
 }
-.memoria-modal-btns button.mod-cta:hover {
+.memoria-modal .memoria-modal-btns button.mod-cta:hover {
   background: var(--interactive-accent-hover);
 }
 
@@ -1183,11 +1183,11 @@
 
 /* 切换按钮：位于标题行右侧，hover 才显轮廓 */
 .memoria-overview-btn {
-  padding: 3px 6px !important;
+  padding: 3px 6px;
   color: var(--text-faint);
 }
 .memoria-overview-btn:hover {
-  color: var(--interactive-accent) !important;
+  color: var(--interactive-accent);
 }
 
 /* 热力图保持原样，去掉外层 padding */
@@ -1211,18 +1211,18 @@
   width: 22px;
   height: 22px;
   padding: 0;
-  border: none !important;
-  background: transparent !important;
+  border: none;
+  background: transparent;
   color: var(--text-muted);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 .memoria-cal-nav:hover {
-  background: var(--background-modifier-hover) !important;
+  background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 .memoria-cal-nav .svg-icon {
@@ -1329,7 +1329,7 @@
 
 /* ================== 编辑模式 ================== */
 .memoria-hidden {
-  display: none !important;
+  display: none;
 }
 
 /* 编辑态的输入卡片：强调色边框发光 */
@@ -1373,17 +1373,17 @@
 
 .memoria-cancel-btn {
   padding: 5px 14px;
-  border: 1px solid var(--background-modifier-border) !important;
-  background: var(--background-primary) !important;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
   color: var(--text-muted);
   font-size: 13px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 .memoria-cancel-btn:hover {
-  background: var(--background-modifier-hover) !important;
+  background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 
@@ -1529,7 +1529,7 @@
 
 /* 默认隐藏侧栏折叠按钮（桌面端不需要） */
 .memoria-sidebar-toggle {
-  display: none;
+  display: none !important;
 }
 
 @media (max-width: 860px) {
@@ -1594,7 +1594,7 @@
   }
   /* 显示折叠按钮 */
   .memoria-sidebar-toggle {
-    display: inline-flex;
+    display: inline-flex !important;
     margin-right: 6px;
     order: -1;
   }
@@ -1638,24 +1638,23 @@
     font-size: 15px; /* 手机上避免 iOS 自动缩放 */
     /* v1.1.18: 防第三方 OB 主题给 textarea 加 text-indent / padding-left，
      *   导致 placeholder 首字符"此"被左边界裁掉。
-     * v1.4.14: 把 padding-left 从 0 !important 改为 4px !important。
+     * v1.4.14: 把 padding-left 从 0 改为 4px。
      *   原来一刀切置 0 会让文字紧贴 textarea 左边缘，在 iOS WebView + 某些
      *   中文字体组合下会把首列笔画（例如"测""此"）"咬掉" 1-2px，
      *   视觉上像文字被"剪半"。4px 的安全区既能防主题注入大 padding，
      *   又保证字形完整呈现。
      * 右侧补齐对称 padding，避免最后一字在滚动条出现时被压到。
      * v1.4.16: 补 padding-top/bottom。
-     *   根因：PC 端原 .memoria-input 有 `padding: 0 !important`（简写覆盖四边），
+     *   根因：PC 端原 .memoria-input 有 `padding: 0`（简写覆盖四边），
      *   v1.4.14 移动端只补了左右，垂直方向仍然是 0。iOS WebView 里中文字首行顶部
      *   反锯齿像素会超出 content box 被裁（"测""试""此"等字右上点画会丢 1-2px），
      *   表现为\"顶部笔画被咬掉\"。加 padding-top:2px 提供垂直安全区，对称加
      *   padding-bottom:2px 保持视觉平衡；line-height:1.6 已经让文字之间有缓冲，
      *   所以 2px 足够，再大会让输入框看起来闲散。 */
-    text-indent: 0 !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     -webkit-appearance: none;
     appearance: none;
   }
@@ -1725,24 +1724,24 @@
  *   给 24 小时柱状图和总览四宫格用。
  */
 .workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
-  padding: 48px 56px 64px !important;
-  overflow-y: auto !important;
-  display: block !important;
-  background: var(--background-primary) !important;
+  padding: 48px 56px 64px;
+  overflow-y: auto;
+  display: block;
+  background: var(--background-primary);
   box-sizing: border-box;
 }
 .is-mobile .workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
-  padding: 24px 16px 48px !important;
+  padding: 24px 16px 48px;
 }
 @media (max-width: 520px) {
   .workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
-    padding: 24px 16px 48px !important;
+    padding: 24px 16px 48px;
   }
 }
 
 .memoria-stats-view {
   display: block;
-  padding: 0 !important;
+  padding: 0;
   max-width: 1000px;
   margin: 0 auto;
   color: var(--text-normal);
@@ -1876,43 +1875,43 @@
   align-items: center;
   gap: 4px;
 }
-.memoria-stats-view .mstat-yh-year-arrow {
+.memoria-stats-view button.mstat-yh-year-arrow {
   width: 26px;
   height: 26px;
-  padding: 0 !important;
-  border: 1px solid var(--background-modifier-border) !important;
-  background: var(--background-primary) !important;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
   color: var(--text-muted);
   border-radius: 999px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: none !important;
+  box-shadow: none;
   transition: background 0.12s, color 0.12s;
 }
-.memoria-stats-view .mstat-yh-year-arrow:hover {
-  background: var(--background-modifier-hover) !important;
+.memoria-stats-view button.mstat-yh-year-arrow:hover {
+  background: var(--background-modifier-hover);
   color: var(--interactive-accent);
-  border-color: color-mix(in srgb, var(--interactive-accent) 50%, var(--background-modifier-border)) !important;
+  border-color: color-mix(in srgb, var(--interactive-accent) 50%, var(--background-modifier-border));
 }
-.memoria-stats-view .mstat-yh-year-arrow .svg-icon {
+.memoria-stats-view button.mstat-yh-year-arrow .svg-icon {
   width: 13px;
   height: 13px;
 }
-.memoria-stats-view .mstat-yh-year-btn {
+.memoria-stats-view button.mstat-yh-year-btn {
   padding: 4px 14px;
-  border: 1px solid var(--background-modifier-border) !important;
-  background: var(--background-primary) !important;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
   color: var(--text-muted);
   border-radius: 999px;
   font-size: 12px;
   cursor: pointer;
   font-variant-numeric: tabular-nums;
-  box-shadow: none !important;
+  box-shadow: none;
 }
-.memoria-stats-view .mstat-yh-year-btn:hover {
-  background: var(--background-modifier-hover) !important;
+.memoria-stats-view button.mstat-yh-year-btn:hover {
+  background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 .memoria-stats-view .mstat-yh-wrap {
@@ -2074,7 +2073,7 @@
   transition: opacity 0.12s, transform 0.12s;
 }
 .memoria-stats-view .mstat-cloud-tag:hover {
-  opacity: 1 !important;
+  opacity: 1;
   transform: scale(1.05);
 }
 
@@ -2215,8 +2214,6 @@
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   /* 隐藏滚动条但保留滚动能力（移动端更常见），需要手势提示可改为 'thin' */
-  scrollbar-width: thin;
-  scrollbar-color: var(--background-modifier-border) transparent;
 }
 .memoria-stats-view .mstat-bar-chart-scroll::-webkit-scrollbar {
   height: 4px;
@@ -2242,10 +2239,10 @@
 @media (max-width: 680px) {
   .workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
     /* v1.1.17: 和主规则一致，16px 左右 padding，释放 8px 给柱图区域 */
-    padding: 24px 16px 48px !important;
+    padding: 24px 16px 48px;
   }
   .memoria-stats-view {
-    padding: 0 !important;
+    padding: 0;
   }
   /* 总览四宫格：4 列 → 2×2 */
   .memoria-stats-view .mstat-overview {
@@ -2309,28 +2306,28 @@
  * 用来暗示"左边可以滑出来一个侧栏"。在我们这个独立的数据报告标签页里完全不需要，
  * 反而显得不够干净。这里只对 stats-view 所在的 leaf 去掉。
  */
-.is-mobile .workspace-leaf:has(.workspace-leaf-content[data-type="memoria-stats-view"])::before,
-.is-mobile .workspace-leaf:has(.workspace-leaf-content[data-type="memoria-stats-view"])::after,
+.is-mobile .workspace-leaf.memoria-stats-workspace-leaf::before,
+.is-mobile .workspace-leaf.memoria-stats-workspace-leaf::after,
 .is-mobile .workspace-leaf-content[data-type="memoria-stats-view"]::before,
 .is-mobile .workspace-leaf-content[data-type="memoria-stats-view"]::after,
 .is-mobile .workspace-leaf-content[data-type="memoria-stats-view"] .view-content::before,
 .is-mobile .workspace-leaf-content[data-type="memoria-stats-view"] .view-content::after {
-  display: none !important;
-  box-shadow: none !important;
-  background: none !important;
-  content: none !important;
+  display: none;
+  box-shadow: none;
+  background: none;
+  content: none;
 }
 /* 同样覆盖主视图（memoria-view）的翻页渐变 */
-.is-mobile .workspace-leaf:has(.workspace-leaf-content[data-type="memoria-view"])::before,
-.is-mobile .workspace-leaf:has(.workspace-leaf-content[data-type="memoria-view"])::after,
+.is-mobile .workspace-leaf.memoria-workspace-leaf::before,
+.is-mobile .workspace-leaf.memoria-workspace-leaf::after,
 .is-mobile .workspace-leaf-content[data-type="memoria-view"]::before,
 .is-mobile .workspace-leaf-content[data-type="memoria-view"]::after,
 .is-mobile .workspace-leaf-content[data-type="memoria-view"] .view-content::before,
 .is-mobile .workspace-leaf-content[data-type="memoria-view"] .view-content::after {
-  display: none !important;
-  box-shadow: none !important;
-  background: none !important;
-  content: none !important;
+  display: none;
+  box-shadow: none;
+  background: none;
+  content: none;
 }
 
 /* ================== 统计弹窗（兼容保留，以防旧 API 调用） ================== */
@@ -2371,14 +2368,17 @@
   color: var(--text-normal);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
-  background: linear-gradient(
-    135deg,
-    var(--text-normal),
-    color-mix(in srgb, var(--interactive-accent) 70%, var(--text-normal))
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+}
+@supports (background-clip: text) {
+  .memoria-stats-modal .mstat-bignum-num {
+    background: linear-gradient(
+      135deg,
+      var(--text-normal),
+      color-mix(in srgb, var(--interactive-accent) 70%, var(--text-normal))
+    );
+    background-clip: text;
+    color: transparent;
+  }
 }
 .memoria-stats-modal .mstat-bignum-label {
   font-size: 11px;
@@ -2398,17 +2398,17 @@
 }
 .memoria-stats-modal .mstat-yh-year-btn {
   padding: 3px 12px;
-  border: 1px solid var(--background-modifier-border) !important;
-  background: var(--background-primary) !important;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
   color: var(--text-muted);
   border-radius: 999px;
   font-size: 11px;
   cursor: pointer;
   font-variant-numeric: tabular-nums;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 .memoria-stats-modal .mstat-yh-year-btn:hover {
-  background: var(--background-modifier-hover) !important;
+  background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 /* 横向滚动容器 */
@@ -2419,7 +2419,6 @@
   overflow-y: hidden;
   padding-bottom: 4px;
   /* 自定义滚动条 */
-  scrollbar-width: thin;
 }
 .memoria-stats-modal .mstat-yh-wrap::-webkit-scrollbar {
   height: 6px;
@@ -2568,7 +2567,7 @@
   transition: opacity 0.12s, transform 0.12s;
 }
 .memoria-stats-modal .mstat-cloud-tag:hover {
-  opacity: 1 !important;
+  opacity: 1;
   transform: scale(1.05);
 }
 
@@ -2694,7 +2693,6 @@
   margin: 6px 0;
   border-radius: 6px;
   /* 婊氬姩鏉℃煍鍜?*/
-  scrollbar-width: thin;
 }
 .memoria-card-body .memoria-table-wrap::-webkit-scrollbar {
   height: 6px;
@@ -2828,8 +2826,8 @@
   opacity: 0.7;
 }
 .memoria-card-quote:hover {
-  opacity: 1 !important;
-  color: var(--interactive-accent) !important;
+  opacity: 1;
+  color: var(--interactive-accent);
 }
 .memoria-card-quote .svg-icon {
   width: 13px;
@@ -3007,13 +3005,13 @@
 }
 .memoria-daily-goal-target,
 .memoria-daily-goal-switch {
-  padding: 3px 4px !important;
+  padding: 3px 4px;
   color: var(--text-faint);
   cursor: pointer;
 }
 .memoria-daily-goal-target:hover,
 .memoria-daily-goal-switch:hover {
-  color: var(--interactive-accent) !important;
+  color: var(--interactive-accent);
 }
 .memoria-daily-goal-target .svg-icon,
 .memoria-daily-goal-switch .svg-icon {
@@ -3106,7 +3104,7 @@
    v1.3.6: 按钮挂在卡片的"最后一个可见元素"内（tagRow / imgGrid / body 优先级），
    margin-left:auto 让它在该元素的末尾右对齐。
    不再需要 is-peek / is-expanded 两态切换 —— 展开/折叠位置完全相同。 */
-.memoria-collapse-toggle {
+.memoria-root button.memoria-collapse-toggle {
   /* 对抗 Obsidian 主题对 button 的默认样式 */
   -webkit-appearance: none;
   appearance: none;
@@ -3114,9 +3112,9 @@
   align-items: center;
   gap: 3px;
   padding: 2px 6px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: none;
+  box-shadow: none;
   border-radius: 4px;
   color: var(--text-faint);
   font-size: 11px;
@@ -3132,16 +3130,16 @@
   position: relative;
   z-index: 2;
 }
-.memoria-collapse-toggle:hover {
+.memoria-root button.memoria-collapse-toggle:hover {
   color: var(--interactive-accent);
-  background: transparent !important;
+  background: transparent;
 }
-.memoria-collapse-toggle:focus,
-.memoria-collapse-toggle:focus-visible {
+.memoria-root button.memoria-collapse-toggle:focus,
+.memoria-root button.memoria-collapse-toggle:focus-visible {
   outline: none;
   box-shadow: none;
 }
-.memoria-collapse-toggle .memoria-collapse-icon {
+.memoria-root button.memoria-collapse-toggle .memoria-collapse-icon {
   display: inline-flex;
   align-items: center;
 }
@@ -3198,23 +3196,23 @@
  *   原因：v1.4.6 把 padding 放在内层 .memoria-year-view 上，
  *   但 Obsidian 的 .view-content 自身有 padding/inset，某些主题下会把我们内层的
  *   padding 视觉上压缩到紧贴边缘。直接把 56/80 的出血框写在 view-content 上，
- *   用 !important 覆盖宿主，彻底解决贴边问题。
+ *   用 覆盖宿主，彻底解决贴边问题。
  */
 .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
-  padding: 64px 80px 80px !important;
-  overflow-y: auto !important;
-  display: block !important;
-  background: var(--background-primary) !important;
+  padding: 64px 80px 80px;
+  overflow-y: auto;
+  display: block;
+  background: var(--background-primary);
   box-sizing: border-box;
 }
 .is-mobile .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
-  padding: 32px 20px 56px !important;
+  padding: 32px 20px 56px;
 }
 
 .memoria-year-view {
   /* v1.4.7: 自身 padding 归零（出血框已上移到 view-content），
    *   只负责 max-width + 居中 + 色彩上下文 */
-  padding: 0 !important;
+  padding: 0;
   max-width: 1400px;
   margin: 0 auto;
   color: var(--text-normal);
@@ -3244,36 +3242,36 @@
   padding: 3px;
   background: var(--background-secondary);
 }
-.memoria-year-nav-btn,
-.memoria-year-today-btn {
+.memoria-year-view button.memoria-year-nav-btn,
+.memoria-year-view button.memoria-year-today-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none !important;
-  background: transparent !important;
+  border: none;
+  background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  box-shadow: none !important;
+  box-shadow: none;
   transition: background 0.12s, color 0.12s;
 }
-.memoria-year-nav-btn {
+.memoria-year-view button.memoria-year-nav-btn {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  padding: 0 !important;
+  padding: 0;
 }
-.memoria-year-today-btn {
-  padding: 4px 14px !important;
+.memoria-year-view button.memoria-year-today-btn {
+  padding: 4px 14px;
   border-radius: 999px;
   font-size: 13px;
   color: var(--text-muted);
 }
-.memoria-year-nav-btn:hover,
-.memoria-year-today-btn:hover {
-  background: var(--background-modifier-hover) !important;
+.memoria-year-view button.memoria-year-nav-btn:hover,
+.memoria-year-view button.memoria-year-today-btn:hover {
+  background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-year-nav-btn .svg-icon {
+.memoria-year-view button.memoria-year-nav-btn .svg-icon {
   width: 14px;
   height: 14px;
 }
@@ -3436,7 +3434,7 @@
     gap: 24px;
   }
   .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
-    padding: 56px 56px 72px !important;
+    padding: 56px 56px 72px;
   }
 }
 @media (max-width: 900px) {
@@ -3445,7 +3443,7 @@
     gap: 20px;
   }
   .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
-    padding: 40px 32px 56px !important;
+    padding: 40px 32px 56px;
   }
   .memoria-year-title {
     font-size: 28px;
@@ -3457,7 +3455,7 @@
     gap: 16px;
   }
   .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
-    padding: 28px 20px 48px !important;
+    padding: 28px 20px 48px;
   }
   .memoria-year-header {
     margin-bottom: 24px;
@@ -3520,8 +3518,17 @@
 .memoria-list.is-compact .memoria-card-body {
   max-height: 6em;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  position: relative;
+}
+.memoria-list.is-compact .memoria-card-body::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2em;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(to bottom, transparent, var(--background-primary));
 }
 .memoria-list.is-compact .memoria-card {
   padding: 10px 14px;
@@ -3875,7 +3882,7 @@
  *   .memoria-input 加 padding-left: 4px / padding-top: 2px / -webkit-appearance
  *   做安全区。但**那段修复包在 @media (max-width: 680px) 里**，只对手机生效。
  *   iPad 横屏 1180px / 纵屏 820px 都超过 680，走的是桌面通用规则
- *   （padding: 0 !important），iOS WebView 上同样的字渲染问题再次出现。
+ *   （padding: 0），iOS WebView 上同样的字渲染问题再次出现。
  *
  * 这次修复：
  *   把"字渲染必须的 padding 安全区"用 (hover: none) and (pointer: coarse)
@@ -3892,11 +3899,10 @@
 @media (hover: none) and (pointer: coarse) {
   .memoria-input {
     /* 防中文首字符笔画被 iOS WebView 裁切（v1.4.14 / v1.4.16 思路）*/
-    text-indent: 0 !important;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     -webkit-appearance: none;
     appearance: none;
   }
@@ -4100,15 +4106,15 @@
     align-items: center;
     justify-content: center;
     /* 跟主题色走 —— 用户要求的"➕ 颜色跟界面一致" */
-    background: var(--interactive-accent) !important;
-    color: var(--text-on-accent) !important;
-    border: none !important;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
     border-radius: 50%;
     /* 浮起阴影 + 微弱主题色光晕，让 FAB 视觉"漂浮在内容上方"
        两层阴影：第一层柔和大范围底影，第二层高对比微小贴边阴影增加立体感 */
     box-shadow:
       0 4px 14px -2px color-mix(in srgb, var(--interactive-accent) 35%, rgba(0, 0, 0, 0.25)),
-      0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     z-index: 100;
     /* 出现/消失动画 */
@@ -4125,7 +4131,7 @@
     transform: scale(0.92);
     box-shadow:
       0 2px 6px -1px color-mix(in srgb, var(--interactive-accent) 35%, rgba(0, 0, 0, 0.3)),
-      0 1px 2px rgba(0, 0, 0, 0.1) !important;
+      0 1px 2px rgba(0, 0, 0, 0.1);
   }
   .memoria-root.memoria-input-fab-mode .memoria-fab .svg-icon {
     width: 24px;
@@ -4142,16 +4148,16 @@
      给 max-height 一个足够大的上限（500px），实际高度由内容决定。 */
   .memoria-root.memoria-input-fab-mode:not(.is-fab-expanded) .memoria-input-card {
     /* 完全隐藏 + 不可交互（不占空间，不抢焦点）*/
-    max-height: 0 !important;
-    min-height: 0 !important;
-    opacity: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
+    max-height: 0;
+    min-height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    overflow: hidden;
+    pointer-events: none;
     /* 防止子元素的 box-shadow 溢出 */
-    box-shadow: none !important;
+    box-shadow: none;
     transition: max-height 0.22s ease, opacity 0.18s ease,
       padding 0.22s ease, margin 0.22s ease;
   }
@@ -4171,11 +4177,11 @@
      *   输入框一直好用同理），不再随内容增高而移动。内容超高由 textarea 内部
      *   滚动消化（见下方 .memoria-input 的 max-height + overflow-y）。
      *   ✕ 按钮 absolute 在固定卡片内，永远可见、不被滚走。 */
-    position: fixed !important;
+    position: fixed;
     left: 8px;
     right: 8px;
     bottom: 0;
-    margin: 0 0 8px !important;
+    margin: 0 0 8px;
     max-height: 60vh;
     opacity: 1;
     z-index: 50;
@@ -4207,19 +4213,19 @@
     align-items: center;
     justify-content: center;
     /* 常驻淡背景圆底，让按钮"看得见" */
-    background: var(--background-modifier-hover) !important;
-    border: none !important;
+    background: var(--background-modifier-hover);
+    border: none;
     border-radius: 50%;
     /* 用 text-normal 而非 text-muted，对比更高更显眼 */
     color: var(--text-normal);
     cursor: pointer;
-    box-shadow: none !important;
+    box-shadow: none;
     z-index: 2;
     -webkit-tap-highlight-color: transparent;
     transition: background 0.12s ease, color 0.12s ease;
   }
   .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-close:active {
-    background: var(--background-modifier-active-hover, var(--interactive-accent)) !important;
+    background: var(--background-modifier-active-hover, var(--interactive-accent));
     color: var(--text-on-accent);
   }
   .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-close .svg-icon {
@@ -4238,10 +4244,10 @@
      这样卡片总高（textarea + 工具栏 + padding）始终 ≤ max-height: 60vh，
      底部工具栏/发送按钮永远贴在卡片底、跟着卡片 fixed 在键盘上方可见。 */
   .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input {
-    max-height: 38vh !important;
-    overflow-y: auto !important;
+    max-height: 38vh;
+    overflow-y: auto;
     /* 给 ✕ 按钮（右上角 36px）让出空间，避免首行末尾文字被盖 */
-    padding-right: 44px !important;
+    padding-right: 44px;
   }
   /* 工具栏行不收缩，始终完整显示在卡片底部 */
   .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-toolbar {
@@ -4249,4 +4255,65 @@
   }
 }
 
+.memoria-clickable {
+  cursor: pointer;
+}
 
+.mstat-yh-cell.is-outside-range {
+  visibility: hidden;
+}
+
+/* ================== Button theme contract ==================
+ * A few declarations intentionally remain important because some Obsidian
+ * themes mark their generic button chrome important as well.
+ */
+.memoria-root button.memoria-icon-btn,
+.memoria-root button.memoria-tool-btn,
+.memoria-root button.memoria-cal-nav,
+.memoria-root button.memoria-overview-btn,
+.memoria-root button.memoria-collapse-toggle {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.memoria-root button.memoria-submit-btn {
+  border: none !important;
+  background: var(--interactive-accent) !important;
+  color: var(--text-on-accent) !important;
+  box-shadow: none !important;
+}
+
+.memoria-root
+  .memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging)
+  button.memoria-submit-btn {
+  background: color-mix(
+    in srgb,
+    var(--interactive-accent) 32%,
+    var(--background-secondary)
+  ) !important;
+  color: color-mix(in srgb, var(--text-normal) 72%, var(--interactive-accent)) !important;
+  opacity: 1 !important;
+  filter: saturate(0.72) !important;
+}
+
+.memoria-root button.memoria-submit-btn:hover {
+  background: var(--interactive-accent-hover, var(--interactive-accent)) !important;
+  color: var(--text-on-accent) !important;
+}
+
+.memoria-stats-view button,
+.memoria-year-view button {
+  text-shadow: none;
+  box-shadow: none !important;
+}
+
+.memoria-root input.memoria-search,
+.memoria-root input.memoria-search:hover,
+.memoria-root input.memoria-search:focus,
+.memoria-root input.memoria-search:active {
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}

@@ -6,6 +6,29 @@
 
 ---
 
+## v2.3.4（2026-06-30 · 商店合规、主题兼容与发布流程修复）
+
+本版本集中修复 Obsidian 自动巡检发现的兼容性与代码规范问题，并重新整理主题样式覆盖。
+
+### 修复
+
+- 将最低 Obsidian 版本调整为 `1.7.2`，与实际使用的 `workspace.revealLeaf()` API 保持一致
+- 补齐异步 API 的等待与错误处理，修复潜在的静默 Promise 失败
+- 将固定内联样式迁移为 CSS class / `setCssStyles()`，设置页标题改用官方 `Setting` API
+- 移除高开销的 `:has()`、重复颜色和不必要的兼容属性
+- 大幅减少 `!important`，仅保留主题自身使用强制按钮样式时不可替代的少量覆盖
+- 恢复输入框展开动画、发送按钮激活状态、搜索框圆角及统一按钮视觉
+- 修复移动端侧栏按钮在桌面端误显示的问题
+- 使用 Node 内置 `node:module` 替代已弃用的 `builtin-modules`
+
+### 工程
+
+- 接入 `eslint-plugin-obsidianmd`，发布前检查达到 0 error
+- 统一 `manifest.json`、`package.json`、`versions.json` 为 `2.3.4`
+- `2.3.4` 最低版本记录为 Obsidian `1.7.2`
+
+---
+
 ## v2.3.3（2026-06-11 晚 · FAB 输入框改 fixed 贴底，根治键盘遮挡/抖动/✕ 消失）
 
 v2.3.2 用 JS `scrollIntoView` 试图把长内容输入框滚回键盘上方，真机测试暴露了三个新问题：
