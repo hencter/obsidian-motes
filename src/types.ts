@@ -108,7 +108,7 @@ export const DEFAULT_SETTINGS: MemoriaSettings = {
   defaultOverviewMode: "heatmap",
   buddy: null,
   mobileInputStyle: "fab",
-  storageMode: "daily",
+  storageMode: "yearly",
 };
 
 export const VIEW_TYPE_MEMORIA = "memoria-view";
