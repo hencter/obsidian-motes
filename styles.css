@@ -658,30 +658,30 @@
 }
 
 /* 瀑布流布局 */
-.memoria-list.memoria-waterfall {
+.memoria-waterfall-grid {
   column-count: 2;
   column-gap: 16px;
 }
 @media (min-width: 960px) {
-  .memoria-list.memoria-waterfall {
+  .memoria-waterfall-grid {
     column-count: 3;
   }
 }
 @media (min-width: 1400px) {
-  .memoria-list.memoria-waterfall {
+  .memoria-waterfall-grid {
     column-count: 4;
   }
 }
-.memoria-list.memoria-waterfall .memoria-card {
+.memoria-waterfall-grid .memoria-card {
   break-inside: avoid;
   margin-bottom: 14px;
 }
-.memoria-list.memoria-waterfall .memoria-load-more {
+.memoria-waterfall-grid .memoria-load-more {
   column-span: all;
 }
 
 @media (max-width: 680px) {
-  .memoria-list.memoria-waterfall {
+  .memoria-waterfall-grid {
     column-count: 1;
     column-gap: 0;
   }

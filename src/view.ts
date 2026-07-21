@@ -2888,9 +2888,17 @@ export class MemoriaView extends ItemView {
     const waterfall = this.settings.waterfallLayout;
     this.listEl.toggleClass("memoria-waterfall", waterfall);
 
+    // 瀑布流模式下，卡片放到独立网格容器里，和 meta bar 分开
+    let cardContainer: HTMLElement;
+    if (waterfall) {
+      cardContainer = this.listEl.createDiv({ cls: "memoria-waterfall-grid" });
+    } else {
+      cardContainer = this.listEl;
+    }
+
     // 1) 先渲染"置顶"分组（不分日期，所有置顶一起）
     if (pinnedMemos.length) {
-      const pinGroup = this.listEl.createDiv({
+      const pinGroup = cardContainer.createDiv({
         cls: "memoria-day-group memoria-pin-group",
       });
       const pinHead = pinGroup.createDiv({
@@ -2904,7 +2912,7 @@ export class MemoriaView extends ItemView {
 
     // 2) 普通笔记：瀑布流模式直接渲染卡片，列表模式按天分组
     if (waterfall) {
-      for (const m of normalMemos) this.renderMemoCard(this.listEl, m, true);
+      for (const m of normalMemos) this.renderMemoCard(cardContainer, m, true);
     } else {
       const groups = new Map<string, Memo[]>();
       for (const m of normalMemos) {
@@ -2919,7 +2927,7 @@ export class MemoriaView extends ItemView {
       const yesterdayStr = fmtDateLocal(ydDate);
 
       for (const [date, list] of groups) {
-        const group = this.listEl.createDiv({ cls: "memoria-day-group" });
+        const group = cardContainer.createDiv({ cls: "memoria-day-group" });
         group.dataset.date = date;
         const head = group.createDiv({ cls: "memoria-day-head" });
         const d = new Date(date + "T00:00:00");
@@ -2933,7 +2941,7 @@ export class MemoriaView extends ItemView {
     }
 
     if (this.pageLimit < memos.length) {
-      const more = this.listEl.createDiv({ cls: "memoria-load-more" });
+      const more = cardContainer.createDiv({ cls: "memoria-load-more" });
       more.setText(t("list.loadMore", { n: memos.length - this.pageLimit }));
     }
   }
