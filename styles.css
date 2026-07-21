@@ -672,23 +672,39 @@
     column-count: 4;
   }
 }
+/* 瀑布流卡片 —— 随意贴风格 */
 .memoria-waterfall-grid .memoria-card {
   break-inside: avoid;
   margin-bottom: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
 }
-/* 瀑布流卡片有机变化：交替微妙色调 */
+.memoria-waterfall-grid .memoria-card:hover {
+  transform: scale(1.015) rotate(0deg) !important;
+  box-shadow: 4px 6px 16px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+  z-index: 2;
+}
+/* 轻微旋转 + 色纸底色 */
 .memoria-waterfall-grid .memoria-card:nth-child(3n+1) {
-  background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 95%, var(--text-accent) 5%);
+  transform: rotate(-0.8deg);
+  background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 94%, #ffeaa7 6%);
 }
 .memoria-waterfall-grid .memoria-card:nth-child(3n+2) {
-  background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 97%, var(--text-muted) 3%);
+  transform: rotate(1.2deg);
+  background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 95%, #a29bfe 5%);
 }
-.memoria-waterfall-grid .memoria-card:nth-child(5n+3) {
-  border-radius: 6px 14px 14px 10px;
+.memoria-waterfall-grid .memoria-card:nth-child(4n+3) {
+  transform: rotate(-1.5deg);
+  background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 94%, #fd79a8 6%);
 }
 .memoria-waterfall-grid .memoria-card:nth-child(5n+1) {
-  border-radius: 12px 6px 12px 10px;
+  transform: rotate(0.6deg);
 }
+.memoria-waterfall-grid .memoria-card:nth-child(5n+4) {
+  transform: rotate(-2deg);
+  background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 95%, #55efc4 5%);
+}
+
 .memoria-waterfall-grid .memoria-load-more {
   column-span: all;
 }
@@ -697,6 +713,14 @@
   .memoria-waterfall-grid {
     column-count: 1;
     column-gap: 0;
+  }
+  .memoria-waterfall-grid .memoria-card {
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .memoria-waterfall-grid .memoria-card:hover {
+    transform: scale(1.01) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
 }
 
