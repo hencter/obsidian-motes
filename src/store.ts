@@ -748,6 +748,73 @@ export class MemoStore {
     }
     return lines.join("\n");
   }
+
+  /** 迁移：将日记格式 (YYYY-MM-DD.md) 合并到年格式 (YYYY.md) */
+  async migrateDailyToYearly(): Promise<{ merged: number; deleted: number; errors: number }> {
+    const folder = normalizePath(this.settings.folder);
+    const dayRe = /^(\d{4})-(\d{2})-(\d{2})\.md$/;
+    const dayFiles = this.app.vault.getMarkdownFiles().filter(
+      (f) => f.path.startsWith(`${folder}/`) && dayRe.test(f.name)
+    );
+
+    let merged = 0;
+    let deleted = 0;
+    let errors = 0;
+
+    for (const dayFile of dayFiles) {
+      try {
+        const raw = await this.app.vault.read(dayFile);
+        const memos = parseFile(dayFile.path, raw);
+        if (memos.length === 0) {
+          await this.app.vault.delete(dayFile);
+          deleted++;
+          continue;
+        }
+
+        const year = dayFile.name.match(dayRe)![1];
+        const yearPath = `${folder}/${year}.md`;
+        const yearFile = this.app.vault.getAbstractFileByPath(yearPath) as TFile | null;
+
+        let yearRaw: string;
+        if (yearFile) {
+          yearRaw = await this.app.vault.read(yearFile);
+        } else {
+          yearRaw = `# ${year}\n`;
+        }
+
+        // 按日期分组，逐条插入
+        const byDate = new Map<string, { date: string; weekday: string; time: string; content: string }[]>();
+        for (const m of memos) {
+          const w = fmtWeekday(m.datetime);
+          const key = m.date;
+          if (!byDate.has(key)) byDate.set(key, []);
+          byDate.get(key)!.push({ date: m.date, weekday: w, time: m.time, content: m.content });
+        }
+
+        for (const [date, items] of byDate) {
+          for (const item of items) {
+            yearRaw = this.insertMemoIntoYear(yearRaw, year, item.date, item.weekday, item.time, item.content);
+            merged++;
+          }
+        }
+
+        if (yearFile) {
+          await this.app.vault.modify(yearFile, yearRaw);
+        } else {
+          await this.app.vault.create(yearPath, yearRaw);
+        }
+
+        await this.app.vault.delete(dayFile);
+        deleted++;
+      } catch (err) {
+        console.error(`[Memoria] Migration failed for ${dayFile.path}:`, err);
+        errors++;
+      }
+    }
+
+    await this.reloadAll();
+    return { merged, deleted, errors };
+  }
 }
 
 function escapeRegex(s: string): string {

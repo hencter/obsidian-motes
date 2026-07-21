@@ -93,6 +93,14 @@ export default class MemoriaPlugin extends Plugin {
       },
     });
 
+    this.addCommand({
+      id: "memoria-migrate-daily-to-yearly",
+      name: t("command.migrateDailyToYearly"),
+      callback: () => {
+        void this.migrateDailyToYearly();
+      },
+    });
+
     // 文件变化监听
     this.registerEvent(
       this.app.vault.on("modify", (f) => {
@@ -400,5 +408,29 @@ export default class MemoriaPlugin extends Plugin {
     save.addEventListener("click", () => {
       void submit();
     });
+  }
+
+  private async migrateDailyToYearly(): Promise<void> {
+    const ok = await this.confirmAsync(t("migration.confirm"));
+    if (!ok) return;
+
+    const dayFiles = this.app.vault.getMarkdownFiles().filter((f) => {
+      const dayRe = /^\d{4}-\d{2}-\d{2}\.md$/;
+      return f.path.startsWith(`${this.settings.folder}/`) && dayRe.test(f.name);
+    });
+
+    if (dayFiles.length === 0) {
+      new Notice(t("migration.done", { merged: 0, deleted: 0 }));
+      return;
+    }
+
+    new Notice(t("migration.progress", { n: dayFiles.length }));
+    const result = await this.store.migrateDailyToYearly();
+
+    if (result.errors > 0) {
+      new Notice(t("migration.doneError", { merged: result.merged, deleted: result.deleted, errors: result.errors }));
+    } else {
+      new Notice(t("migration.done", { merged: result.merged, deleted: result.deleted }));
+    }
   }
 }
