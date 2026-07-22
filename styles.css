@@ -1963,18 +1963,28 @@
 .memoria-editor-host .cm-gutters {
   display: none !important;
 }
-/* MarkdownRenderer 预览层 */
-.memoria-editor-render {
-  padding: 0 4px;
+/* Markdown 实时预览区 */
+.memoria-editor-host {
+  margin: 12px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary-alt, var(--background-secondary));
+  min-height: 40px;
+  max-height: 45vh;
+  overflow-y: auto;
   font-size: var(--font-text-size, 14px);
   line-height: var(--line-height-normal, 1.6);
   color: var(--text-normal);
-  cursor: text;
-  min-height: 1.6em;
+}
+.memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-editor-host {
+  display: none;
 }
 .memoria-editor-render-empty {
   color: var(--text-faint);
   font-style: italic;
+  text-align: center;
+  padding: 12px 0;
 }
 
 .memoria-input-hint {
