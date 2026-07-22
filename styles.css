@@ -1906,14 +1906,17 @@
 .memoria-editor-host .inline-title {
   display: none !important;
 }
-.memoria-editor-host .view-header {
-  display: none !important;
-}
-.memoria-editor-host .view-header-nav-buttons {
-  display: none !important;
-}
+.memoria-editor-host .view-header,
+.memoria-editor-host .view-header-nav-buttons,
 .memoria-editor-host .view-header-title-container {
   display: none !important;
+}
+.memoria-editor-host .metadata-container,
+.memoria-editor-host .cm-panels {
+  display: none !important;
+}
+.memoria-editor-host .workspace-leaf-content {
+  padding: 0 !important;
 }
 .memoria-editor-host .cm-editor {
   background: transparent !important;
@@ -1923,6 +1926,21 @@
   font-size: var(--font-text-size, 14px);
   line-height: var(--line-height-normal, 1.6);
   padding: 0 !important;
+  overflow: visible !important;
+}
+.memoria-editor-host .cm-sizer {
+  padding: 0 !important;
+}
+.memoria-editor-host .cm-contentContainer {
+  overflow: visible !important;
+}
+.memoria-editor-host .cm-content {
+  min-height: 0 !important;
+  padding: 0 !important;
+  padding-bottom: 0 !important;
+}
+.memoria-editor-host .cm-content::after {
+  display: none !important;
 }
 .memoria-editor-host .cm-gutters {
   display: none !important;
