@@ -1943,6 +1943,7 @@
   overflow-y: auto !important;
 }
 .memoria-editor-host .cm-sizer {
+  min-height: 0 !important;
   padding: 0 !important;
 }
 .memoria-editor-host .cm-content {
@@ -1977,10 +1978,6 @@
   line-height: var(--line-height-normal, 1.6);
   padding: 0 !important;
   overflow-y: auto !important;
-}
-.memoria-editor-host .cm-sizer {
-  min-height: 0 !important;
-  border: none !important;
 }
 
 .memoria-input-hint {
