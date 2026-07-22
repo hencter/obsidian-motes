@@ -486,18 +486,13 @@
 /* 输入卡片 */
 .memoria-input-card {
   margin: 16px 24px 0;
-  padding: 14px 16px 10px;
+  padding: 14px 0 10px;
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
   background: var(--background-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
   transition: border-color 0.15s, box-shadow 0.15s;
   flex-shrink: 0;
-  /* v1.4.4: 输入卡建立独立的层叠上下文，并抬高到 z-index:2。
-   *   原因：:focus-within 激活后的 3px accent 光晕 box-shadow 会向外扩散，
-   *   如果输入卡没有独立层级，扩散到的区域会被相邻的 .memoria-list 里
-   *   带不透明背景的笔记卡片覆盖掉（移动端输入卡贴底、手指滚动时尤其明显）。
-   *   给它一个高于卡片的 z-index 即可让光晕始终"浮"在笔记之上。 */
   position: relative;
   z-index: 2;
 }
@@ -661,7 +656,7 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
-  padding-top: 8px;
+  padding: 8px 16px 0;
   border-top: 1px solid var(--background-modifier-border);
 }
 .memoria-input-tools {
