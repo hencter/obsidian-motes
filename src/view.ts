@@ -1749,10 +1749,8 @@ export class MotesView extends ItemView implements HoverParent {
     // 同步筛选状态到独立侧栏
     setFilter({ ...this.filter });
     const hasStandaloneSidebar = this.app.workspace.getLeavesOfType(VIEW_TYPE_MOTES_SIDEBAR).length > 0;
-    if (hasStandaloneSidebar) {
-      this.sidebarEl.style.display = "none";
-    } else {
-      this.sidebarEl.style.display = "";
+    this.sidebarEl.toggleClass("motes-sidebar-hidden", hasStandaloneSidebar);
+    if (!hasStandaloneSidebar) {
       this.renderSidebar();
     }
     this.renderQuickTabs();
