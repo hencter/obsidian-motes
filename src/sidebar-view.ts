@@ -43,10 +43,7 @@ export class MotesSidebarView extends ItemView {
   getIcon(): string { return "panel-left"; }
 
   async onOpen(): Promise<void> {
-    this.contentEl.addClass("Motes-sidebar-view");
-    this.contentEl.style.overflow = "auto";
-    // 复用内嵌侧栏样式，只覆盖容器背景
-    this.contentEl.style.background = "var(--background-primary)";
+    this.contentEl.addClass("motes-sidebar-view");
     this.unsubscribe = this.store.onChange(() => this.render());
     onFilterChange(() => this.render());
     this.render();
