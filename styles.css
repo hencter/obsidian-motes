@@ -624,32 +624,6 @@
   color: var(--text-faint);
 }
 /* 实时预览面板 */
-.memoria-input-preview {
-  margin-top: 12px;
-  padding: 14px 16px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  background: var(--background-primary-alt, var(--background-secondary));
-  min-height: 40px;
-  max-height: 50vh;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text-normal);
-}
-.memoria-input-preview-empty {
-  color: var(--text-faint);
-  font-style: italic;
-  text-align: center;
-  padding: 12px 0;
-}
-.memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-input-preview {
-  display: none;
-}
-.memoria-tool-btn.is-active {
-  color: var(--interactive-accent);
-  background: color-mix(in srgb, var(--interactive-accent) 12%, transparent);
-}
 .memoria-root button.memoria-submit-btn {
   width: 38px;
   height: 32px;
@@ -1922,6 +1896,10 @@
   margin: 0;
   padding: 0;
   min-height: 96px;
+  transition: min-height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-editor-host {
+  min-height: 40px;
 }
 .memoria-editor-host .workspace-leaf-content {
   padding: 0 !important;

@@ -91,10 +91,6 @@ export class MemoriaView extends ItemView implements HoverParent {
    *  .is-just-hatched class 播放破壳动画，播完立即清除，
    *  后续切视图不再重播（避免"伪更新"打扰） */
   private buddyJustHatched = false;
-  /** 实时预览面板 */
-  private inputPreviewEl: HTMLElement | null = null;
-  private inputPreviewComponent = new Component();
-  private showInputPreview = false;
   /** v2.1.0-iter8: 选中包裹快捷键处理器（** == * ~~ `）*/
   private wrapHandler = new WrapHandler();
   // 内嵌侧栏状态（独立侧栏未打开时仍使用）
@@ -597,20 +593,18 @@ export class MemoriaView extends ItemView implements HoverParent {
   private buildInputCard(parent: HTMLElement): void {
     const inputCard = parent.createDiv({ cls: "memoria-input-card" });
 
+    // 隐藏的 textarea（兼容旧代码路径，如 TagSuggest 需要 textarea 引用）
     this.inputEl = inputCard.createEl("textarea", {
       cls: "memoria-input",
-      attr: {
-        placeholder: t("input.placeholder"),
-        rows: "1",
-      },
+      attr: { rows: "1" },
     });
+    this.inputEl.style.display = "none";
 
     // Obsidian 原生编辑器宿主
     this.editorHostEl = inputCard.createDiv({ cls: "memoria-editor-host" });
     this.setupNativeEditor().then(() => {
       const draft = this.loadDraft();
       if (draft) this.setEditorValue(draft);
-      // 编辑器内容变化时同步到 textarea（保持现有代码兼容）
       const editor = this.getEditor();
       if (editor) {
         this.registerDomEvent(this.editorHostEl, "input", () => {
@@ -618,149 +612,23 @@ export class MemoriaView extends ItemView implements HoverParent {
           this.inputEl.value = val;
           if (!this.editingMemo) this.saveDraft(val);
           this.syncInputCardContentState();
+          this.autoResizeEditor();
+        });
+        // 编辑器获得焦点 → 展开输入卡片
+        this.editorHostEl.addEventListener("focusin", () => {
+          inputCard.addClass("is-focused");
+        });
+        this.editorHostEl.addEventListener("focusout", (e) => {
+          // 焦点移到卡片外才收起
+          if (!inputCard.contains(e.relatedTarget as Node)) {
+            inputCard.removeClass("is-focused");
+          }
         });
       }
     });
-    // v2.0.17: 渐进式披露（点击聚焦时展开）。
-    //   设计决策：仅在用户**主动点击**输入框时展开，hover 不触发。
-    //   理由：
-    //   1. 鼠标在笔记列表和工具栏间穿梭经常路过输入框，hover 会带来大量视觉噪音
-    //   2. 点击 = 明确的写作意图；hover = 只是路过，两者不应同等对待
-    //   3. 桌面和移动端体验一致（移动端本来也没有 hover 概念）
-    //
-    //   不用 :focus-within 伪类：Chromium 对 textarea 在伪类驱动下的 transition
-    //   有诡异行为（动画只跑 30% 路程就跳到终点），换成 JS class 触发能完整走完 0.7s。
-    this.inputEl.addEventListener("focus", () => {
-      inputCard.addClass("is-focused");
-    });
-    this.inputEl.addEventListener("blur", () => {
-      inputCard.removeClass("is-focused");
-    });
-    // 标签联想
+
+    // 标签联想（仍然绑定 textarea，但编辑器输入同步到 textarea 后 TagSuggest 可工作）
     this.tagSuggest = new TagSuggest(this.app, this.inputEl);
-    // 实时预览面板
-    this.inputPreviewEl = inputCard.createDiv({
-      cls: "memoria-input-preview memoria-hidden",
-    });
-
-    this.inputEl.addEventListener("keydown", (e) => {
-      // v2.0.16: 发送快捷键按 sendHotkey 配置决定，含 IME 保护。
-      //   前面 contentEl 的 capture 监听已经响应过了；这里是 bubble 阶段兜底
-      //   （某些环境 capture 阶段的事件可能已被上游 preventDefault）。
-      if (this.shouldSendOnKeydown(e)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        void this.submitMemo();
-        return;
-      }
-      // IME 组合态守卫（只保护下面的 Escape / Tab / 列表续行，不影响发送）
-      if (e.isComposing || (e as KeyboardEvent & { keyCode?: number }).keyCode === 229) {
-        return;
-      }
-
-      // v2.1.0-iter8: 选中文本 + 按 wrap 字符（** == * ~~ `）→ 包裹而不是替换
-      //   响应来自 GitHub issue：用户期望 Obsidian 风格的"选中包裹"行为
-      if (this.wrapHandler.handleKey(e, this.inputEl)) {
-        e.preventDefault();
-        return;
-      }
-
-      if (e.key === "Escape" && this.editingMemo) {
-        e.preventDefault();
-        this.exitEditMode();
-      } else if (e.key === "Tab") {
-        // v1.1.9: 列表行的 Tab / Shift+Tab 缩进（只在列表行触发，避免影响普通输入）
-        if (this.handleListIndent(e.shiftKey)) {
-          e.preventDefault();
-        }
-      } else if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
-        // v1.1.9: 列表项 Enter 智能续行
-        //   v2.0.16: 仅在 sendHotkey === "ctrl-enter" 模式下启用（因为默认模式下
-        //   纯 Enter 已经用于"发送"，智能续行会和发送冲突）。
-        if (this.settings.sendHotkey === "ctrl-enter") {
-          if (this.handleListContinuation()) {
-            e.preventDefault();
-          }
-        }
-      }
-    });
-    // v1.1.7: 输入时保存草稿（非编辑模式才存，避免用编辑的内容覆盖草稿）
-    // v1.1.8: 同时做高度自适应
-    // v2.0.17: 同步输入卡片的 has-content 状态（用于"默认收起、有内容保持展开"动画）
-    this.inputEl.addEventListener("input", () => {
-      if (!this.editingMemo) this.saveDraft(this.inputEl.value);
-      this.autoResizeInput();
-      this.syncInputCardContentState();
-      if (this.showInputPreview) this.updateInputPreview();
-      // v2.3.3: 移除上一版的 scrollIntoView（它在 iOS 上每次打字 smooth 滚动
-      //   导致界面抖动频闪，还把 ✕ 按钮滚出视口）。FAB 展开态改用 fixed 贴底 +
-      //   textarea 内部滚动后，内容变长不再需要滚整个页面，问题从根上消除。
-    });
-    // v2.3.3: 移除 v2.0.10 的 focus → scrollIntoView 逻辑。
-    //   FAB 展开态现在用 position: fixed 贴屏幕底部 + textarea 内部滚动（见
-    //   styles.css），输入卡片永远固定在键盘上方，不需要靠滚动页面来定位；
-    //   常驻模式（always-visible）的 textarea 本身有 max-height 上限不会无限
-    //   撑高，也不需要。彻底去掉 scrollIntoView，根除 iOS 上的抖动频闪问题。
-    // 粘贴图片 + v2.0.0: 富文本 → Markdown 转换
-    this.inputEl.addEventListener("paste", (e) => {
-      void (async () => {
-      const items = Array.from(e.clipboardData?.items ?? []);
-      if (!items) return;
-      // 1) 图片（最高优先级）
-      for (const it of items) {
-        if (it.kind === "file" && it.type.startsWith("image/")) {
-          e.preventDefault();
-          const file = it.getAsFile();
-          if (file) await this.handleImageFile(file);
-          return;
-        }
-      }
-      // v2.0.0: 2) 如果剪贴板同时有 HTML + plain text，且 HTML 不是简单 plain text 裹一层
-      //   → 把 HTML 转成 Markdown 插入，保留加粗/斜体/链接/列表结构
-      //   判断依据：HTML 里含有 <a> / <strong> / <em> / <ul> / <ol> / <h1-6> 等有语义的标签
-      // v2.1.2: 前置检测 —— 如果 plain text 已经是 markdown 语法（含 [[]]、#标签、```代码块
-      //   等），信任它、走默认粘贴路径。解决从 Obsidian 主编辑器复制 [[笔记]] 或 #标签
-      //   时，HTML 版本被渲染成 <a class="internal-link"> 导致双链被转成 [text](url) 的 bug。
-      const htmlData = e.clipboardData?.getData("text/html");
-      const plainData = e.clipboardData?.getData("text/plain") ?? "";
-      if (looksLikeMarkdown(plainData)) {
-        // 走默认浏览器粘贴（plainData 已经是正确的 markdown）
-        return;
-      }
-      if (htmlData && shouldConvertHtmlToMd(htmlData)) {
-        e.preventDefault();
-        const md = htmlToMarkdown(htmlData) || plainData;
-        this.insertAtCursor(md);
-        this.autoResizeInput();
-      }
-      // 否则走默认（浏览器自己处理纯文本粘贴）
-      })().catch((err) => {
-        console.error("[Memoria] Failed to handle paste:", err);
-      });
-    });
-    // 拖拽图片
-    this.inputEl.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      this.inputEl.addClass("dragging");
-    });
-    this.inputEl.addEventListener("dragleave", () => {
-      this.inputEl.removeClass("dragging");
-    });
-    this.inputEl.addEventListener("drop", (e) => {
-      void (async () => {
-      e.preventDefault();
-      this.inputEl.removeClass("dragging");
-      const files = Array.from(e.dataTransfer?.files ?? []);
-      for (const f of files) {
-        if (f.type.startsWith("image/")) {
-          await this.handleImageFile(f);
-        }
-      }
-      })().catch((err) => {
-        console.error("[Memoria] Failed to handle dropped image:", err);
-      });
-    });
 
     const inputToolbar = inputCard.createDiv({ cls: "memoria-input-toolbar" });
     const toolLeft = inputToolbar.createDiv({ cls: "memoria-input-tools" });
@@ -779,7 +647,6 @@ export class MemoriaView extends ItemView implements HoverParent {
     setIcon(addImageBtn, "image");
     addImageBtn.addEventListener("click", () => this.pickImageFromDisk());
 
-    // v1.1.7: 无序列表
     const ulBtn = toolLeft.createEl("button", {
       cls: "memoria-tool-btn",
       attr: { "aria-label": t("toolbar.insertUL") },
@@ -787,7 +654,6 @@ export class MemoriaView extends ItemView implements HoverParent {
     setIcon(ulBtn, "list");
     ulBtn.addEventListener("click", () => this.insertListAtCursor("- "));
 
-    // v1.1.7: 有序列表（v1.1.8 修复：序号自动 +1，而不是永远是 "1."）
     const olBtn = toolLeft.createEl("button", {
       cls: "memoria-tool-btn",
       attr: { "aria-label": t("toolbar.insertOL") },
@@ -795,7 +661,6 @@ export class MemoriaView extends ItemView implements HoverParent {
     setIcon(olBtn, "list-ordered");
     olBtn.addEventListener("click", () => this.insertOrderedListAtCursor());
 
-    // v1.1.7: 任务列表
     const taskBtn = toolLeft.createEl("button", {
       cls: "memoria-tool-btn",
       attr: { "aria-label": t("toolbar.insertTask") },
@@ -813,25 +678,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       this.showTablePicker(addTableBtn);
     });
 
-    // 实时预览切换按钮
-    const previewBtn = toolLeft.createEl("button", {
-      cls: "memoria-tool-btn",
-      attr: { "aria-label": t("toolbar.preview") },
-    });
-    setIcon(previewBtn, "eye");
-    previewBtn.addEventListener("click", () => {
-      this.showInputPreview = !this.showInputPreview;
-      this.inputPreviewEl?.toggleClass("memoria-hidden", !this.showInputPreview);
-      previewBtn.toggleClass("is-active", this.showInputPreview);
-      if (this.showInputPreview) this.updateInputPreview();
-    });
-
-    // v1.2.1: 去掉 "Ctrl+Enter · 拖拽/粘贴图片" 提示，让输入区更清爽
-
     const submitWrap = inputToolbar.createDiv({ cls: "memoria-submit-wrap" });
-    // v1.6.0: 编辑模式下可修改时间。新建模式默认隐藏，进入编辑模式时填值并显示。
-    //   用原生 datetime-local，iOS 上是滚轮选择器，PC 上是日历 + 时间双控件，
-    //   全平台体验一致且零依赖。
     const editDateTimeInput = submitWrap.createEl("input", {
       cls: "memoria-edit-datetime memoria-hidden",
       type: "datetime-local",
@@ -843,7 +690,6 @@ export class MemoriaView extends ItemView implements HoverParent {
       text: t("input.cancel"),
     });
     cancelBtn.addEventListener("click", () => this.exitEditMode());
-    // 存起来方便 updateEditBanner 切换可见性
     this.editBannerEl = cancelBtn;
 
     const submitBtn = submitWrap.createEl("button", {
@@ -857,6 +703,18 @@ export class MemoriaView extends ItemView implements HoverParent {
     submitBtn.addEventListener("click", () => {
       void this.submitMemo();
     });
+  }
+
+  private autoResizeEditor(): void {
+    if (!this.editorHostEl) return;
+    const cm = this.editorHostEl.querySelector(".cm-editor") as HTMLElement | null;
+    if (!cm) return;
+    const scroller = cm.querySelector(".cm-scroller") as HTMLElement | null;
+    if (!scroller) return;
+    const contentHeight = scroller.scrollHeight;
+    const maxH = window.innerHeight * 0.4;
+    const h = Math.min(contentHeight + 16, maxH);
+    this.editorHostEl.style.minHeight = `${Math.max(96, h)}px`;
   }
 
   /** 在光标处插入文本。
@@ -1565,27 +1423,6 @@ export class MemoriaView extends ItemView implements HoverParent {
       /* ignore */
     }
   }
-
-  /** 使用 Obsidian 原生 MarkdownRenderer 实时预览输入内容 */
-  private updateInputPreview = debounce(() => {
-    if (!this.inputPreviewEl || !this.showInputPreview) return;
-    this.inputPreviewComponent.unload();
-    this.inputPreviewComponent = new Component();
-    this.inputPreviewComponent.load();
-    this.inputPreviewEl.empty();
-    const md = this.getEditorValue();
-    if (!md) {
-      this.inputPreviewEl.createDiv({ cls: "memoria-input-preview-empty", text: t("preview.empty") });
-      return;
-    }
-    void MarkdownRenderer.render(
-      this.app,
-      md,
-      this.inputPreviewEl,
-      "",
-      this.inputPreviewComponent
-    );
-  }, 200, true);
 
   // ============== 原生编辑器 ==============
 
