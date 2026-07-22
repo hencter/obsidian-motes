@@ -8,20 +8,20 @@
  */
 .memoria-root button.memoria-icon-btn,
 .memoria-root button.memoria-tool-btn,
+.memoria-root button.memoria-quick-tab,
 .memoria-root button.memoria-cal-nav,
 .memoria-root button.memoria-overview-btn,
-.memoria-root button.memoria-edit-cancel,
-.memoria-root button.memoria-submit-btn {
-  box-shadow: none;
-  /* 关键：覆盖 Obsidian 默认按钮的背景边框 */
+.memoria-root button.memoria-edit-cancel {
+  box-shadow: none !important;
+  border: none !important;
 }
 .memoria-root button.memoria-icon-btn,
 .memoria-root button.memoria-tool-btn,
 .memoria-root button.memoria-cal-nav,
 .memoria-root button.memoria-overview-btn {
   background-color: transparent;
-  border: none;
-  box-shadow: none;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* 让视图的 contentEl 填满整个面板，清除 Obsidian 默认 padding */
