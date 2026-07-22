@@ -1963,28 +1963,42 @@
 .memoria-editor-host .cm-gutters {
   display: none !important;
 }
-/* Markdown 实时预览区 */
+/* CodeMirror 实时编辑器 */
 .memoria-editor-host {
-  margin: 12px 0 0;
-  padding: 14px 16px;
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 8px;
-  background: var(--background-primary-alt, var(--background-secondary));
-  min-height: 40px;
-  max-height: 45vh;
-  overflow-y: auto;
-  font-size: var(--font-text-size, 14px);
-  line-height: var(--line-height-normal, 1.6);
-  color: var(--text-normal);
+  margin: 0;
+  padding: 0;
+  height: 280px !important;
+  max-height: 45vh !important;
+  overflow: hidden !important;
 }
 .memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-editor-host {
-  display: none;
+  height: 56px !important;
 }
-.memoria-editor-render-empty {
-  color: var(--text-faint);
-  font-style: italic;
-  text-align: center;
-  padding: 12px 0;
+.memoria-input-card.is-focused .memoria-editor-host,
+.memoria-input-card.has-content .memoria-editor-host,
+.memoria-input-card.is-editing .memoria-editor-host {
+  height: 280px !important;
+}
+.memoria-editor-host .inline-title,
+.memoria-editor-host .view-header,
+.memoria-editor-host .metadata-container,
+.memoria-editor-host .cm-gutters,
+.memoria-editor-host .cm-panels {
+  display: none !important;
+}
+.memoria-editor-host .workspace-leaf,
+.memoria-editor-host .workspace-leaf-content,
+.memoria-editor-host .markdown-source-view,
+.memoria-editor-host .cm-editor {
+  height: 100% !important;
+  max-height: 100% !important;
+}
+.memoria-editor-host .cm-scroller {
+  font-family: var(--font-text);
+  font-size: var(--font-text-size, 14px);
+  line-height: var(--line-height-normal, 1.6);
+  padding: 0 !important;
+  overflow-y: auto !important;
 }
 
 .memoria-input-hint {

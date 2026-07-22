@@ -6,6 +6,7 @@ import {
   Notice,
   WorkspaceLeaf,
   MarkdownRenderer,
+  MarkdownView,
   Component,
   setIcon,
   TFile,
@@ -13,6 +14,7 @@ import {
   debounce,
   HoverParent,
   HoverPopover,
+  normalizePath,
 } from "obsidian";
 import { Memo, MemoriaSettings, RESERVED_TAGS, VIEW_TYPE_MEMORIA, VIEW_TYPE_MEMORIA_STATS, VIEW_TYPE_MEMORIA_YEAR, VIEW_TYPE_MEMORIA_SIDEBAR } from "./types";
 import { MemoStore } from "./store";
@@ -91,6 +93,8 @@ export class MemoriaView extends ItemView implements HoverParent {
   private buddyJustHatched = false;
   /** v2.1.0-iter8: 选中包裹快捷键处理器（** == * ~~ `）*/
   private wrapHandler = new WrapHandler();
+  private editorLeaf!: WorkspaceLeaf;
+  private editorHostEl!: HTMLElement;
   // 内嵌侧栏状态（独立侧栏未打开时仍使用）
   private overviewMode: "heatmap" | "calendar" | "buddy" = "heatmap";
   private overviewModeOverridden = false;
@@ -207,6 +211,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
     if (this.filterUnsub) { this.filterUnsub(); this.filterUnsub = null; }
+    try { this.editorLeaf?.detach(); } catch { /* ignore */ }
     if (this.tagSuggest) {
       this.tagSuggest.destroy();
       this.tagSuggest = null;
@@ -591,47 +596,31 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     this.inputEl = inputCard.createEl("textarea", {
       cls: "memoria-input",
-      attr: {
-        placeholder: t("input.placeholder"),
-        rows: "3",
-      },
+      attr: { rows: "1" },
     });
+    this.inputEl.style.display = "none";
 
-    // 实时 MarkdownRenderer 预览
     this.editorHostEl = inputCard.createDiv({ cls: "memoria-editor-host" });
-    const updatePreview = debounce(() => {
-      this.editorPreviewComponent.unload();
-      this.editorPreviewComponent = new Component();
-      this.editorPreviewComponent.load();
-      this.editorHostEl.empty();
-      const md = this.inputEl.value.trim();
-      if (!md) {
-        this.editorHostEl.createDiv({
-          cls: "memoria-editor-render-empty",
-          text: t("preview.empty"),
+    this.setupNativeEditor().then(() => {
+      const draft = this.loadDraft();
+      if (draft) this.setEditorValue(draft);
+      const editor = this.getEditor();
+      if (editor) {
+        this.registerDomEvent(this.editorHostEl, "input", () => {
+          const val = editor.getValue();
+          this.inputEl.value = val;
+          if (!this.editingMemo) this.saveDraft(val);
+          this.syncInputCardContentState();
         });
-        return;
+        this.editorHostEl.addEventListener("focusin", () => {
+          inputCard.addClass("is-focused");
+        });
+        this.editorHostEl.addEventListener("focusout", (e) => {
+          if (!inputCard.contains(e.relatedTarget as Node)) {
+            inputCard.removeClass("is-focused");
+          }
+        });
       }
-      void MarkdownRenderer.render(
-        this.app,
-        md,
-        this.editorHostEl,
-        "",
-        this.editorPreviewComponent
-      );
-    }, 200, true);
-
-    this.inputEl.addEventListener("input", () => {
-      if (!this.editingMemo) this.saveDraft(this.inputEl.value);
-      this.autoResizeInput();
-      this.syncInputCardContentState();
-      updatePreview();
-    });
-    this.inputEl.addEventListener("focus", () => {
-      inputCard.addClass("is-focused");
-    });
-    this.inputEl.addEventListener("blur", () => {
-      inputCard.removeClass("is-focused");
     });
 
     // 标签联想（仍然绑定 textarea，但编辑器输入同步到 textarea 后 TagSuggest 可工作）
@@ -1299,7 +1288,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
 
   private async submitMemo(): Promise<void> {
-    const text = this.inputEl.value.trim();
+    const text = this.getEditorValue().trim();
     if (!text) return;
     try {
       if (this.editingMemo) {
@@ -1326,6 +1315,7 @@ export class MemoriaView extends ItemView implements HoverParent {
         new Notice(t("notice.saved"));
       }
       if (this.settings.clearAfterSave) {
+        this.setEditorValue("");
         this.inputEl.value = "";
         this.clearDraft();
       }
@@ -1413,6 +1403,45 @@ export class MemoriaView extends ItemView implements HoverParent {
       window.localStorage.removeItem(this.draftKey());
     } catch {
       /* ignore */
+    }
+  }
+
+  private getEditor() {
+    const view = this.editorLeaf?.view;
+    if (view instanceof MarkdownView) return view.editor;
+    return null;
+  }
+
+  private getEditorValue(): string {
+    const editor = this.getEditor();
+    return editor ? editor.getValue() : this.inputEl?.value ?? "";
+  }
+
+  private setEditorValue(text: string): void {
+    const editor = this.getEditor();
+    if (editor) editor.setValue(text);
+    this.inputEl.value = text;
+  }
+
+  private async setupNativeEditor(): Promise<void> {
+    if (this.editorLeaf) return;
+    const folder = normalizePath(this.settings.folder);
+    const draftPath = `${folder}/_draft.md`;
+    const dir = this.app.vault.getAbstractFileByPath(folder);
+    if (!dir) await this.app.vault.createFolder(folder);
+    const existing = this.app.vault.getAbstractFileByPath(draftPath);
+    if (!(existing instanceof TFile)) {
+      await this.app.vault.create(draftPath, "");
+    }
+    // @ts-expect-error WorkspaceLeaf constructor is internal
+    this.editorLeaf = new WorkspaceLeaf(this.app);
+    await this.editorLeaf.openFile(
+      this.app.vault.getAbstractFileByPath(draftPath) as TFile,
+      { state: { mode: "source", source: false } }
+    );
+    const view = this.editorLeaf.view;
+    if (view instanceof MarkdownView) {
+      this.editorHostEl.replaceChildren(view.containerEl);
     }
   }
 
@@ -1586,9 +1615,9 @@ export class MemoriaView extends ItemView implements HoverParent {
    *  v1.6.0: 同步把 memo 的时间填入 datetime-local 输入框，允许编辑时一并修改
    */
   private enterEditMode(memo: Memo): void {
-    if (this.inputEl.value.trim()) this.saveDraft(this.inputEl.value);
+    if (this.getEditorValue().trim()) this.saveDraft(this.getEditorValue());
     this.editingMemo = memo;
-    this.inputEl.value = memo.content;
+    this.setEditorValue(memo.content);
     if (this.editDateTimeEl) {
       this.editDateTimeEl.value = `${memo.date}T${memo.time}`;
     }
@@ -1607,7 +1636,7 @@ export class MemoriaView extends ItemView implements HoverParent {
    */
   private exitEditMode(): void {
     this.editingMemo = null;
-    this.inputEl.value = this.loadDraft();
+    this.setEditorValue(this.loadDraft());
     if (this.editDateTimeEl) this.editDateTimeEl.value = "";
     this.updateEditBanner();
     // v1.1.8: 草稿长度不一，重算高度
