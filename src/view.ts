@@ -152,7 +152,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     return VIEW_TYPE_MEMORIA;
   }
   getDisplayText(): string {
-    return "Memoria";
+    return "Motes";
   }
   getIcon(): string {
     return "feather";

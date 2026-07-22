@@ -56,7 +56,7 @@ export default class MemoriaPlugin extends Plugin {
     // 注册为 Page Preview 的 hover-link 来源，让 [[双链]] 悬浮预览走 Obsidian 原生弹窗
     this.registerHoverLinkSource(VIEW_TYPE_MEMORIA, {
       defaultMod: false,
-      display: "Memoria",
+      display: "Motes",
     });
 
     // Ribbon 按钮

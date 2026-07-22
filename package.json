@@ -1,7 +1,7 @@
 {
-  "name": "memoria",
+  "name": "motes",
   "version": "2.4.0",
-  "description": "Memoria - Obsidian memos plugin with pure markdown storage",
+  "description": "Motes - A flow-style note plugin for Obsidian with native editor, waterfall layout and flexible storage",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",

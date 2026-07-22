@@ -733,7 +733,7 @@ function escapeHtml(s: string): string {
 /** JSON 导出：结构化数据 */
 function renderJson(memos: Memo[], filterDesc: string): string {
   const data = {
-    exported_by: "Memoria",
+     exported_by: "Motes",
     exported_at: new Date().toISOString(),
     filter: filterDesc,
     count: memos.length,

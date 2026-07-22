@@ -117,7 +117,7 @@ export const DEFAULT_SETTINGS: MemoriaSettings = {
   storageMode: "yearly",
   waterfallLayout: false,
   editorHeight: 200,
-  brandName: "Memoria",
+  brandName: "Motes",
 };
 
 export const VIEW_TYPE_MEMORIA = "memoria-view";
