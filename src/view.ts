@@ -1480,6 +1480,10 @@ export class MemoriaView extends ItemView implements HoverParent {
     const view = this.editorLeaf.view;
     if (view instanceof MarkdownView) {
       this.editorHostEl.replaceChildren(view.containerEl);
+      // 编辑器获得焦点时激活 leaf，确保快捷键生效
+      this.editorHostEl.addEventListener("focusin", () => {
+        try { this.app.workspace.setActiveLeaf(this.editorLeaf); } catch { /* ignore */ }
+      });
     }
   }
 
