@@ -419,43 +419,65 @@
 /* 快捷筛选 Tab 栏 */
 .memoria-quick-tabs {
   display: flex;
-  gap: 4px;
-  padding: 8px 24px 0;
+  gap: 2px;
+  padding: 10px 24px 6px;
   flex-shrink: 0;
   overflow-x: auto;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.memoria-quick-tabs::-webkit-scrollbar {
+  display: none;
 }
 .memoria-quick-tab {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
+  gap: 6px;
+  padding: 6px 14px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-faint);
   font-size: 12px;
-  border-radius: 6px;
+  font-weight: 500;
+  border-radius: 6px 6px 0 0;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.12s, color 0.12s;
+  transition: color 0.15s, background 0.15s;
   box-shadow: none;
+  position: relative;
+}
+.memoria-quick-tab::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  border-radius: 2px 2px 0 0;
+  transition: background 0.15s;
 }
 .memoria-quick-tab:hover {
-  background: var(--background-modifier-hover);
   color: var(--text-normal);
+  background: var(--background-modifier-hover);
 }
 .memoria-quick-tab.is-active {
+  color: var(--interactive-accent);
+  background: transparent;
+}
+.memoria-quick-tab.is-active::after {
   background: var(--interactive-accent);
-  color: var(--text-on-accent);
-  font-weight: 500;
 }
 .memoria-quick-tab-icon {
   display: flex;
   align-items: center;
-  opacity: 0.85;
+  opacity: 0.7;
+}
+.memoria-quick-tab.is-active .memoria-quick-tab-icon {
+  opacity: 1;
 }
 .memoria-quick-tab-icon .svg-icon {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 .memoria-quick-tab-label {
   line-height: 1;
