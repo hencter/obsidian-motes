@@ -4641,39 +4641,6 @@
   box-shadow: none !important;
 }
 
-/* ================== Wiki Link 卡片预览 ================== */
-.memoria-link-preview {
-  z-index: 10003;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 10px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.16);
-  padding: 14px 16px;
-  font-size: 13px;
-  line-height: 1.6;
-  overflow: hidden;
-  pointer-events: auto;
-}
-.memoria-link-preview-title {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-accent);
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--background-modifier-border);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.memoria-link-preview-content {
-  font-size: 12px;
-  color: var(--text-muted);
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-y: auto;
-  max-height: 260px;
-}
-
 
 
 

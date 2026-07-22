@@ -117,6 +117,7 @@ export const DEFAULT_SETTINGS: MemoriaSettings = {
 export const VIEW_TYPE_MEMORIA = "memoria-view";
 export const VIEW_TYPE_MEMORIA_STATS = "memoria-stats-view";
 export const VIEW_TYPE_MEMORIA_YEAR = "memoria-year-view";
+export const VIEW_TYPE_MEMORIA_SIDEBAR = "memoria-sidebar-view";
 
 /** 保留标签：这些标签不会在侧栏的标签列表里显示，也不会出现在卡片底部胶囊 */
 export const PIN_TAG = "置顶";

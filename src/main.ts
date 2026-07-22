@@ -12,10 +12,12 @@ import {
   VIEW_TYPE_MEMORIA,
   VIEW_TYPE_MEMORIA_STATS,
   VIEW_TYPE_MEMORIA_YEAR,
+  VIEW_TYPE_MEMORIA_SIDEBAR,
 } from "./types";
 import { MemoStore } from "./store";
 import { renderMemo } from "./parser";
 import { MemoriaView } from "./view";
+import { MemoriaSidebarView } from "./sidebar-view";
 import { MemoriaSettingTab } from "./settings";
 import { StatsView } from "./stats";
 import { YearPanoramaView } from "./year-panorama";
@@ -39,6 +41,10 @@ export default class MemoriaPlugin extends Plugin {
       (leaf: WorkspaceLeaf) => new MemoriaView(leaf, this.store, this.settings, this)
     );
     this.registerView(
+      VIEW_TYPE_MEMORIA_SIDEBAR,
+      (leaf: WorkspaceLeaf) => new MemoriaSidebarView(leaf, this.store, this.settings, this)
+    );
+    this.registerView(
       VIEW_TYPE_MEMORIA_STATS,
       (leaf: WorkspaceLeaf) => new StatsView(leaf, this.store)
     );
@@ -46,6 +52,12 @@ export default class MemoriaPlugin extends Plugin {
       VIEW_TYPE_MEMORIA_YEAR,
       (leaf: WorkspaceLeaf) => new YearPanoramaView(leaf, this.store)
     );
+
+    // 注册为 Page Preview 的 hover-link 来源，让 [[双链]] 悬浮预览走 Obsidian 原生弹窗
+    this.registerHoverLinkSource(VIEW_TYPE_MEMORIA, {
+      defaultMod: false,
+      display: "Memoria",
+    });
 
     // Ribbon 按钮
     this.addRibbonIcon("feather", t("ribbon.openMemoria"), () => {
@@ -98,6 +110,14 @@ export default class MemoriaPlugin extends Plugin {
       name: t("command.migrateDailyToYearly"),
       callback: () => {
         void this.migrateDailyToYearly();
+      },
+    });
+
+    this.addCommand({
+      id: "open-memoria-sidebar",
+      name: t("command.openSidebar"),
+      callback: () => {
+        void this.activateSidebarView();
       },
     });
 
@@ -196,6 +216,19 @@ export default class MemoriaPlugin extends Plugin {
       active: true,
     });
     await this.app.workspace.revealLeaf(leaf);
+  }
+
+  async activateSidebarView(): Promise<void> {
+    const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR);
+    if (existing.length) {
+      await this.app.workspace.revealLeaf(existing[0]);
+      return;
+    }
+    const leaf = this.app.workspace.getRightLeaf(false);
+    if (leaf) {
+      await leaf.setViewState({ type: VIEW_TYPE_MEMORIA_SIDEBAR, active: true });
+      await this.app.workspace.revealLeaf(leaf);
+    }
   }
 
   /**

@@ -39,9 +39,10 @@ const zhCN: Dict = {
   "sidebar.withLink": "有链接",
   "sidebar.random": "随机",
   "sidebar.section.views": "视图",
-  "sidebar.section.search": "检索式",
+  "sidebar.section.search": "检索",
   "sidebar.section.years": "年份",
   "sidebar.section.tags": "标签",
+  "sidebar.viewTitle": "Memoria 侧栏",
 
   // 输入框
   "input.placeholder": "此刻，你在想什么？",
@@ -324,6 +325,7 @@ const zhCN: Dict = {
   "settings.storageMode.daily": "日记格式（每天一篇）",
   "settings.storageMode.yearly": "年格式（每年一篇）⭐ 推荐",
   "command.migrateDailyToYearly": "迁移日记格式 → 年格式",
+  "command.openSidebar": "打开独立侧栏",
   "migration.confirm": "将所有日记文件（YYYY-MM-DD.md）合并到对应的年文件（YYYY.md）中，然后删除日记文件。此操作不可撤销，建议先备份。确定要继续吗？",
   "migration.progress": "正在迁移 {n} 个日记文件…",
   "migration.done": "迁移完成：{merged} 条笔记已合并，{deleted} 个日记文件已删除",
@@ -577,9 +579,10 @@ const enUS: Dict = {
   "sidebar.withLink": "With link",
   "sidebar.random": "Random",
   "sidebar.section.views": "Views",
-  "sidebar.section.search": "Queries",
+  "sidebar.section.search": "Search",
   "sidebar.section.years": "Years",
   "sidebar.section.tags": "Tags",
+  "sidebar.viewTitle": "Memoria sidebar",
 
   // Input
   "input.placeholder": "What's on your mind?",
@@ -862,6 +865,7 @@ const enUS: Dict = {
   "settings.storageMode.daily": "Daily (one file per day)",
   "settings.storageMode.yearly": "Yearly (one file per year) ⭐ Recommended",
   "command.migrateDailyToYearly": "Migrate daily → yearly format",
+  "command.openSidebar": "Open independent sidebar",
   "migration.confirm": "Merge all daily files (YYYY-MM-DD.md) into corresponding year files (YYYY.md), then delete the daily files. This is irreversible — backup recommended. Continue?",
   "migration.progress": "Migrating {n} daily files…",
   "migration.done": "Migration done: {merged} memos merged, {deleted} daily files deleted",

@@ -11,8 +11,10 @@ import {
   TFile,
   Platform,
   debounce,
+  HoverParent,
+  HoverPopover,
 } from "obsidian";
-import { Memo, MemoriaSettings, RESERVED_TAGS, VIEW_TYPE_MEMORIA, VIEW_TYPE_MEMORIA_STATS, VIEW_TYPE_MEMORIA_YEAR } from "./types";
+import { Memo, MemoriaSettings, RESERVED_TAGS, VIEW_TYPE_MEMORIA, VIEW_TYPE_MEMORIA_STATS, VIEW_TYPE_MEMORIA_YEAR, VIEW_TYPE_MEMORIA_SIDEBAR } from "./types";
 import { MemoStore } from "./store";
 import { TagSuggest } from "./tag-suggest";
 import { extractImages, renderImageGrid, openLightbox } from "./image-grid";
@@ -26,6 +28,7 @@ import { exportMemos, ExportFormat } from "./export";
 import { hatch, HatchedBuddy } from "./buddy/hatch";
 import { renderBuddy, renderEgg } from "./buddy/render";
 import { pickQuip } from "./buddy/quips";
+import { getFilter, setFilter, onFilterChange, Filter } from "./filter-state";
 import {
   replaceTextareaRange,
   setTextareaValue,
@@ -63,15 +66,10 @@ interface ReviewFilters {
   keyword: string;
 }
 
-export class MemoriaView extends ItemView {
+export class MemoriaView extends ItemView implements HoverParent {
+  hoverPopover: HoverPopover | null = null;
   private workspaceLeafEl: HTMLElement | null = null;
-  private filter: Filter = {
-    tag: null,
-    year: null,
-    date: null,
-    keyword: "",
-    preset: "all",
-  };
+  private filter: Filter = { ...getFilter() };
   private reviewFilters: ReviewFilters = {
     tag: "",
     year: "",
@@ -79,37 +77,13 @@ export class MemoriaView extends ItemView {
     keyword: "",
   };
   private unsubscribe: (() => void) | null = null;
+  private filterUnsub: (() => void) | null = null;
   private inputEl!: HTMLTextAreaElement;
   private listEl!: HTMLElement;
-  private sidebarEl!: HTMLElement;
   private searchEl!: HTMLInputElement;
   private childComponent = new Component();
-  /** v1.1.14: 改为按 settings.pageSize 初始化，不再硬编码 50 */
   private pageLimit: number;
-  private tagsExpanded = false;
   private tagSuggest: TagSuggest | null = null;
-  /** 侧栏顶部视图：热力图 / 月历 / 宠物（v2.1.0 新增 buddy）
-   *  v2.0.20: 初始值从 settings.defaultOverviewMode 读（老用户默认 heatmap 不变）
-   *  在 constructor 里设置实际初值，这里只给类型 */
-  private overviewMode: "heatmap" | "calendar" | "buddy" = "heatmap";
-  /** v2.0.20: 当前会话中用户是否手动切换过 overviewMode
-   *  - false：跟随 settings.defaultOverviewMode（用户在设置页改默认值时立即生效）
-   *  - true：锁定为用户当前选择（改设置默认值不影响当前会话） */
-  private overviewModeOverridden = false;
-
-  /** v2.1.0-iter6: 宠物气泡文案的会话级缓存
-   *  用户反馈：每次点视图切换都刷新气泡会引发"刷屏心理"（忍不住一直点）。
-   *  改为只在真正有意义的时机才换一句：
-   *    1. view 首次打开（onOpen 时 cache 清空，下次 renderBuddy 重算）
-   *    2. 用户新增了一条笔记（store.onChange 里检测到 memos.length 增加）
-   *  其他渲染（切换视图、筛选、刷新 UI）都复用 cache，不重算。
-   *  null = 需要重算；字符串 = 直接用（即便是空串）*/
-  private buddyQuipCache: string | null = null;
-  /** 用于检测笔记数是否增加（增加才换气泡，删除不换） */
-  private buddyLastMemoCount = -1;
-
-  /** v2.1.0-iter8: 选中包裹快捷键处理器（** == * ~~ `）*/
-  private wrapHandler = new WrapHandler();
 
   /** v2.1.0-iter10: "刚孵化"标记 —— 仅在下一次 renderBuddy 时给卡片加
    *  .is-just-hatched class 播放破壳动画，播完立即清除，
@@ -150,14 +124,10 @@ export class MemoriaView extends ItemView {
     leaf: WorkspaceLeaf,
     private store: MemoStore,
     private settings: MemoriaSettings,
-    /** v2.0.0: 持有 plugin 引用，用于在设置变化时 saveSettings */
     private plugin: { saveSettings(): Promise<void> }
   ) {
     super(leaf);
-    // v1.1.14: pageLimit 初值从设置读取（之前硬编码 50，导致设置页的 pageSize 滑块完全无效）
     this.pageLimit = Math.max(10, this.settings.pageSize || 50);
-    // v2.0.20: 侧栏默认视图也从设置读
-    this.overviewMode = this.settings.defaultOverviewMode || "heatmap";
   }
 
   /** v1.1.14: 统一走 settings.pageSize，设置即改即生效 */
@@ -181,6 +151,14 @@ export class MemoriaView extends ItemView {
     this.contentEl.addClass("memoria-root");
     this.buildLayout();
     this.unsubscribe = this.store.onChange(() => this.renderAll());
+
+    // 监听独立侧栏的筛选变化
+    this.filterUnsub = onFilterChange(() => {
+      this.filter = { ...getFilter() };
+      if (this.searchEl) this.searchEl.value = this.filter.keyword;
+      this.pageLimit = this.getInitialPageLimit();
+      this.renderList();
+    });
 
     // v2.0.14: Obsidian 内置命令「在新标签页中打开光标处链接」默认占用 Ctrl+Enter。
     //   v2.0.17: 发送快捷键改为 sendHotkey 可配置，两种模式互斥：
@@ -224,6 +202,7 @@ export class MemoriaView extends ItemView {
     this.workspaceLeafEl?.removeClass("memoria-workspace-leaf");
     this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
+    if (this.filterUnsub) { this.filterUnsub(); this.filterUnsub = null; }
     if (this.tagSuggest) {
       this.tagSuggest.destroy();
       this.tagSuggest = null;
@@ -1834,10 +1813,17 @@ export class MemoriaView extends ItemView {
   }
 
   private renderAll(): void {
-    // v2.2.0: 每次 renderAll 同步一次 root 的 fab-mode class，
-    //   让用户在设置页切换 mobileInputStyle 后立即生效（store.notifyChange 会触发 renderAll）
     this.syncFabMode();
-    this.renderSidebar();
+    // Push local filter to shared state (independent sidebar reads from shared)
+    setFilter({ ...this.filter });
+    // Skip inline sidebar if standalone sidebar view is open
+    const hasStandaloneSidebar = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR).length > 0;
+    if (!hasStandaloneSidebar) {
+      this.sidebarEl.style.display = "";
+      this.renderSidebar();
+    } else {
+      this.sidebarEl.style.display = "none";
+    }
     this.renderList();
   }
 
@@ -2037,6 +2023,7 @@ export class MemoriaView extends ItemView {
       this.filter.date = null;
       if (key === "random") this.filter.randomSeed = Date.now();
       this.pageLimit = this.getInitialPageLimit();
+      setFilter({ ...this.filter });
       this.renderAll();
     });
   }
@@ -3428,80 +3415,20 @@ export class MemoriaView extends ItemView {
       }
     });
 
-    // Wiki link hover preview
-    this.bindWikiLinkPreview(body, memo);
-  }
-
-  private bindWikiLinkPreview(body: HTMLElement, memo: Memo): void {
-    let previewEl: HTMLElement | null = null;
-    let hideTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const clearPreview = () => {
-      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
-      if (previewEl) { previewEl.remove(); previewEl = null; }
-    };
-
-    const showPreview = async (link: HTMLAnchorElement) => {
-      clearPreview();
-      const href = link.getAttribute("data-href") || link.getAttribute("href") || "";
-      if (!href) return;
-
-      const file = this.app.metadataCache.getFirstLinkpathDest(href, memo.file);
-      if (!(file instanceof TFile)) return;
-
-      try {
-        const raw = await this.app.vault.cachedRead(file);
-        const firstLines = raw.trim().split("\n").slice(0, 15).join("\n");
-
-        previewEl = activeDocument.body.createDiv({ cls: "memoria-link-preview" });
-
-        const titleEl = previewEl.createDiv({ cls: "memoria-link-preview-title" });
-        titleEl.createSpan({ text: file.basename });
-
-        const contentEl = previewEl.createDiv({ cls: "memoria-link-preview-content" });
-        contentEl.createSpan({ text: firstLines || "(empty)" });
-
-        const rect = link.getBoundingClientRect();
-        let left = rect.left;
-        let top = rect.bottom + 6;
-
-        // Boundary clamping
-        const pw = 320;
-        const vw = activeDocument.documentElement.clientWidth;
-        if (left + pw > vw - 16) left = Math.max(16, vw - pw - 16);
-        if (left < 16) left = 16;
-
-        previewEl.setCssStyles({
-          position: "fixed",
-          left: `${left}px`,
-          top: `${top}px`,
-          maxWidth: `${pw}px`,
-          maxHeight: "320px",
-        });
-
-        previewEl.addEventListener("mouseenter", () => {
-          if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
-        });
-        previewEl.addEventListener("mouseleave", () => {
-          hideTimer = setTimeout(clearPreview, 150);
-        });
-      } catch {
-        clearPreview();
-      }
-    };
-
-    body.addEventListener("mouseenter", (e) => {
+    // Wiki link hover preview via Obsidian native Page Preview
+    body.addEventListener("mouseover", (e) => {
       const internal = (e.target as HTMLElement).closest<HTMLAnchorElement>("a.internal-link");
       if (!internal) return;
-      void showPreview(internal);
-    }, true);
-
-    body.addEventListener("mouseleave", (e) => {
-      const internal = (e.target as HTMLElement).closest<HTMLAnchorElement>("a.internal-link");
-      if (internal) {
-        hideTimer = setTimeout(clearPreview, 200);
-      }
-    }, true);
+      const href = internal.getAttribute("data-href") || internal.getAttribute("href") || "";
+      if (!href) return;
+      this.app.workspace.trigger("hover-link", {
+        event: e,
+        source: VIEW_TYPE_MEMORIA,
+        hoverParent: this,
+        targetEl: internal,
+        linktext: href,
+      });
+    });
   }
 
   /**
