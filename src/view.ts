@@ -6,6 +6,7 @@ import {
   Notice,
   WorkspaceLeaf,
   MarkdownRenderer,
+  MarkdownView,
   Component,
   setIcon,
   TFile,
@@ -13,6 +14,7 @@ import {
   debounce,
   HoverParent,
   HoverPopover,
+  normalizePath,
 } from "obsidian";
 import { Memo, MemoriaSettings, RESERVED_TAGS, VIEW_TYPE_MEMORIA, VIEW_TYPE_MEMORIA_STATS, VIEW_TYPE_MEMORIA_YEAR, VIEW_TYPE_MEMORIA_SIDEBAR } from "./types";
 import { MemoStore } from "./store";
@@ -200,12 +202,8 @@ export class MemoriaView extends ItemView implements HoverParent {
     } catch (err) {
       console.error("[Memoria] reloadAll failed:", err);
     }
-    // v1.1.7: 恢复上次未发送的草稿
-    const draft = this.loadDraft();
-    if (draft) this.inputEl.value = draft;
-    // v1.1.8: 初次渲染后按实际内容算一次高度
+    // v1.1.7: 恢复上次未发送的草稿（编辑器就绪后由 setupNativeEditor 处理）
     this.autoResizeInput();
-    // v2.0.17: 有草稿的话让输入卡片保持展开态
     this.syncInputCardContentState();
     this.renderAll();
   }
@@ -215,6 +213,8 @@ export class MemoriaView extends ItemView implements HoverParent {
     this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
     if (this.filterUnsub) { this.filterUnsub(); this.filterUnsub = null; }
+    // 销毁编辑器 leaf
+    try { this.editorLeaf?.detach(); } catch { /* ignore */ }
     if (this.tagSuggest) {
       this.tagSuggest.destroy();
       this.tagSuggest = null;
@@ -601,11 +601,25 @@ export class MemoriaView extends ItemView implements HoverParent {
       cls: "memoria-input",
       attr: {
         placeholder: t("input.placeholder"),
-        // v2.0.17: rows=1 让 textarea 的"内容约束高度"降到 1 行（~22px），
-        //   这样展开动画（40→96）全程由 min-height 主导 rendered height，
-        //   视觉上从第一毫秒就开始丝滑升高，而不是前半段卡在 rows=2 的 ~44px。
         rows: "1",
       },
+    });
+
+    // Obsidian 原生编辑器宿主
+    this.editorHostEl = inputCard.createDiv({ cls: "memoria-editor-host" });
+    this.setupNativeEditor().then(() => {
+      const draft = this.loadDraft();
+      if (draft) this.setEditorValue(draft);
+      // 编辑器内容变化时同步到 textarea（保持现有代码兼容）
+      const editor = this.getEditor();
+      if (editor) {
+        this.registerDomEvent(this.editorHostEl, "input", () => {
+          const val = editor.getValue();
+          this.inputEl.value = val;
+          if (!this.editingMemo) this.saveDraft(val);
+          this.syncInputCardContentState();
+        });
+      }
     });
     // v2.0.17: 渐进式披露（点击聚焦时展开）。
     //   设计决策：仅在用户**主动点击**输入框时展开，hover 不触发。
@@ -1432,13 +1446,10 @@ export class MemoriaView extends ItemView implements HoverParent {
 
 
   private async submitMemo(): Promise<void> {
-    const text = this.inputEl.value.trim();
+    const text = this.getEditorValue().trim();
     if (!text) return;
     try {
       if (this.editingMemo) {
-        // v1.6.0: 编辑模式可以同时改时间和内容。
-        //   读取 datetime-local input：值是 "yyyy-MM-ddTHH:mm" 格式，
-        //   按本地时区解析（new Date('yyyy-MM-ddTHH:mm') 在所有浏览器都按本地时区解析）。
         const dtStr = this.editDateTimeEl?.value ?? "";
         const origStr = `${this.editingMemo.date}T${this.editingMemo.time}`;
         const timeChanged = dtStr && dtStr !== origStr;
@@ -1452,57 +1463,32 @@ export class MemoriaView extends ItemView implements HoverParent {
           await this.store.editMemoDateTime(this.editingMemo, newDate, text);
           new Notice(t("notice.updatedWithTime"));
         } else {
-          // 时间没动，走原有路径只改内容
           await this.store.editMemo(this.editingMemo, text);
           new Notice(t("notice.updated"));
         }
         this.exitEditMode();
       } else {
-        // v2.0.13: 当侧栏点了某个标签做筛选时，新建 memo 自动追加该标签
-        //   （和 flomo / Thino 的行为一致 —— 在 #工作 视图下记录默认带 #工作）
-        //   只对 filter.tag 生效，预设视图（today/pinned 等）不动。
-        //   规则：
-        //     1. 仅当 filter.tag 不为空时触发
-        //     2. 用户已经在文本里手打了相同标签 → 不重复加
-        //     3. 标签作为新行追加在末尾，不破坏用户原排版
         const finalText = this.appendActiveTagIfMissing(text);
         await this.store.addMemo(finalText);
         new Notice(t("notice.saved"));
       }
-      // v1.1.14: 接入 settings.clearAfterSave（之前无条件清空，设置项形同虚设）
-      //   编辑模式下 exitEditMode() 已经把 inputEl 恢复为草稿，此处不再强清；
-      //   新建模式按用户设置决定。
       if (this.settings.clearAfterSave) {
+        this.setEditorValue("");
         this.inputEl.value = "";
         this.clearDraft();
       }
-      // v2.0.17-iter14: 发送完成后让 textarea 失焦，触发渐进式披露动画收起
-      //   （对齐 flomo 体验：发完一条 = 一个完整动作的结束 = 视觉重置）。
-      //   仅在「新建模式 + clearAfterSave 开启」时 blur ——
-      //   - 编辑模式下 exitEditMode 自有焦点逻辑
-      //   - 关闭 clearAfterSave 的用户希望保留文本继续编辑，不强制失焦
-      //
-      //   ⚠️ 顺序很关键：必须先 blur 后 autoResizeInput()。如果先 autoResize：
-      //   此时 is-focused 还在 → CSS min-height=96px → 空 textarea 的 scrollHeight
-      //   被算成约 98px > expandedMin 96 → autoResize 设 inline height=98px →
-      //   后续 blur 移除 is-focused 让 CSS min-height 变 40，但 inline height=98px
-      //   优先级更高，textarea 死死卡在 98px。
       if (!this.editingMemo && this.settings.clearAfterSave) {
-        this.inputEl.blur();
+        const editor = this.getEditor();
+        if (editor) editor.focus();
+        setTimeout(() => editor.blur(), 50);
       }
-      // v1.1.8: 清空后高度回到 min；没清空也重算一次（autoResize 幂等）
       this.autoResizeInput();
-      // v2.0.17: 清空后让输入卡片回到收起态
       this.syncInputCardContentState();
-      // v2.2.0: 移动端 FAB 模式下，发送成功后自动收回到 FAB 入口
-      //   - 仅 fab 模式 + 新建（不是编辑）+ 已开启清空 时收起
-      //   - 不打扰编辑模式（编辑路径自有逻辑）
       if (
         !this.editingMemo &&
         this.settings.clearAfterSave &&
         this.settings.mobileInputStyle === "fab"
       ) {
-        // 强制收起（force=true 跳过"有内容则不收"的保护，因为我们刚清完内容）
         this.collapseFabInput(true);
       }
     } catch (e) {
@@ -1587,7 +1573,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     this.inputPreviewComponent = new Component();
     this.inputPreviewComponent.load();
     this.inputPreviewEl.empty();
-    const md = this.inputEl.value.trim();
+    const md = this.getEditorValue();
     if (!md) {
       this.inputPreviewEl.createDiv({ cls: "memoria-input-preview-empty", text: t("preview.empty") });
       return;
@@ -1600,6 +1586,52 @@ export class MemoriaView extends ItemView implements HoverParent {
       this.inputPreviewComponent
     );
   }, 200, true);
+
+  // ============== 原生编辑器 ==============
+
+  private getEditor() {
+    const view = this.editorLeaf?.view;
+    if (view instanceof MarkdownView) return view.editor;
+    return null;
+  }
+
+  private getEditorValue(): string {
+    const editor = this.getEditor();
+    return editor ? editor.getValue() : this.inputEl?.value ?? "";
+  }
+
+  private setEditorValue(text: string): void {
+    const editor = this.getEditor();
+    if (editor) editor.setValue(text);
+    this.inputEl.value = text;
+  }
+
+  private async setupNativeEditor(): Promise<void> {
+    const folder = normalizePath(this.settings.folder);
+    const draftPath = `${folder}/_draft.md`;
+    await this.ensureDir(folder);
+    const existing = this.app.vault.getAbstractFileByPath(draftPath);
+    if (!(existing instanceof TFile)) {
+      await this.app.vault.create(draftPath, "");
+    }
+
+    // @ts-expect-error WorkspaceLeaf constructor is internal but widely used
+    this.editorLeaf = new WorkspaceLeaf(this.app);
+    await this.editorLeaf.openFile(
+      this.app.vault.getAbstractFileByPath(draftPath) as TFile,
+      { state: { mode: "source", source: false } }
+    );
+
+    const view = this.editorLeaf.view;
+    if (view instanceof MarkdownView) {
+      this.editorHostEl.replaceChildren(view.containerEl);
+    }
+  }
+
+  private async ensureDir(path: string): Promise<void> {
+    const exists = this.app.vault.getAbstractFileByPath(path);
+    if (!exists) await this.app.vault.createFolder(path);
+  }
 
   private isMobileSidebarLayout(): boolean {
     return window.innerWidth <= 680;
@@ -1771,24 +1803,18 @@ export class MemoriaView extends ItemView implements HoverParent {
    *  v1.6.0: 同步把 memo 的时间填入 datetime-local 输入框，允许编辑时一并修改
    */
   private enterEditMode(memo: Memo): void {
-    // 进入编辑前，把当前未发送草稿存起来（如果有）
-    if (this.inputEl.value.trim()) this.saveDraft(this.inputEl.value);
+    if (this.getEditorValue().trim()) this.saveDraft(this.getEditorValue());
     this.editingMemo = memo;
-    this.inputEl.value = memo.content;
-    // v1.6.0: 把 memo 时间填进 datetime input（格式 yyyy-MM-ddTHH:mm，本地时区）
+    this.setEditorValue(memo.content);
     if (this.editDateTimeEl) {
       this.editDateTimeEl.value = `${memo.date}T${memo.time}`;
     }
-    // v2.2.0: 移动端 FAB 模式下，编辑某条卡片时输入框可能是隐藏的，先展开
     if (this.settings.mobileInputStyle === "fab") {
       this.contentEl.addClass("is-fab-expanded");
     }
-    this.inputEl.focus();
-    // 把光标移到末尾
-    const len = this.inputEl.value.length;
-    this.inputEl.setSelectionRange(len, len);
+    const editor = this.getEditor();
+    if (editor) editor.focus();
     this.updateEditBanner();
-    // v1.1.8: 按 memo 内容重算高度
     this.autoResizeInput();
   }
 
@@ -1798,7 +1824,7 @@ export class MemoriaView extends ItemView implements HoverParent {
    */
   private exitEditMode(): void {
     this.editingMemo = null;
-    this.inputEl.value = this.loadDraft();
+    this.setEditorValue(this.loadDraft());
     if (this.editDateTimeEl) this.editDateTimeEl.value = "";
     this.updateEditBanner();
     // v1.1.8: 草稿长度不一，重算高度
