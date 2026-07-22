@@ -394,6 +394,8 @@ export class MemoriaView extends ItemView implements HoverParent {
       const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR).length > 0;
       if (standaloneOpen) {
         setIcon(toggleBtn, "panel-left");
+      } else if (this.isMobileSidebarLayout()) {
+        setIcon(toggleBtn, "menu");
       } else {
         setIcon(
           toggleBtn,
@@ -409,17 +411,44 @@ export class MemoriaView extends ItemView implements HoverParent {
       if (standaloneOpen) {
         this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR)[0].detach();
         this.toggleDesktopSidebar(false);
+      } else if (this.isMobileSidebarLayout()) {
+        this.toggleSidebar(!this.contentEl.hasClass("memoria-sidebar-open"));
       } else {
-        void (async () => {
-          const leaf = this.app.workspace.getLeftLeaf(false);
-          if (leaf) {
-            await leaf.setViewState({ type: VIEW_TYPE_MEMORIA_SIDEBAR, active: true });
-            await this.app.workspace.revealLeaf(leaf);
-          }
-        })();
+        this.toggleDesktopSidebar(
+          !this.contentEl.hasClass("memoria-sidebar-collapsed")
+        );
       }
       syncSidebarToggleIcon();
     });
+
+    // 响应式侧栏：中等宽度自动收起
+    const MEDIUM_BREAK = 960;
+    const MOBILE_BREAK = 680;
+    let lastAutoState = false;
+    const resizeObserver = new ResizeObserver(() => {
+      const w = root.clientWidth;
+      const isMobile = w <= MOBILE_BREAK;
+      const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR).length > 0;
+      if (isMobile || standaloneOpen) return;
+      const shouldCollapse = w <= MEDIUM_BREAK;
+      root.classList.toggle("memoria-auto-collapse", shouldCollapse);
+      if (shouldCollapse && !lastAutoState) {
+        if (!root.dataset.memoriaAutoCollapsed) {
+          root.dataset.memoriaAutoCollapsed = "true";
+          this.toggleDesktopSidebar(true);
+        }
+      } else if (!shouldCollapse && lastAutoState) {
+        if (root.dataset.memoriaAutoCollapsed === "true") {
+          delete root.dataset.memoriaAutoCollapsed;
+          this.toggleDesktopSidebar(false);
+        }
+      }
+      lastAutoState = shouldCollapse;
+      syncSidebarToggleIcon();
+    });
+    resizeObserver.observe(root);
+    this.register(() => resizeObserver.disconnect());
+    this.registerDomEvent(window, "resize", syncSidebarToggleIcon);
 
     // 快捷筛选 Tab 栏
     this.buildQuickTabs(main);
