@@ -1,5 +1,5 @@
 // ================= 共享筛选状态 =================
-// 供 MemoriaView（主视图）和 MemoriaSidebarView（独立侧栏）之间同步筛选
+// 供 MotesView（主视图）和 MotesSidebarView（独立侧栏）之间同步筛选
 
 export interface Filter {
   tag: string | null;

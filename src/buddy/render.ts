@@ -129,9 +129,9 @@ export function renderBuddy(
   const stage = computeStage(days, memos.length);
 
   const card = parent.createDiv({
-    cls: `memoria-buddy memoria-buddy-${buddy.rarity}` +
-      ` memoria-buddy-stage-${stage}` +
-      (buddy.shiny ? " memoria-buddy-shiny" : "") +
+    cls: `Motes-buddy Motes-buddy-${buddy.rarity}` +
+      ` Motes-buddy-stage-${stage}` +
+      (buddy.shiny ? " Motes-buddy-shiny" : "") +
       (callbacks?.justHatched ? " is-just-hatched" : ""),
   });
 
@@ -143,24 +143,24 @@ export function renderBuddy(
   //   2. "成年"阶段一旦达到不再变化，每天看会腻
   //   3. 陪伴天数顺其自然就好，没必要每天看到
   //   平时只看到 ASCII + 名字 + 数据 + 心情，顶栏静静等待"想知道时再看"
-  const topbar = card.createDiv({ cls: "memoria-buddy-topbar" });
-  const rarityWrap = topbar.createDiv({ cls: "memoria-buddy-rarity-wrap" });
+  const topbar = card.createDiv({ cls: "Motes-buddy-topbar" });
+  const rarityWrap = topbar.createDiv({ cls: "Motes-buddy-rarity-wrap" });
   rarityWrap.createSpan({
-    cls: "memoria-buddy-rarity",
+    cls: "Motes-buddy-rarity",
     text: `${RARITY_LABELS[buddy.rarity]} ${t(RARITY_KEY[buddy.rarity])}`,
   });
   rarityWrap.createSpan({
-    cls: `memoria-buddy-stage memoria-buddy-stage-tag-${stage}`,
+    cls: `Motes-buddy-stage Motes-buddy-stage-tag-${stage}`,
     text: ` · ${t(STAGE_KEY[stage])}`,
   });
   if (buddy.shiny) {
     rarityWrap.createSpan({
-      cls: "memoria-buddy-shiny-tag",
+      cls: "Motes-buddy-shiny-tag",
       text: "✨",
     });
   }
   topbar.createSpan({
-    cls: "memoria-buddy-days",
+    cls: "Motes-buddy-days",
     // v2.1.0-iter10: 首日显示"陪你的第 1 天"而不是"已陪你 0 天"
     //   后者会让用户有"陪伴还没开始"的失落感。
     // 英文界面空间更紧，hover 顶栏用紧凑的 1 day / 60 days，避免换成两行。
@@ -175,19 +175,19 @@ export function renderBuddy(
   //   v2.1.0-iter13: 少年 / 成年阶段，sprite 周围加"气场"装饰元素
   //     - 少年：头顶 ✦ ✦（gentle-float 浮动）
   //     - 成年：头顶 ✦ ✦ + 底部 ┈┈┈┈┈ 光晕（gentle-pulse 呼吸）
-  const spriteWrap = card.createDiv({ cls: "memoria-buddy-sprite-wrap" });
+  const spriteWrap = card.createDiv({ cls: "Motes-buddy-sprite-wrap" });
   if (stage === "teen" || stage === "adult") {
     spriteWrap.createDiv({
-      cls: "memoria-buddy-aura memoria-buddy-aura-top",
+      cls: "Motes-buddy-aura Motes-buddy-aura-top",
       text: "✦ ✦",
     });
   }
   const spriteLines = composeSprite(buddy);
-  const sprite = spriteWrap.createDiv({ cls: "memoria-buddy-sprite" });
+  const sprite = spriteWrap.createDiv({ cls: "Motes-buddy-sprite" });
   sprite.setText(spriteLines.join("\n"));
   if (stage === "adult") {
     spriteWrap.createDiv({
-      cls: "memoria-buddy-aura memoria-buddy-aura-bottom",
+      cls: "Motes-buddy-aura Motes-buddy-aura-bottom",
       text: "┈┈┈┈┈┈┈",
     });
   }
@@ -197,9 +197,9 @@ export function renderBuddy(
   // v2.1.0-iter15: 移除阶段标签（移到顶栏与稀有度聚类）+ 移除 Motto 独立行
   //   Motto 收进"物种"的 hover title 里 —— 平时少一行视觉信息，
   //   鼠标好奇时才浮出，更像"和宠物熟悉之后才知道的小秘密"
-  const nameRow = card.createDiv({ cls: "memoria-buddy-name-row" });
+  const nameRow = card.createDiv({ cls: "Motes-buddy-name-row" });
   const nameSpan = nameRow.createSpan({
-    cls: "memoria-buddy-name",
+    cls: "Motes-buddy-name",
     text: buddy.name,
   });
   nameSpan.setAttr("title", t("buddy.rename.tip"));
@@ -214,14 +214,14 @@ export function renderBuddy(
     });
   }
   const speciesSpan = nameRow.createSpan({
-    cls: "memoria-buddy-species",
+    cls: "Motes-buddy-species",
     text: ` · ${t(meta.nameKey)}`,
   });
   // v2.1.0-iter15: Motto 隐藏到物种 hover 里（人格感保留，但不抢视觉）
   speciesSpan.setAttr("title", `「${t(meta.mottoKey)}」`);
 
   // ===== 5 维属性条 =====
-  const statsBox = card.createDiv({ cls: "memoria-buddy-stats" });
+  const statsBox = card.createDiv({ cls: "Motes-buddy-stats" });
   renderStat(statsBox, "DEBUGGING", t("buddy.stat.debugging"), stats.debugging);
   renderStat(statsBox, "PATIENCE", t("buddy.stat.patience"), stats.patience);
   renderStat(statsBox, "CHAOS", t("buddy.stat.chaos"), stats.chaos);
@@ -230,8 +230,8 @@ export function renderBuddy(
 
   // ===== 气泡（情境文案，文案由调用方传入；v2.1.0-iter6 不再在此计算） =====
   if (quipText) {
-    const bubble = card.createDiv({ cls: "memoria-buddy-bubble" });
-    bubble.createSpan({ cls: "memoria-buddy-bubble-text", text: quipText });
+    const bubble = card.createDiv({ cls: "Motes-buddy-bubble" });
+    bubble.createSpan({ cls: "Motes-buddy-bubble-text", text: quipText });
   }
 }
 
@@ -241,7 +241,7 @@ function renderStat(
   label: string,
   value: number
 ): void {
-  const row = parent.createDiv({ cls: "memoria-buddy-stat-row" });
+  const row = parent.createDiv({ cls: "Motes-buddy-stat-row" });
   // v2.1.0-iter3: 加 hover tooltip 解释每个属性怎么算的
   const tooltips: Record<string, string> = {
     DEBUGGING: t("buddy.stat.tip.debugging"),
@@ -252,15 +252,15 @@ function renderStat(
   };
   const tip = tooltips[rawKey] || "";
   const labelSpan = row.createSpan({
-    cls: "memoria-buddy-stat-label",
+    cls: "Motes-buddy-stat-label",
     text: label,
   });
   if (tip) labelSpan.setAttr("title", tip);
-  const barWrap = row.createSpan({ cls: "memoria-buddy-stat-bar" });
+  const barWrap = row.createSpan({ cls: "Motes-buddy-stat-bar" });
   if (tip) barWrap.setAttr("title", tip);
-  const fill = barWrap.createSpan({ cls: "memoria-buddy-stat-fill" });
+  const fill = barWrap.createSpan({ cls: "Motes-buddy-stat-fill" });
   fill.style.width = `${Math.max(0, Math.min(100, value))}%`;
-  row.createSpan({ cls: "memoria-buddy-stat-val", text: String(value) });
+  row.createSpan({ cls: "Motes-buddy-stat-val", text: String(value) });
 }
 
 /** 渲染"还没孵化"的占位（蛋 + 起名输入框 + 孵化按钮）
@@ -270,8 +270,8 @@ export function renderEgg(
   parent: HTMLElement,
   onHatch: (name: string) => void
 ): void {
-  const egg = parent.createDiv({ cls: "memoria-buddy memoria-buddy-egg" });
-  const spriteEl = egg.createDiv({ cls: "memoria-buddy-sprite" });
+  const egg = parent.createDiv({ cls: "Motes-buddy Motes-buddy-egg" });
+  const spriteEl = egg.createDiv({ cls: "Motes-buddy-sprite" });
   const setEggSprite = (eyes: string) => {
     spriteEl.setText(
       "   .---.\n" +
@@ -282,15 +282,15 @@ export function renderEgg(
   };
   setEggSprite("??");
   egg.createDiv({
-    cls: "memoria-buddy-egg-title",
+    cls: "Motes-buddy-egg-title",
     text: t("buddy.egg.title"),
   });
   egg.createDiv({
-    cls: "memoria-buddy-egg-desc",
+    cls: "Motes-buddy-egg-desc",
     text: t("buddy.egg.desc"),
   });
   const input = egg.createEl("input", {
-    cls: "memoria-buddy-egg-input",
+    cls: "Motes-buddy-egg-input",
     attr: {
       type: "text",
       placeholder: t("buddy.egg.placeholder"),
@@ -308,7 +308,7 @@ export function renderEgg(
     }
   });
   const btn = egg.createEl("button", {
-    cls: "memoria-buddy-egg-btn",
+    cls: "Motes-buddy-egg-btn",
     text: t("buddy.egg.hatchBtn"),
   });
 

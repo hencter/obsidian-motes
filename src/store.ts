@@ -4,7 +4,7 @@
 // v3.0.0: 存储方式改为日记格式 YYYY-MM-DD.md（每篇为独立天文件）
 
 import { App, TFile, normalizePath } from "obsidian";
-import { Memo, MemoriaSettings, PIN_TAG, STAR_TAG } from "./types";
+import { Memo, MotesSettings, PIN_TAG, STAR_TAG } from "./types";
 import {
   parseFile,
   renderMemo,
@@ -20,7 +20,7 @@ export class MemoStore {
   private loading = false;
   private reloadLocks = new Map<string, { running: boolean; pending: boolean }>();
 
-  constructor(private app: App, private settings: MemoriaSettings) {}
+  constructor(private app: App, private settings: MotesSettings) {}
 
   onChange(cb: () => void): () => void {
     this.listeners.push(cb);
@@ -393,7 +393,7 @@ export class MemoStore {
       try {
         await this.appendToTrash(memo);
       } catch (err) {
-        console.error("[Memoria] 写入回收站失败（将继续执行删除）:", err);
+        console.error("[Motes] 写入回收站失败（将继续执行删除）:", err);
       }
     }
 
@@ -438,11 +438,11 @@ export class MemoStore {
    *
    * 格式：每条带来源注释 + 原时间 + 原内容，方便将来人肉恢复：
    *   ## 已删除 2026-05-04 01:30
-   *   - 来源：Memoria/2026.md · 原时间 2026-04-25 12:43
+   *   - 来源：Motes/2026.md · 原时间 2026-04-25 12:43
    *     <原 memo 内容>
    *
    * 注意：_trash.md 没有 `# YYYY` 头、也不按日期分组，避免被 parseFile 误识别成正常 memo；
-   *       也不放在 Memoria 文件夹之外，因为用户停用插件后依然能在同一文件夹里看到它。
+   *       也不放在 Motes 文件夹之外，因为用户停用插件后依然能在同一文件夹里看到它。
    */
   private async appendToTrash(memo: Memo): Promise<void> {
     const folder = normalizePath(this.settings.folder);
@@ -467,9 +467,9 @@ export class MemoStore {
       | null;
     if (!existing) {
       const header =
-        `# Memoria 回收站\n\n` +
+        `# Motes 回收站\n\n` +
         `> 这里保存被删除的笔记。停用插件后依然可读，可手动恢复或清空。\n` +
-        `> 该文件不会被 Memoria 主视图识别为普通笔记。\n`;
+        `> 该文件不会被 Motes 主视图识别为普通笔记。\n`;
       await this.app.vault.create(trashPath, header + block);
     } else {
       const old = await this.app.vault.read(existing);
@@ -491,7 +491,7 @@ export class MemoStore {
    *
    *   逻辑：以 `## 已删除 ...` 行作为每条记录的分界，切成 N 条；
    *         如果 N > limit，则丢掉最前面 N-limit 条，保留最新的 limit 条。
-   *         文件头的说明块（`# Memoria 回收站` 及其 > 引用）永远保留。
+   *         文件头的说明块（`# Motes 回收站` 及其 > 引用）永远保留。
    */
   private trimTrashToLimit(raw: string, limit: number): string {
     if (!limit || limit <= 0) return raw;
@@ -600,7 +600,7 @@ export class MemoStore {
 
   /**
    * 保存二进制图片到附件目录
-   * 文件名：memoria-YYYYMMDD-HHmmss-随机.<ext>
+   * 文件名：Motes-YYYYMMDD-HHmmss-随机.<ext>
    */
   async saveImageAttachment(
     bytes: ArrayBuffer,
@@ -619,7 +619,7 @@ export class MemoStore {
       pad(now.getSeconds());
     const rand = Math.random().toString(36).slice(2, 6);
     const ext = (extension || "png").replace(/^\./, "").toLowerCase();
-    const path = `${folder}/memoria-${stamp}-${rand}.${ext}`;
+    const path = `${folder}/Motes-${stamp}-${rand}.${ext}`;
     await this.app.vault.createBinary(path, bytes);
     return path;
   }
@@ -807,7 +807,7 @@ export class MemoStore {
         await this.app.vault.delete(dayFile);
         deleted++;
       } catch (err) {
-        console.error(`[Memoria] Migration failed for ${dayFile.path}:`, err);
+        console.error(`[Motes] Migration failed for ${dayFile.path}:`, err);
         errors++;
       }
     }

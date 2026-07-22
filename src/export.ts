@@ -8,7 +8,7 @@
  *
  * 导出范围：
  *   - 按当前筛选（复用 filter query），零重复代码
- *   - 批量数据，全部保存到 vault 里的 Memoria/exports/ 目录（方便用户从 Obsidian 右键复制路径）
+ *   - 批量数据，全部保存到 vault 里的 Motes/exports/ 目录（方便用户从 Obsidian 右键复制路径）
  *
  * 注意：
  *   - 不打包图片（图片链接保持原样，是 vault 内相对路径或外链）
@@ -28,7 +28,7 @@ export interface ExportOptions {
   memos: Memo[];
   /** 可读的筛选描述（比如 "本周" / "#工作 且 AI" / "全部"） */
   filterDesc: string;
-  /** 导出目录（相对 vault 根），默认 "Memoria/exports" */
+  /** 导出目录（相对 vault 根），默认 "Motes/exports" */
   exportFolder: string;
 }
 
@@ -46,7 +46,7 @@ export async function exportMemos(app: App, opts: ExportOptions): Promise<string
   //   "File exists"（formatTimestamp 精度到分钟）
   const stamp = formatTimestamp(new Date());
   const rand = Math.random().toString(36).slice(2, 6);
-  const filename = `memoria-export-${stamp}-${rand}.${format}`;
+  const filename = `Motes-export-${stamp}-${rand}.${format}`;
   const filePath = `${folder}/${filename}`;
 
   let content: string;
@@ -84,7 +84,7 @@ function renderMarkdown(memos: Memo[], filterDesc: string): string {
   const now = new Date();
   const fm = [
     "---",
-    `exported_by: Memoria`,
+    `exported_by: Motes`,
     `exported_at: ${now.toISOString()}`,
     `count: ${memos.length}`,
     `filter: ${escapeYaml(filterDesc)}`,
@@ -136,7 +136,7 @@ function escapeYaml(s: string): string {
  * 设计理念：
  *   - 像一份"数字纪念册"而不是"数据导出"
  *   - 时间线感：日期作为大分组，笔记卡片垂直流动
- *   - 布局像 Memoria 主视图的"精简版"，用户一看就熟悉
+ *   - 布局像 Motes 主视图的"精简版"，用户一看就熟悉
  *   - 深浅自适应 + 优雅字体栈 + 克制的配色
  *   - 不依赖外部 CDN，自包含单文件可离线看、可发邮件、可打印
  */
@@ -493,7 +493,7 @@ body {
   parts.push(
     '<meta name="viewport" content="width=device-width, initial-scale=1">'
   );
-  parts.push(`<title>Memoria · ${escapeHtml(filterDesc)}</title>`);
+  parts.push(`<title>Motes · ${escapeHtml(filterDesc)}</title>`);
   parts.push("<style>" + css + "</style>");
   parts.push("</head>");
   parts.push("<body>");
@@ -502,7 +502,7 @@ body {
   // 顶部标题区
   parts.push('<header class="header">');
   parts.push(
-    '<div class="brand"><span class="brand-dot"></span>MEMORIA</div>'
+    '<div class="brand"><span class="brand-dot"></span>Motes</div>'
   );
   parts.push(`<h1 class="title">${escapeHtml(filterDesc)}</h1>`);
   parts.push(
@@ -530,7 +530,7 @@ body {
         `<span class="day-head-count">${t("list.totalCount", { n: (byDate.get(date) ?? []).length })}</span></div>`
     );
     const items = byDate.get(date) ?? [];
-    items.sort((a, b) => a.time.localeCompare(b.time)); // 同日内早的在前（与 Memoria 文件规范一致）
+    items.sort((a, b) => a.time.localeCompare(b.time)); // 同日内早的在前（与 Motes 文件规范一致）
     for (const m of items) {
       parts.push('<article class="memo">');
       parts.push(`<div class="memo-time">${m.time}</div>`);
@@ -557,7 +557,7 @@ body {
   // footer
   parts.push('<footer class="footer">');
   parts.push(
-    `<a href="https://github.com/i-iooi-i/obsidian-memoria" target="_blank" rel="noopener">${t("export.footer")}</a>`
+    `<a href="https://github.com/i-iooi-i/obsidian-Motes" target="_blank" rel="noopener">${t("export.footer")}</a>`
   );
   parts.push("</footer>");
 

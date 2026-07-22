@@ -1,7 +1,7 @@
 // ================= 统计报告（作为 Obsidian 标签页打开） =================
 
 import { ItemView, WorkspaceLeaf, setIcon } from "obsidian";
-import { Memo, RESERVED_TAGS, VIEW_TYPE_MEMORIA_STATS } from "./types";
+import { Memo, RESERVED_TAGS, VIEW_TYPE_Motes_STATS } from "./types";
 import type { MemoStore } from "./store";
 import { t, getCurrentLocale } from "./i18n";
 
@@ -15,7 +15,7 @@ export class StatsView extends ItemView {
   }
 
   getViewType(): string {
-    return VIEW_TYPE_MEMORIA_STATS;
+    return VIEW_TYPE_Motes_STATS;
   }
 
   getDisplayText(): string {
@@ -28,8 +28,8 @@ export class StatsView extends ItemView {
 
   async onOpen(): Promise<void> {
     this.workspaceLeafEl = this.contentEl.closest(".workspace-leaf");
-    this.workspaceLeafEl?.addClass("memoria-stats-workspace-leaf");
-    this.contentEl.addClass("memoria-stats-view");
+    this.workspaceLeafEl?.addClass("Motes-stats-workspace-leaf");
+    this.contentEl.addClass("Motes-stats-view");
     this.memos = this.store.getAll();
     this.render();
     this.unsubscribe = this.store.onChange(() => {
@@ -39,7 +39,7 @@ export class StatsView extends ItemView {
   }
 
   async onClose(): Promise<void> {
-    this.workspaceLeafEl?.removeClass("memoria-stats-workspace-leaf");
+    this.workspaceLeafEl?.removeClass("Motes-stats-workspace-leaf");
     this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
   }
@@ -63,7 +63,7 @@ export class StatsView extends ItemView {
       return;
     }
 
-    const body = contentEl.createDiv({ cls: "memoria-stats-body" });
+    const body = contentEl.createDiv({ cls: "Motes-stats-body" });
     this.renderOverview(body);
     this.renderYearHeatmap(body);
     this.renderTopTags(body);
@@ -468,7 +468,7 @@ export class StatsView extends ItemView {
     const list = section.createDiv({ cls: "mstat-fact-list" });
 
     // v2.0.4: 英文版文案池暂未翻译，先给个友好提示
-    //   理由：highlights 里的"有趣发现"全是中文文学性表达（"话痨日""Memoria 有点想你"等），
+    //   理由：highlights 里的"有趣发现"全是中文文学性表达（"话痨日""Motes 有点想你"等），
     //   机翻成英文会失去味道；专业翻译成本暂时不打算投入。中文用户占绝对主流。
     if (getCurrentLocale() === "en-US") {
       list.createDiv({
@@ -515,7 +515,7 @@ export class StatsView extends ItemView {
       );
     } else {
       easterEggs.push(
-        "傍晚到深夜，是 Memoria 最活跃的时间段，你也是。",
+        "傍晚到深夜，是 Motes 最活跃的时间段，你也是。",
         "睡前写一条，明天醒来会感谢今晚的自己。"
       );
     }
@@ -687,7 +687,7 @@ export class StatsView extends ItemView {
             [
               `你已经 ${diffDays} 天没记录新想法了，要不要随手写一条？`,
               `${diffDays} 天没更新 —— 也许此刻脑子里那个念头就值得留下来`,
-              `距离上次记录已经 ${diffDays} 天，Memoria 有点想你`,
+              `距离上次记录已经 ${diffDays} 天，Motes 有点想你`,
             ],
             9
           )

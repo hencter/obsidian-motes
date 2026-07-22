@@ -1,11 +1,11 @@
 // ================= 设置页 =================
 
 import { App, PluginSettingTab, Setting } from "obsidian";
-import type MemoriaPlugin from "./main";
+import type MotesPlugin from "./main";
 import { t } from "./i18n";
 
-export class MemoriaSettingTab extends PluginSettingTab {
-  constructor(app: App, private plugin: MemoriaPlugin) {
+export class MotesSettingTab extends PluginSettingTab {
+  constructor(app: App, private plugin: MotesPlugin) {
     super(app, plugin);
   }
 
@@ -21,10 +21,10 @@ export class MemoriaSettingTab extends PluginSettingTab {
       .setDesc(t("settings.folder.desc"))
       .addText((tx) =>
         tx
-          .setPlaceholder("Memoria")
+          .setPlaceholder("Motes")
           .setValue(this.plugin.settings.folder)
           .onChange(async (v) => {
-            this.plugin.settings.folder = v.trim() || "Memoria";
+            this.plugin.settings.folder = v.trim() || "Motes";
             await this.plugin.saveSettings();
             await this.plugin.store.reloadAll();
           })
@@ -35,11 +35,11 @@ export class MemoriaSettingTab extends PluginSettingTab {
       .setDesc(t("settings.attachFolder.desc"))
       .addText((tx) =>
         tx
-          .setPlaceholder("Memoria/attachments")
+          .setPlaceholder("Motes/attachments")
           .setValue(this.plugin.settings.attachmentFolder)
           .onChange(async (v) => {
             this.plugin.settings.attachmentFolder =
-              v.trim() || "Memoria/attachments";
+              v.trim() || "Motes/attachments";
             await this.plugin.saveSettings();
           })
       );
@@ -206,7 +206,7 @@ export class MemoriaSettingTab extends PluginSettingTab {
               | "calendar"
               | "buddy";
             await this.plugin.saveSettings();
-            // 仅 UI 设置，重渲染即可；已打开的 Memoria 视图也会立刻应用
+            // 仅 UI 设置，重渲染即可；已打开的 Motes 视图也会立刻应用
             this.plugin.store.notifyChange();
           })
       );
@@ -306,7 +306,7 @@ export class MemoriaSettingTab extends PluginSettingTab {
             this.plugin.settings.mobileInputStyle =
               v as "fab" | "always-visible";
             await this.plugin.saveSettings();
-            // 立即重渲染所有 Memoria 视图，让 root class 跟着切换（不需要重启 OB）
+            // 立即重渲染所有 Motes 视图，让 root class 跟着切换（不需要重启 OB）
             this.plugin.store.notifyChange();
           })
       );
@@ -356,7 +356,7 @@ export class MemoriaSettingTab extends PluginSettingTab {
       .setDesc(t("settings.brandName.desc"))
       .addText((tx) =>
         tx
-          .setPlaceholder("Memoria")
+          .setPlaceholder("Motes")
           .setValue(this.plugin.settings.brandName)
           .onChange(async (v) => {
             this.plugin.settings.brandName = v.trim();
@@ -387,7 +387,7 @@ export class MemoriaSettingTab extends PluginSettingTab {
           .setCta()
           .onClick(() => {
             window.open(
-              "https://github.com/hencter/obsidian-memoria",
+              "https://github.com/hencter/obsidian-Motes",
               "_blank"
             );
           })
@@ -398,8 +398,8 @@ export class MemoriaSettingTab extends PluginSettingTab {
     });
     linkP.appendText("🔗 ");
     linkP.createEl("a", {
-      text: "https://github.com/hencter/obsidian-memoria",
-      href: "https://github.com/hencter/obsidian-memoria",
+      text: "https://github.com/hencter/obsidian-Motes",
+      href: "https://github.com/hencter/obsidian-Motes",
     });
 
     // 版本号显示

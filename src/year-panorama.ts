@@ -4,8 +4,8 @@
 
 import { ItemView, WorkspaceLeaf, setIcon } from "obsidian";
 import { MemoStore } from "./store";
-import { VIEW_TYPE_MEMORIA_YEAR, VIEW_TYPE_MEMORIA } from "./types";
-import { MemoriaView } from "./view";
+import { VIEW_TYPE_Motes_YEAR, VIEW_TYPE_Motes } from "./types";
+import { MotesView } from "./view";
 import { t } from "./i18n";
 
 /** 星期几简称，走 i18n（中: 日一二三四五六 / 英: SMTWTFS） */
@@ -23,7 +23,7 @@ export class YearPanoramaView extends ItemView {
   }
 
   getViewType(): string {
-    return VIEW_TYPE_MEMORIA_YEAR;
+    return VIEW_TYPE_Motes_YEAR;
   }
   getDisplayText(): string {
     return t("year.viewTitle");
@@ -34,7 +34,7 @@ export class YearPanoramaView extends ItemView {
 
   async onOpen(): Promise<void> {
     this.render();
-    // 数据变了重绘（用户在 Memoria 主视图记录笔记后，这里也要同步高亮）
+    // 数据变了重绘（用户在 Motes 主视图记录笔记后，这里也要同步高亮）
     this.unsubscribe = this.store.onChange(() => this.render());
   }
 
@@ -47,7 +47,7 @@ export class YearPanoramaView extends ItemView {
   private render(): void {
     const container = this.contentEl;
     container.empty();
-    container.addClass("memoria-year-view");
+    container.addClass("Motes-year-view");
 
     // 统计每天笔记数
     const dayMap = new Map<string, number>();
@@ -56,15 +56,15 @@ export class YearPanoramaView extends ItemView {
     }
 
     // ========== 顶栏：年份（左） + 切换（右） ==========
-    const header = container.createDiv({ cls: "memoria-year-header" });
+    const header = container.createDiv({ cls: "Motes-year-header" });
     header.createDiv({
-      cls: "memoria-year-title",
+      cls: "Motes-year-title",
       text: String(this.displayYear),
     });
 
-    const nav = header.createDiv({ cls: "memoria-year-nav" });
+    const nav = header.createDiv({ cls: "Motes-year-nav" });
     const prevBtn = nav.createEl("button", {
-      cls: "memoria-year-nav-btn",
+      cls: "Motes-year-nav-btn",
       attr: { "aria-label": t("stats.nav.prevYear") },
     });
     setIcon(prevBtn, "chevron-left");
@@ -73,7 +73,7 @@ export class YearPanoramaView extends ItemView {
     const todayYear = new Date().getFullYear();
     if (this.displayYear !== todayYear) {
       const todayBtn = nav.createEl("button", {
-        cls: "memoria-year-today-btn",
+        cls: "Motes-year-today-btn",
         text: t("year.thisYear"),
       });
       todayBtn.addEventListener("click", () => {
@@ -83,7 +83,7 @@ export class YearPanoramaView extends ItemView {
     }
 
     const nextBtn = nav.createEl("button", {
-      cls: "memoria-year-nav-btn",
+      cls: "Motes-year-nav-btn",
       attr: { "aria-label": t("stats.nav.nextYear") },
     });
     setIcon(nextBtn, "chevron-right");
@@ -97,7 +97,7 @@ export class YearPanoramaView extends ItemView {
       monthlyCounts[mi]++;
     }
 
-    const grid = container.createDiv({ cls: "memoria-year-grid" });
+    const grid = container.createDiv({ cls: "Motes-year-grid" });
     const today = new Date();
     const todayStr = fmtDate(today);
     const thisMonth = today.getFullYear() === this.displayYear ? today.getMonth() : -1;
@@ -105,15 +105,15 @@ export class YearPanoramaView extends ItemView {
     let yearCount = 0;
     for (let month = 0; month < 12; month++) {
       const monthEl = grid.createDiv({
-        cls: "memoria-year-month" + (month === thisMonth ? " is-current" : ""),
+        cls: "Motes-year-month" + (month === thisMonth ? " is-current" : ""),
       });
 
       // 月份标签行（可点击跳当月首日）
-      const lblRow = monthEl.createDiv({ cls: "memoria-year-month-label" });
+      const lblRow = monthEl.createDiv({ cls: "Motes-year-month-label" });
       const mnNum = formatMonth(month, this.displayYear);
       lblRow.createSpan({ text: t("year.monthName", { m: month + 1 }) });
       if (monthlyCounts[month] > 0) {
-        const badge = lblRow.createSpan({ cls: "memoria-year-month-count" });
+        const badge = lblRow.createSpan({ cls: "Motes-year-month-count" });
         badge.setText(String(monthlyCounts[month]));
       }
       lblRow.addEventListener("click", () => {
@@ -122,13 +122,13 @@ export class YearPanoramaView extends ItemView {
       lblRow.setAttr("title", t("year.monthClick"));
 
       // 星期头（v2.0.4: 走 i18n）
-      const weekHead = monthEl.createDiv({ cls: "memoria-year-weekhead" });
+      const weekHead = monthEl.createDiv({ cls: "Motes-year-weekhead" });
       for (let i = 0; i < 7; i++) {
-        weekHead.createDiv({ cls: "memoria-year-wday", text: weekdayShort(i) });
+        weekHead.createDiv({ cls: "Motes-year-wday", text: weekdayShort(i) });
       }
 
       // 日期网格：显示整个 6 周网格（含上月尾 & 下月头，颜色灰显）
-      const cal = monthEl.createDiv({ cls: "memoria-year-grid-days" });
+      const cal = monthEl.createDiv({ cls: "Motes-year-grid-days" });
       const firstDayOfMonth = new Date(this.displayYear, month, 1);
       const startDow = firstDayOfMonth.getDay(); // 0=日
       const daysInMonth = new Date(
@@ -172,7 +172,7 @@ export class YearPanoramaView extends ItemView {
 
         const cell = cal.createDiv({
           cls:
-            "memoria-year-day" +
+            "Motes-year-day" +
             (isOut ? " is-out" : "") +
             (!isOut && count > 0 ? " has-memo" : "") +
             levelCls +
@@ -191,40 +191,40 @@ export class YearPanoramaView extends ItemView {
     }
 
     // ========== 底部：年度小统计 ==========
-    const foot = container.createDiv({ cls: "memoria-year-foot" });
+    const foot = container.createDiv({ cls: "Motes-year-foot" });
     const activeDays = Array.from(dayMap.keys()).filter((d) =>
       d.startsWith(String(this.displayYear) + "-")
     ).length;
     foot.createSpan({
-      cls: "memoria-year-foot-item",
+      cls: "Motes-year-foot-item",
       text: t("year.yearSum", { year: this.displayYear, n: yearCount }),
     });
-    foot.createSpan({ cls: "memoria-year-foot-sep", text: "·" });
+    foot.createSpan({ cls: "Motes-year-foot-sep", text: "·" });
     foot.createSpan({
-      cls: "memoria-year-foot-item",
+      cls: "Motes-year-foot-item",
       text: t("year.activeDays", { n: activeDays }),
     });
   }
 
-  /** 点击某天：打开 Memoria 主视图并筛选到那一天的笔记。
-   *  v1.4.8: 从"设搜索框值"改为调 MemoriaView.focusOnDate()，
+  /** 点击某天：打开 Motes 主视图并筛选到那一天的笔记。
+   *  v1.4.8: 从"设搜索框值"改为调 MotesView.focusOnDate()，
    *    因为搜索框只匹配 memo.content，对 memo.date 无效；走 focusOnDate 能复用
    *    侧栏月历点日期的同一套 filter.date 机制，才能真正筛出该日笔记。
    */
   private async jumpToDate(date: string): Promise<void> {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA);
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes);
     let leaf = leaves[0];
     if (!leaf) {
       leaf = this.app.workspace.getLeaf("tab");
       await leaf.setViewState({
-        type: VIEW_TYPE_MEMORIA,
+        type: VIEW_TYPE_Motes,
         active: true,
       });
     }
     await this.app.workspace.revealLeaf(leaf);
 
     const view = leaf.view;
-    if (view instanceof MemoriaView) {
+    if (view instanceof MotesView) {
       view.focusOnDate(date);
     }
   }

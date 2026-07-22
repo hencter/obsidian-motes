@@ -1,31 +1,31 @@
 /* ================================================================
- * Memoria 样式（完全基于 Obsidian CSS 变量，自动跟随主题）
+ * motes 样式（完全基于 Obsidian CSS 变量，自动跟随主题）
  * ================================================================ */
 
 /* ============== 重置：清除 Obsidian 默认 button 样式 ==============
  * Obsidian 主题给所有 <button> 加了背景+边框+内边距，
  * 我们的图标按钮需要强制干净的"裸样式"
  */
-.memoria-root button.memoria-icon-btn,
-.memoria-root button.memoria-tool-btn,
-.memoria-root button.memoria-quick-tab,
-.memoria-root button.memoria-cal-nav,
-.memoria-root button.memoria-overview-btn,
-.memoria-root button.memoria-edit-cancel {
+.motes-root button.motes-icon-btn,
+.motes-root button.motes-tool-btn,
+.motes-root button.motes-quick-tab,
+.motes-root button.motes-cal-nav,
+.motes-root button.motes-overview-btn,
+.motes-root button.motes-edit-cancel {
   box-shadow: none !important;
   border: none !important;
 }
-.memoria-root button.memoria-icon-btn,
-.memoria-root button.memoria-tool-btn,
-.memoria-root button.memoria-cal-nav,
-.memoria-root button.memoria-overview-btn {
+.motes-root button.motes-icon-btn,
+.motes-root button.motes-tool-btn,
+.motes-root button.motes-cal-nav,
+.motes-root button.motes-overview-btn {
   background-color: transparent;
   border: none !important;
   box-shadow: none !important;
 }
 
 /* 让视图的 contentEl 填满整个面板，清除 Obsidian 默认 padding */
-.workspace-leaf-content[data-type="memoria-view"] .view-content {
+.workspace-leaf-content[data-type="motes-view"] .view-content {
   padding: 0;
   overflow: hidden;
   display: flex;
@@ -33,8 +33,8 @@
   background: var(--background-primary);
 }
 
-.memoria-root,
-.memoria-container {
+.motes-root,
+.motes-container {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -44,7 +44,7 @@
 }
 
 /* ================== 整体结构 ================== */
-.memoria-shell {
+.motes-shell {
   display: flex;
   flex: 1;
   min-height: 0;
@@ -52,7 +52,7 @@
 }
 
 /* ================== 左侧栏 ================== */
-.memoria-sidebar {
+.motes-sidebar {
   width: 240px;
   flex-shrink: 0;
   overflow-y: auto;
@@ -67,7 +67,7 @@
 }
 
 @media (min-width: 681px) {
-  .memoria-root.memoria-sidebar-collapsed .memoria-sidebar {
+  .motes-root.motes-sidebar-collapsed .motes-sidebar {
     width: 0;
     padding-left: 0;
     padding-right: 0;
@@ -80,7 +80,7 @@
 
 /* 响应式自动折叠：中等宽度（681-960px）自动收起侧栏，不需要手动切换 */
 @media (min-width: 681px) and (max-width: 960px) {
-  .memoria-root.memoria-auto-collapse .memoria-sidebar {
+  .motes-root.motes-auto-collapse .motes-sidebar {
     width: 0;
     padding-left: 0;
     padding-right: 0;
@@ -92,32 +92,32 @@
 }
 
 /* 统计条 */
-.memoria-stats {
+.motes-stats {
   display: flex;
   align-items: center;
   justify-content: space-around;
   padding: 4px 4px 14px;
   position: relative;
 }
-.memoria-stat {
+.motes-stat {
   text-align: center;
   flex: 1;
 }
-.memoria-stat-num {
+.motes-stat-num {
   font-size: 22px;
   font-weight: 700;
   color: var(--text-normal);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
-.memoria-stat-label {
+.motes-stat-label {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 4px;
   letter-spacing: 0.4px;
 }
 /* 视图切换按钮：贴在统计条右侧 */
-.memoria-stats-switch {
+.motes-stats-switch {
   flex: 0 0 auto;
   width: 28px;
   height: 28px;
@@ -126,59 +126,59 @@
   color: var(--text-faint);
   align-self: center;
 }
-.memoria-stats-switch:hover {
+.motes-stats-switch:hover {
   color: var(--interactive-accent);
 }
 
 /* 热力图 */
-.memoria-heatmap {
+.motes-heatmap {
   display: flex;
   gap: 3px;
   padding: 8px 6px 8px;
   /* v1.4.1: 去掉底部灰线，由下方的进度条提供"分隔感" */
 }
-.memoria-heatmap-col {
+.motes-heatmap-col {
   display: flex;
   flex-direction: column;
   gap: 3px;
   flex: 1;
 }
-.memoria-heatmap-cell {
+.motes-heatmap-cell {
   aspect-ratio: 1;
   border-radius: 2px;
   background: var(--background-modifier-border);
   min-height: 8px;
   transition: transform 0.08s;
 }
-.memoria-heatmap-cell:hover {
+.motes-heatmap-cell:hover {
   transform: scale(1.35);
 }
-.memoria-heatmap-cell.level-0 {
+.motes-heatmap-cell.level-0 {
   background: var(--background-modifier-border);
   opacity: 0.45;
 }
-.memoria-heatmap-cell.level-1 {
+.motes-heatmap-cell.level-1 {
   background: var(--interactive-accent);
   opacity: 0.3;
 }
-.memoria-heatmap-cell.level-2 {
+.motes-heatmap-cell.level-2 {
   background: var(--interactive-accent);
   opacity: 0.55;
 }
-.memoria-heatmap-cell.level-3 {
+.motes-heatmap-cell.level-3 {
   background: var(--interactive-accent);
   opacity: 0.8;
 }
-.memoria-heatmap-cell.level-4 {
+.motes-heatmap-cell.level-4 {
   background: var(--interactive-accent);
   opacity: 1;
 }
-.memoria-heatmap-cell.future {
+.motes-heatmap-cell.future {
   opacity: 0.15;
 }
 
 /* 侧栏分区标题 */
-.memoria-sidebar-section {
+.motes-sidebar-section {
   padding: 14px 12px 6px;
   font-size: 11px;
   font-weight: 600;
@@ -186,17 +186,17 @@
   letter-spacing: 0.6px;
   text-transform: uppercase;
 }
-.memoria-section-collapsible {
+.motes-section-collapsible {
   cursor: pointer;
   user-select: none;
   display: flex;
   align-items: center;
   transition: color 0.12s;
 }
-.memoria-section-collapsible:hover {
+.motes-section-collapsible:hover {
   color: var(--text-muted);
 }
-.memoria-section-arrow {
+.motes-section-arrow {
   display: inline-block;
   width: 12px;
   font-size: 10px;
@@ -204,7 +204,7 @@
 }
 
 /* 侧栏小提示 */
-.memoria-sidebar-hint {
+.motes-sidebar-hint {
   margin: 14px 12px 0;
   padding: 10px 12px;
   background: var(--background-modifier-hover);
@@ -213,19 +213,19 @@
   line-height: 1.55;
   color: var(--text-faint);
 }
-.memoria-sidebar-hint code {
+.motes-sidebar-hint code {
   padding: 1px 5px;
   background: var(--background-primary);
   border-radius: 3px;
   font-size: 11px;
   color: var(--text-accent);
 }
-.memoria-sidebar-hint b {
+.motes-sidebar-hint b {
   color: var(--text-muted);
 }
 
 /* 侧栏导航项 */
-.memoria-nav-item {
+.motes-nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -239,20 +239,20 @@
   overflow: hidden;
   transition: background 0.12s, color 0.12s;
 }
-.memoria-nav-item:hover {
+.motes-nav-item:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-nav-item.active {
+.motes-nav-item.active {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   font-weight: 500;
 }
-.memoria-nav-item.active .memoria-nav-count {
+.motes-nav-item.active .motes-nav-count {
   color: var(--text-on-accent);
   opacity: 0.85;
 }
-.memoria-nav-icon {
+.motes-nav-icon {
   flex-shrink: 0;
   width: 16px;
   height: 16px;
@@ -262,27 +262,27 @@
   opacity: 0.85;
   font-size: 13px;
 }
-.memoria-nav-icon .svg-icon {
+.motes-nav-icon .svg-icon {
   width: 16px;
   height: 16px;
 }
-.memoria-nav-text {
+.motes-nav-text {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.memoria-nav-count {
+.motes-nav-count {
   font-size: 11px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
-.memoria-tag-item .memoria-nav-icon {
+.motes-tag-item .motes-nav-icon {
   color: var(--text-accent);
   opacity: 0.7;
 }
 
 /* ================== 右主区 ================== */
-.memoria-main {
+.motes-main {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -291,7 +291,7 @@
 }
 
 /* 顶部 bar */
-.memoria-topbar {
+.motes-topbar {
   display: flex;
   align-items: center;
   /* v1.4.5: 去掉 justify-content: space-between
@@ -307,10 +307,10 @@
   background: var(--background-primary);
 }
 /* v1.4.5: 让搜索框这组元素贴右边 */
-.memoria-topbar .memoria-search-wrap {
+.motes-topbar .motes-search-wrap {
   margin-left: auto;
 }
-.memoria-topbar-title {
+.motes-topbar-title {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -318,24 +318,24 @@
   font-weight: 700;
   color: var(--text-normal);
 }
-.memoria-logo {
+.motes-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--interactive-accent);
 }
-.memoria-logo .svg-icon {
+.motes-logo .svg-icon {
   width: 22px;
   height: 22px;
   stroke-width: 2;
 }
-.memoria-brand {
+.motes-brand {
   letter-spacing: 0.3px;
 }
-.memoria-brand:empty {
+.motes-brand:empty {
   display: none;
 }
-.memoria-search-wrap {
+.motes-search-wrap {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -347,19 +347,19 @@
   flex: 0 1 260px;
   min-width: 120px;
 }
-.memoria-search-wrap:focus-within {
+.motes-search-wrap:focus-within {
   border-color: var(--interactive-accent);
 }
-.memoria-search-icon {
+.motes-search-icon {
   display: flex;
   align-items: center;
   color: var(--text-faint);
 }
-.memoria-search-icon .svg-icon {
+.motes-search-icon .svg-icon {
   width: 14px;
   height: 14px;
 }
-.memoria-search {
+.motes-search {
   width: 100%;
   padding: 6px 4px;
   border: none;
@@ -369,15 +369,15 @@
   font-size: 13px;
   outline: none;
 }
-.memoria-search:focus,
-.memoria-search:hover,
-.memoria-search:active {
+.motes-search:focus,
+.motes-search:hover,
+.motes-search:active {
   border: none;
   background: transparent;
   box-shadow: none;
   outline: none;
 }
-.memoria-root button.memoria-icon-btn {
+.motes-root button.motes-icon-btn {
   padding: 4px 8px;
   border: none;
   background: transparent;
@@ -392,32 +392,32 @@
   transition: background 0.12s, color 0.12s;
   box-shadow: none;
 }
-.memoria-root button.memoria-icon-btn:hover {
+.motes-root button.motes-icon-btn:hover {
   background: var(--background-modifier-hover);
   /* v1.4.9: hover 改为 accent 色，与打卡条和切换按钮的 hover 行为一致，
    *   给"这个东西可点击"的强反馈，代替原来变 --text-normal 的弱反馈。 */
   color: var(--interactive-accent);
 }
-.memoria-root button.memoria-icon-btn .svg-icon {
+.motes-root button.motes-icon-btn .svg-icon {
   width: 14px;
   height: 14px;
 }
 
 /* v1.1.2: 刷新按钮点击后转圈动画 */
-.memoria-root button.memoria-icon-btn.is-spinning {
+.motes-root button.motes-icon-btn.is-spinning {
   pointer-events: none;
   opacity: 0.8;
 }
-.memoria-root button.memoria-icon-btn.is-spinning .svg-icon {
-  animation: memoria-spin 0.8s linear infinite;
+.motes-root button.motes-icon-btn.is-spinning .svg-icon {
+  animation: motes-spin 0.8s linear infinite;
 }
-@keyframes memoria-spin {
+@keyframes motes-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
 /* 快捷筛选 Tab 栏 */
-.memoria-quick-tabs {
+.motes-quick-tabs {
   display: flex;
   gap: 2px;
   padding: 10px 24px 6px;
@@ -425,10 +425,10 @@
   overflow-x: auto;
   border-bottom: 1px solid var(--background-modifier-border);
 }
-.memoria-quick-tabs::-webkit-scrollbar {
+.motes-quick-tabs::-webkit-scrollbar {
   display: none;
 }
-.memoria-quick-tab {
+.motes-quick-tab {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -445,7 +445,7 @@
   box-shadow: none;
   position: relative;
 }
-.memoria-quick-tab::after {
+.motes-quick-tab::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -456,35 +456,35 @@
   border-radius: 2px 2px 0 0;
   transition: background 0.15s;
 }
-.memoria-quick-tab:hover {
+.motes-quick-tab:hover {
   color: var(--text-normal);
   background: var(--background-modifier-hover);
 }
-.memoria-quick-tab.is-active {
+.motes-quick-tab.is-active {
   color: var(--interactive-accent);
   background: transparent;
 }
-.memoria-quick-tab.is-active::after {
+.motes-quick-tab.is-active::after {
   background: var(--interactive-accent);
 }
-.memoria-quick-tab-icon {
+.motes-quick-tab-icon {
   display: flex;
   align-items: center;
   opacity: 0.7;
 }
-.memoria-quick-tab.is-active .memoria-quick-tab-icon {
+.motes-quick-tab.is-active .motes-quick-tab-icon {
   opacity: 1;
 }
-.memoria-quick-tab-icon .svg-icon {
+.motes-quick-tab-icon .svg-icon {
   width: 14px;
   height: 14px;
 }
-.memoria-quick-tab-label {
+.motes-quick-tab-label {
   line-height: 1;
 }
 
 /* 输入卡片 */
-.memoria-input-card {
+.motes-input-card {
   margin: 16px 24px 0;
   padding: 14px 0 10px;
   border: 1px solid var(--background-modifier-border);
@@ -496,7 +496,7 @@
   position: relative;
   z-index: 2;
 }
-.memoria-input-card:focus-within {
+.motes-input-card:focus-within {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 3px
     color-mix(in srgb, var(--interactive-accent) 15%, transparent);
@@ -529,12 +529,12 @@
  *   配合 JS 的 150ms 鼠标驻留检测（防快速掠过误触发）和帧间 class 切换
  *   （绕过 Chromium 对 textarea :hover 伪类的 transition 短路 bug）。
  */
-.memoria-input-card {
+.motes-input-card {
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
-.memoria-root textarea.memoria-input {
+.motes-root textarea.motes-input {
   /* v2.0.17: 渐进式披露 —— 收起态 40px ↔ 展开态 96px 的过渡。
    *   使用 Material Design 标准缓动曲线，前段稍慢、后段顺滑收尾，丝滑悠闲感。
    *   同时覆盖 min-height + height：
@@ -545,7 +545,7 @@
    *   设置前临时禁用 transition（transitions-none class，见下方）。
    *   v2.0.17-iter12: —— Obsidian 主题（如 ITS Theme / AnuPpuccin 等）
    *     会用 `textarea { transition: box-shadow ... }` 这种基础 type 选择器
-   *     覆盖我们的 transition（实测权重比 .memoria-input 高，因为主题用了
+   *     覆盖我们的 transition（实测权重比 .motes-input 高，因为主题用了
    *     `body.theme-light textarea` 这种链式选择器，权重 0,0,1,1 > 0,0,1,0）。
    *     不加 时 getComputedStyle 显示 transition 变成主题的
    *     `box-shadow, border 0.15s`，min-height 0s 就触发瞬时跳变。
@@ -558,16 +558,16 @@
 /* v2.0.17: 输入时（input 事件触发 autoResizeInput）临时禁用动画，
  *   避免 textarea 随内容长高时被 0.7s 慢动画拖住手感。
  *   JS 会在设 inline height 前加这个 class，一帧后移除。 */
-.memoria-root textarea.memoria-input.memoria-no-transition {
+.motes-root textarea.motes-input.motes-no-transition {
   transition: none;
 }
-.memoria-input-toolbar {
+.motes-input-toolbar {
   /* v2.0.17: 工具栏整体淡入淡出 */
   transition:
     opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
     border-top-color 0.7s ease;
 }
-.memoria-root button.memoria-submit-btn {
+.motes-root button.motes-submit-btn {
   /* v2.0.17: 发送按钮饱和度淡入 */
   transition:
     background 0.12s,
@@ -585,19 +585,19 @@
  *   transition 有 bug（动画只跑 30% 路程就跳到终点），换成 JS class
  *   .is-focused（focus/blur 事件触发）能让 0.7s transition 完整走完。
  */
-.memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-input {
+.motes-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .motes-input {
   min-height: 40px;
 }
-.memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-input-toolbar {
+.motes-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .motes-input-toolbar {
   opacity: 0.55;
   border-top-color: color-mix(in srgb, var(--background-modifier-border) 50%, transparent);
 }
-.memoria-root .memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) button.memoria-submit-btn {
+.motes-root .motes-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) button.motes-submit-btn {
   opacity: 0.7;
   filter: saturate(0.7);
 }
 
-.memoria-input {
+.motes-input {
   width: 100%;
   /* v1.1.18: box-sizing 必须显式声明为 border-box，
    *   否则 width:100% + Obsidian/主题给 textarea 的隐式 border inset
@@ -630,28 +630,28 @@
   resize: none;
   outline: none;
   overflow-y: auto;
-  /* v2.0.17: 原 `transition: height 0.08s ease` 已移到上方的 .memoria-input 规则块里，
+  /* v2.0.17: 原 `transition: height 0.08s ease` 已移到上方的 .motes-input 规则块里，
    *   并改为 min-height + height 0.7s（渐进式披露动画）。如果这里再声明 transition，会把
    *   上方的新规则覆盖掉 —— 这就是当时动画不生效的直接原因。
    */
 }
-.memoria-input:focus,
-.memoria-input:hover,
-.memoria-input:active {
+.motes-input:focus,
+.motes-input:hover,
+.motes-input:active {
   border: none;
   background: transparent;
   box-shadow: none;
   outline: none;
 }
-.memoria-input::placeholder {
+.motes-input::placeholder {
   color: var(--text-faint);
 }
-.memoria-input.dragging {
+.motes-input.dragging {
   background: var(--background-modifier-hover);
   border-radius: 6px;
   box-shadow: inset 0 0 0 2px var(--interactive-accent);
 }
-.memoria-input-toolbar {
+.motes-input-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -659,12 +659,12 @@
   padding: 8px 16px 0;
   border-top: 1px solid var(--background-modifier-border);
 }
-.memoria-input-tools {
+.motes-input-tools {
   display: flex;
   align-items: center;
   gap: 2px;
 }
-.memoria-root button.memoria-tool-btn {
+.motes-root button.motes-tool-btn {
   padding: 4px 8px;
   border: none;
   background: transparent;
@@ -677,21 +677,21 @@
   transition: background 0.12s, color 0.12s;
   box-shadow: none;
 }
-.memoria-root button.memoria-tool-btn:hover {
+.motes-root button.motes-tool-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-root button.memoria-tool-btn .svg-icon {
+.motes-root button.motes-tool-btn .svg-icon {
   width: 15px;
   height: 15px;
 }
-.memoria-input-hint {
+.motes-input-hint {
   margin-left: 6px;
   font-size: 11px;
   color: var(--text-faint);
 }
 /* 实时预览面板 */
-.memoria-root button.memoria-submit-btn {
+.motes-root button.motes-submit-btn {
   width: 38px;
   height: 32px;
   padding: 0;
@@ -707,92 +707,92 @@
   transition: background 0.12s, filter 0.12s;
   box-shadow: none;
 }
-.memoria-root button.memoria-submit-btn .svg-icon {
+.motes-root button.motes-submit-btn .svg-icon {
   width: 16px;
   height: 16px;
   stroke-width: 2.4;
 }
-.memoria-root button.memoria-submit-btn:hover {
+.motes-root button.motes-submit-btn:hover {
   background: var(--interactive-accent-hover);
   /* 有些主题没定义 --interactive-accent-hover，fallback 用 filter 做微变亮 */
   filter: brightness(1.05);
 }
 
 /* ================== 列表 ================== */
-.memoria-list {
+.motes-list {
   flex: 1;
   overflow-y: auto;
   padding: 18px 24px 64px;
 }
 
 /* 瀑布流布局 */
-.memoria-waterfall-grid {
+.motes-waterfall-grid {
   column-count: 2;
   column-gap: 16px;
 }
 @media (min-width: 960px) {
-  .memoria-waterfall-grid {
+  .motes-waterfall-grid {
     column-count: 3;
   }
 }
 @media (min-width: 1400px) {
-  .memoria-waterfall-grid {
+  .motes-waterfall-grid {
     column-count: 4;
   }
 }
 /* 瀑布流卡片 —— 随意贴风格 */
-.memoria-waterfall-grid .memoria-card {
+.motes-waterfall-grid .motes-card {
   break-inside: avoid;
   margin-bottom: 14px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 2px 3px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
 }
-.memoria-waterfall-grid .memoria-card:hover {
+.motes-waterfall-grid .motes-card:hover {
   transform: scale(1.015) rotate(0deg) !important;
   box-shadow: 4px 6px 16px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
   z-index: 2;
 }
 /* 轻微旋转 + 色纸底色 */
-.memoria-waterfall-grid .memoria-card:nth-child(3n+1) {
+.motes-waterfall-grid .motes-card:nth-child(3n+1) {
   transform: rotate(-0.8deg);
   background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 94%, #ffeaa7 6%);
 }
-.memoria-waterfall-grid .memoria-card:nth-child(3n+2) {
+.motes-waterfall-grid .motes-card:nth-child(3n+2) {
   transform: rotate(1.2deg);
   background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 95%, #a29bfe 5%);
 }
-.memoria-waterfall-grid .memoria-card:nth-child(4n+3) {
+.motes-waterfall-grid .motes-card:nth-child(4n+3) {
   transform: rotate(-1.5deg);
   background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 94%, #fd79a8 6%);
 }
-.memoria-waterfall-grid .memoria-card:nth-child(5n+1) {
+.motes-waterfall-grid .motes-card:nth-child(5n+1) {
   transform: rotate(0.6deg);
 }
-.memoria-waterfall-grid .memoria-card:nth-child(5n+4) {
+.motes-waterfall-grid .motes-card:nth-child(5n+4) {
   transform: rotate(-2deg);
   background: color-mix(in srgb, var(--background-primary-alt, var(--background-secondary)) 95%, #55efc4 5%);
 }
 
-.memoria-waterfall-grid .memoria-load-more {
+.motes-waterfall-grid .motes-load-more {
   column-span: all;
 }
 
 @media (max-width: 680px) {
-  .memoria-waterfall-grid {
+  .motes-waterfall-grid {
     column-count: 1;
     column-gap: 0;
   }
-  .memoria-waterfall-grid .memoria-card {
+  .motes-waterfall-grid .motes-card {
     transform: none !important;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
-  .memoria-waterfall-grid .memoria-card:hover {
+  .motes-waterfall-grid .motes-card:hover {
     transform: scale(1.01) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
 }
 
-.memoria-list-meta {
+.motes-list-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -800,7 +800,7 @@
   color: var(--text-faint);
   font-size: 12px;
 }
-.memoria-root button.memoria-meta-btn {
+.motes-root button.motes-meta-btn {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -814,18 +814,18 @@
   font-size: var(--font-ui-small);
   line-height: 1;
 }
-.memoria-root button.memoria-meta-btn:hover,
-.memoria-root button.memoria-meta-btn:focus-visible {
+.motes-root button.motes-meta-btn:hover,
+.motes-root button.motes-meta-btn:focus-visible {
   border-color: var(--interactive-accent);
   color: var(--text-normal);
 }
-.memoria-root button.memoria-meta-btn .svg-icon {
+.motes-root button.motes-meta-btn .svg-icon {
   width: 14px;
   height: 14px;
 }
 
 
-.memoria-review-toolbar {
+.motes-review-toolbar {
   display: flex;
   align-items: end;
   flex-wrap: wrap;
@@ -837,19 +837,19 @@
   background: var(--background-primary-alt, var(--background-secondary));
 }
 
-.memoria-review-control {
+.motes-review-control {
   display: flex;
   min-width: 120px;
 }
 
-.memoria-review-select-wrap {
+.motes-review-select-wrap {
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
 }
 
-.memoria-review-select {
+.motes-review-select {
   width: 100%;
   min-height: var(--input-height);
   padding-right: 30px;
@@ -858,11 +858,11 @@
   -webkit-appearance: none;
 }
 
-.memoria-review-select::-ms-expand {
+.motes-review-select::-ms-expand {
   display: none;
 }
 
-.memoria-review-select-icon {
+.motes-review-select-icon {
   position: absolute;
   right: 10px;
   display: flex;
@@ -871,16 +871,16 @@
   pointer-events: none;
 }
 
-.memoria-review-select-icon .svg-icon {
+.motes-review-select-icon .svg-icon {
   width: 14px;
   height: 14px;
 }
 
-.memoria-review-keyword {
+.motes-review-keyword {
   flex: 1 1 220px;
 }
 
-.memoria-review-search-wrap {
+.motes-review-search-wrap {
   display: flex;
   align-items: center;
   width: 100%;
@@ -892,19 +892,19 @@
   background: var(--background-modifier-form-field);
   transition: border-color 0.15s;
 }
-.memoria-review-search-wrap:focus-within {
+.motes-review-search-wrap:focus-within {
   border-color: var(--interactive-accent);
 }
-.memoria-review-search-icon {
+.motes-review-search-icon {
   display: flex;
   align-items: center;
   color: var(--text-faint);
 }
-.memoria-review-search-icon .svg-icon {
+.motes-review-search-icon .svg-icon {
   width: 14px;
   height: 14px;
 }
-.memoria-review-input {
+.motes-review-input {
   width: 100%;
   min-height: var(--input-height);
   padding: 6px 4px;
@@ -916,16 +916,16 @@
   font-size: var(--font-ui-small);
   outline: none;
 }
-.memoria-review-input:hover,
-.memoria-review-input:focus,
-.memoria-review-input:active {
+.motes-review-input:hover,
+.motes-review-input:focus,
+.motes-review-input:active {
   border: none;
   background: transparent;
   box-shadow: none;
   outline: none;
 }
 
-.memoria-review-actions {
+.motes-review-actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -934,45 +934,45 @@
 }
 
 @media (max-width: 680px) {
-  .memoria-review-toolbar {
+  .motes-review-toolbar {
     align-items: stretch;
     margin-inline: 0;
   }
 
-  .memoria-review-control {
+  .motes-review-control {
     flex: 1 1 calc(50% - 4px);
     min-width: 0;
   }
 
-  .memoria-review-keyword,
-  .memoria-review-actions {
+  .motes-review-keyword,
+  .motes-review-actions {
     flex: 1 1 100%;
   }
 }
-.memoria-empty {
+.motes-empty {
   padding: 100px 24px 40px;
   text-align: center;
   color: var(--text-faint);
 }
-.memoria-empty-emoji {
+.motes-empty-emoji {
   font-size: 40px;
   margin-bottom: 12px;
 }
-.memoria-empty-text {
+.motes-empty-text {
   font-size: 15px;
   color: var(--text-muted);
   margin-bottom: 4px;
 }
-.memoria-empty-sub {
+.motes-empty-sub {
   font-size: 12px;
   color: var(--text-faint);
 }
 
 /* 日期分组 */
-.memoria-day-group {
+.motes-day-group {
   margin-bottom: 28px;
 }
-.memoria-day-head {
+.motes-day-head {
   padding: 6px 4px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -981,7 +981,7 @@
 }
 
 /* 置顶专属分组 */
-.memoria-pin-group {
+.motes-pin-group {
   padding: 8px 12px 14px;
   margin-bottom: 24px;
   background: color-mix(
@@ -993,7 +993,7 @@
     color-mix(in srgb, var(--interactive-accent) 40%, transparent);
   border-radius: 10px;
 }
-.memoria-pin-head {
+.motes-pin-head {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1003,22 +1003,22 @@
   font-weight: 700;
   letter-spacing: 0.4px;
 }
-.memoria-pin-head-icon {
+.motes-pin-head-icon {
   display: inline-flex;
   align-items: center;
 }
-.memoria-pin-head-icon .svg-icon {
+.motes-pin-head-icon .svg-icon {
   width: 13px;
   height: 13px;
 }
 /* 置顶分组内的卡片：去掉原本置顶卡片的背景色，因为整个组已经有背景了 */
-.memoria-pin-group .memoria-card.is-pinned {
+.motes-pin-group .motes-card.is-pinned {
   background: var(--background-primary-alt, var(--background-secondary));
   border-color: var(--background-modifier-border);
 }
 
 /* 卡片 */
-.memoria-card {
+.motes-card {
   padding: 14px 18px;
   margin-bottom: 12px;
   background: var(--background-primary-alt, var(--background-secondary));
@@ -1026,39 +1026,39 @@
   border-radius: 10px;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
-.memoria-card:hover {
+.motes-card:hover {
   border-color: var(--background-modifier-border-hover);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
-.memoria-card-head {
+.motes-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 }
-.memoria-card-time-wrap {
+.motes-card-time-wrap {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-.memoria-card-pin,
-.memoria-card-star {
+.motes-card-pin,
+.motes-card-star {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.memoria-card-pin .svg-icon,
-.memoria-card-star .svg-icon {
+.motes-card-pin .svg-icon,
+.motes-card-star .svg-icon {
   width: 13px;
   height: 13px;
 }
-.memoria-card-pin {
+.motes-card-pin {
   color: var(--interactive-accent);
 }
-.memoria-card-star {
+.motes-card-star {
   color: #e8b84a;
 }
-.memoria-card.is-pinned {
+.motes-card.is-pinned {
   border-color: var(--interactive-accent);
   background: color-mix(
     in srgb,
@@ -1066,42 +1066,42 @@
     var(--background-primary-alt, var(--background-secondary))
   );
 }
-.memoria-card-time {
+.motes-card-time {
   font-size: 12px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.2px;
 }
-.memoria-card-actions {
+.motes-card-actions {
   display: flex;
   gap: 2px;
   opacity: 0;
   transition: opacity 0.15s;
 }
-.memoria-card:hover .memoria-card-actions {
+.motes-card:hover .motes-card-actions {
   opacity: 1;
 }
-.memoria-card-body {
+.motes-card-body {
   font-size: 14px;
   line-height: 1.7;
   color: var(--text-normal);
   word-break: break-word;
 }
-.memoria-card-body > *:first-child {
+.motes-card-body > *:first-child {
   margin-top: 0;
 }
-.memoria-card-body > *:last-child {
+.motes-card-body > *:last-child {
   margin-bottom: 0;
 }
-.memoria-card-body p {
+.motes-card-body p {
   margin: 0.4em 0;
 }
-.memoria-card-body ul,
-.memoria-card-body ol {
+.motes-card-body ul,
+.motes-card-body ol {
   margin: 0.4em 0;
   padding-left: 1.4em;
 }
-.memoria-card-body blockquote {
+.motes-card-body blockquote {
   margin: 0.5em 0;
   padding: 4px 12px;
   border-left: 3px solid var(--interactive-accent);
@@ -1111,7 +1111,7 @@
 }
 /* 行内 code（文字里的 `xxx`）：胶囊背景；
  * 注意用 :not(pre code) 排除代码块内部的 code，否则会破坏代码块整体感 */
-.memoria-card-body :not(pre) > code {
+.motes-card-body :not(pre) > code {
   padding: 1px 5px;
   background: var(--background-modifier-hover);
   border-radius: 3px;
@@ -1121,7 +1121,7 @@
 }
 
 /* 代码块 <pre>：跟随 Obsidian 原生外观（带背景和细边框） */
-.memoria-card-body pre {
+.motes-card-body pre {
   position: relative;
   margin: 8px 0;
   padding: 10px 12px;
@@ -1132,7 +1132,7 @@
   font-size: 13px;
   line-height: 1.55;
 }
-.memoria-card-body pre > code {
+.motes-card-body pre > code {
   /* 重置：代码块里的 code 不应该有行内 code 的胶囊样式 */
   padding: 0;
   background: transparent;
@@ -1145,9 +1145,9 @@
 }
 
 /* Obsidian 原生代码块复制按钮：统一移到右上角（不同 Obsidian 版本 class 名不同，全部匹配） */
-.memoria-card-body pre .copy-code-button,
-.memoria-card-body pre > button,
-.memoria-card-body pre .code-copy-button {
+.motes-card-body pre .copy-code-button,
+.motes-card-body pre > button,
+.motes-card-body pre .code-copy-button {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -1164,37 +1164,37 @@
   opacity: 0;
   transition: opacity 0.12s ease;
 }
-.memoria-card-body pre:hover .copy-code-button,
-.memoria-card-body pre:hover > button,
-.memoria-card-body pre:hover .code-copy-button,
-.memoria-card-body pre .copy-code-button:focus,
-.memoria-card-body pre > button:focus,
-.memoria-card-body pre .code-copy-button:focus {
+.motes-card-body pre:hover .copy-code-button,
+.motes-card-body pre:hover > button,
+.motes-card-body pre:hover .code-copy-button,
+.motes-card-body pre .copy-code-button:focus,
+.motes-card-body pre > button:focus,
+.motes-card-body pre .code-copy-button:focus {
   opacity: 1;
 }
 
-.memoria-card-body img {
+.motes-card-body img {
   max-width: 100%;
   border-radius: 6px;
   margin: 0.5em 0;
 }
 
 /* ================== 图片九宫格 ================== */
-.memoria-img-grid {
+.motes-img-grid {
   display: grid;
   gap: 4px;
   margin-top: 10px;
   max-width: 380px;
 }
-.memoria-img-grid-1 {
+.motes-img-grid-1 {
   grid-template-columns: 1fr;
   max-width: 260px;
 }
-.memoria-img-grid-1 .memoria-img-cell {
+.motes-img-grid-1 .motes-img-cell {
   aspect-ratio: auto;
   max-height: 240px;
 }
-.memoria-img-grid-1 .memoria-img {
+.motes-img-grid-1 .motes-img {
   width: auto;
   max-width: 100%;
   max-height: 240px;
@@ -1202,27 +1202,27 @@
   background: var(--background-modifier-hover);
   border-radius: 8px;
 }
-.memoria-img-grid-2 {
+.motes-img-grid-2 {
   grid-template-columns: repeat(2, 1fr);
   max-width: 260px;
 }
-.memoria-img-grid-3 {
+.motes-img-grid-3 {
   grid-template-columns: repeat(3, 1fr);
 }
-.memoria-img-grid-4 {
+.motes-img-grid-4 {
   grid-template-columns: repeat(2, 1fr);
   max-width: 260px;
 }
-.memoria-img-grid-5,
-.memoria-img-grid-6,
-.memoria-img-grid-7,
-.memoria-img-grid-8,
-.memoria-img-grid-9 {
+.motes-img-grid-5,
+.motes-img-grid-6,
+.motes-img-grid-7,
+.motes-img-grid-8,
+.motes-img-grid-9 {
   grid-template-columns: repeat(3, 1fr);
 }
 
 /* 单元格：默认正方形 */
-.memoria-img-cell {
+.motes-img-cell {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
@@ -1231,10 +1231,10 @@
   cursor: zoom-in;
   transition: opacity 0.15s;
 }
-.memoria-img-cell:hover {
+.motes-img-cell:hover {
   opacity: 0.92;
 }
-.memoria-img-cell .memoria-img {
+.motes-img-cell .motes-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -1242,14 +1242,14 @@
   margin: 0;
   border-radius: 0;
 }
-.memoria-img-grid-1 .memoria-img-cell {
+.motes-img-grid-1 .motes-img-cell {
   cursor: zoom-in;
   border-radius: 8px;
   background: transparent;
 }
 
 /* +N 蒙版 */
-.memoria-img-overlay {
+.motes-img-overlay {
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
@@ -1264,7 +1264,7 @@
 }
 
 /* ================== Lightbox ================== */
-.memoria-lightbox {
+.motes-lightbox {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.88);
@@ -1274,7 +1274,7 @@
   justify-content: center;
   cursor: zoom-out;
 }
-.memoria-lightbox-stage {
+.motes-lightbox-stage {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1282,7 +1282,7 @@
   max-height: 88vh;
   cursor: zoom-out;
 }
-.memoria-lightbox-img {
+.motes-lightbox-img {
   max-width: 92vw;
   max-height: 88vh;
   object-fit: contain;
@@ -1290,7 +1290,7 @@
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
   cursor: pointer;
 }
-.memoria-lightbox-counter {
+.motes-lightbox-counter {
   position: fixed;
   top: 18px;
   left: 50%;
@@ -1302,7 +1302,7 @@
   padding: 4px 12px;
   border-radius: 999px;
 }
-.memoria-lightbox-close {
+.motes-lightbox-close {
   position: fixed;
   top: 14px;
   right: 18px;
@@ -1317,10 +1317,10 @@
   line-height: 1;
   transition: background 0.15s;
 }
-.memoria-lightbox-close:hover {
+.motes-lightbox-close:hover {
   background: rgba(255, 255, 255, 0.3);
 }
-.memoria-lightbox-nav {
+.motes-lightbox-nav {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
@@ -1335,18 +1335,18 @@
   border-radius: 6px;
   transition: background 0.15s;
 }
-.memoria-lightbox-nav:hover {
+.motes-lightbox-nav:hover {
   background: rgba(255, 255, 255, 0.25);
 }
-.memoria-lightbox-prev {
+.motes-lightbox-prev {
   left: 16px;
 }
-.memoria-lightbox-next {
+.motes-lightbox-next {
   right: 16px;
 }
 
 /* 标签胶囊 */
-.memoria-card-tags {
+.motes-card-tags {
   display: flex;
   flex-wrap: wrap;
   /* v1.4.12: 加 align-items: center。
@@ -1359,7 +1359,7 @@
   gap: 6px;
   margin-top: 10px;
 }
-.memoria-tag-pill {
+.motes-tag-pill {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
@@ -1371,12 +1371,12 @@
   transition: background 0.12s, color 0.12s;
   user-select: none;
 }
-.memoria-tag-pill:hover {
+.motes-tag-pill:hover {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
 }
 
-.memoria-load-more {
+.motes-load-more {
   padding: 20px;
   text-align: center;
   color: var(--text-faint);
@@ -1386,7 +1386,7 @@
 }
 
 /* ================== 编辑弹窗 ================== */
-.memoria-modal-backdrop {
+.motes-modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
@@ -1395,7 +1395,7 @@
   align-items: center;
   justify-content: center;
 }
-.memoria-modal {
+.motes-modal {
   width: min(560px, 90vw);
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
@@ -1406,12 +1406,12 @@
   flex-direction: column;
   gap: 12px;
 }
-.memoria-modal-title {
+.motes-modal-title {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-normal);
 }
-.memoria-modal-textarea {
+.motes-modal-textarea {
   width: 100%;
   min-height: 160px;
   /* v1.1.10: 和主输入框统一走自动高度 —— 关掉浏览器 resize 手柄，
@@ -1430,15 +1430,15 @@
   outline: none;
   transition: height 0.08s ease;
 }
-.memoria-modal-textarea:focus {
+.motes-modal-textarea:focus {
   border-color: var(--interactive-accent);
 }
-.memoria-modal-btns {
+.motes-modal-btns {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
 }
-.memoria-modal .memoria-modal-btns button {
+.motes-modal .motes-modal-btns button {
   padding: 6px 16px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
@@ -1448,34 +1448,34 @@
   font-size: 13px;
   transition: background 0.12s;
 }
-.memoria-modal .memoria-modal-btns button:hover {
+.motes-modal .motes-modal-btns button:hover {
   background: var(--background-modifier-hover);
 }
-.memoria-modal .memoria-modal-btns button.mod-cta {
+.motes-modal .motes-modal-btns button.mod-cta {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   border-color: var(--interactive-accent);
 }
-.memoria-modal .memoria-modal-btns button.mod-cta:hover {
+.motes-modal .motes-modal-btns button.mod-cta:hover {
   background: var(--interactive-accent-hover);
 }
 
 /* ================== 概览：热力图 ↔ 日历 可切换 ================== */
-.memoria-overview {
+.motes-overview {
   padding: 10px 6px 6px;
   /* v1.4.1: 去掉底部灰线，和下方进度条视觉上连贯 */
   margin-bottom: 0;
 }
 
 /* 概览顶部标题栏：左边标题 + 右边切换按钮 */
-.memoria-overview-title {
+.motes-overview-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 4px 6px;
   min-height: 20px;
 }
-.memoria-overview-label {
+.motes-overview-label {
   font-size: 10px;
   font-weight: 600;
   color: var(--text-faint);
@@ -1484,32 +1484,32 @@
 }
 
 /* 切换按钮：位于标题行右侧，hover 才显轮廓 */
-.memoria-overview-btn {
+.motes-overview-btn {
   padding: 3px 6px;
   color: var(--text-faint);
 }
-.memoria-overview-btn:hover {
+.motes-overview-btn:hover {
   color: var(--interactive-accent);
 }
 
 /* 热力图保持原样，去掉外层 padding */
-.memoria-overview .memoria-heatmap {
+.motes-overview .motes-heatmap {
   padding: 0 2px;
   border-bottom: none;
   margin-bottom: 0;
 }
 
 /* ================== 月历 ================== */
-.memoria-calendar {
+.motes-calendar {
   padding: 0 2px;
 }
-.memoria-cal-head {
+.motes-cal-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 4px 8px;
 }
-.memoria-cal-nav {
+.motes-cal-nav {
   width: 22px;
   height: 22px;
   padding: 0;
@@ -1523,15 +1523,15 @@
   border-radius: 4px;
   box-shadow: none;
 }
-.memoria-cal-nav:hover {
+.motes-cal-nav:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-cal-nav .svg-icon {
+.motes-cal-nav .svg-icon {
   width: 14px;
   height: 14px;
 }
-.memoria-cal-title {
+.motes-cal-title {
   font-size: 12px;
   font-weight: 600;
   color: var(--text-normal);
@@ -1540,10 +1540,10 @@
   border-radius: 4px;
   transition: background 0.12s;
 }
-.memoria-cal-title:hover {
+.motes-cal-title:hover {
   background: var(--background-modifier-hover);
 }
-.memoria-cal-week-head {
+.motes-cal-week-head {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
@@ -1552,12 +1552,12 @@
   padding: 2px 0 4px;
   letter-spacing: 0.3px;
 }
-.memoria-cal-grid {
+.motes-cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
 }
-.memoria-cal-cell {
+.motes-cal-cell {
   position: relative;
   aspect-ratio: 1;
   display: flex;
@@ -1569,17 +1569,17 @@
   cursor: default;
   user-select: none;
 }
-.memoria-cal-cell.empty {
+.motes-cal-cell.empty {
   cursor: default;
 }
-.memoria-cal-cell.has-memo {
+.motes-cal-cell.has-memo {
   cursor: pointer;
   color: var(--text-normal);
 }
-.memoria-cal-cell.has-memo:hover {
+.motes-cal-cell.has-memo:hover {
   background: var(--background-modifier-hover);
 }
-.memoria-cal-cell.is-today {
+.motes-cal-cell.is-today {
   background: color-mix(
     in srgb,
     var(--interactive-accent) 15%,
@@ -1588,20 +1588,20 @@
   color: var(--interactive-accent);
   font-weight: 600;
 }
-.memoria-cal-cell.is-active {
+.motes-cal-cell.is-active {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   font-weight: 600;
 }
-.memoria-cal-cell.is-active.is-today {
+.motes-cal-cell.is-active.is-today {
   color: var(--text-on-accent);
 }
-.memoria-cal-num {
+.motes-cal-num {
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 /* 圆点绝对定位在格子底部中央，不影响数字位置 */
-.memoria-cal-dot {
+.motes-cal-dot {
   position: absolute;
   left: 50%;
   bottom: 3px;
@@ -1611,38 +1611,38 @@
   border-radius: 50%;
   background: var(--interactive-accent);
 }
-.memoria-cal-dot.level-1 {
+.motes-cal-dot.level-1 {
   opacity: 0.35;
 }
-.memoria-cal-dot.level-2 {
+.motes-cal-dot.level-2 {
   opacity: 0.6;
 }
-.memoria-cal-dot.level-3 {
+.motes-cal-dot.level-3 {
   opacity: 0.85;
 }
-.memoria-cal-dot.level-4 {
+.motes-cal-dot.level-4 {
   opacity: 1;
   box-shadow: 0 0 0 1px
     color-mix(in srgb, var(--interactive-accent) 40%, transparent);
 }
-.memoria-cal-cell.is-active .memoria-cal-dot {
+.motes-cal-cell.is-active .motes-cal-dot {
   background: var(--text-on-accent);
 }
 
 /* ================== 编辑模式 ================== */
-.memoria-hidden {
+.motes-hidden {
   display: none;
 }
 
 /* 编辑态的输入卡片：强调色边框发光 */
-.memoria-input-card.is-editing {
+.motes-input-card.is-editing {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 3px
     color-mix(in srgb, var(--interactive-accent) 15%, transparent);
 }
 
 /* 右下角发送区：取消按钮 + 发送按钮 */
-.memoria-submit-wrap {
+.motes-submit-wrap {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -1655,7 +1655,7 @@
  *   - Android Chrome：material datetime picker
  *   保持视觉风格与 cancel-btn 一致：低调灰边框，hover 加深。
  */
-.memoria-edit-datetime {
+.motes-edit-datetime {
   padding: 4px 8px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-primary);
@@ -1667,13 +1667,13 @@
   cursor: pointer;
   transition: border-color 0.12s, color 0.12s;
 }
-.memoria-edit-datetime:hover,
-.memoria-edit-datetime:focus {
+.motes-edit-datetime:hover,
+.motes-edit-datetime:focus {
   border-color: var(--interactive-accent);
   color: var(--text-normal);
 }
 
-.memoria-cancel-btn {
+.motes-cancel-btn {
   padding: 5px 14px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-primary);
@@ -1684,7 +1684,7 @@
   transition: background 0.12s, color 0.12s;
   box-shadow: none;
 }
-.memoria-cancel-btn:hover {
+.motes-cancel-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
@@ -1709,12 +1709,12 @@
  *   （~1180px）和桌面继续走单行布局。
  */
 @media (max-width: 900px) {
-  .memoria-submit-wrap {
+  .motes-submit-wrap {
     flex-wrap: wrap;
     justify-content: flex-end;
     row-gap: 8px;
   }
-  .memoria-edit-datetime:not(.memoria-hidden) {
+  .motes-edit-datetime:not(.motes-hidden) {
     /* 编辑态下整体换行到 submit-wrap 第一行（按钮在第二行）
      *   不强求 width: 100%，让 iOS 按内容宽度自然渲染（贴右） */
     flex-basis: 100%;
@@ -1726,14 +1726,14 @@
 }
 
 /* 正在编辑的卡片：高亮边框 */
-.memoria-card.is-editing {
+.motes-card.is-editing {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 2px
     color-mix(in srgb, var(--interactive-accent) 18%, transparent);
 }
 
 /* ================== 标签联想下拉框 ================== */
-.memoria-tag-suggest {
+.motes-tag-suggest {
   position: fixed;
   z-index: 10001;
   background: var(--background-primary);
@@ -1746,7 +1746,7 @@
   min-width: 180px;
   font-size: 13px;
 }
-.memoria-tag-suggest-item {
+.motes-tag-suggest-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1757,21 +1757,21 @@
   user-select: none;
   transition: background 0.08s;
 }
-.memoria-tag-suggest-item:hover,
-.memoria-tag-suggest-item.active {
+.motes-tag-suggest-item:hover,
+.motes-tag-suggest-item.active {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
 }
-.memoria-tag-suggest-icon {
+.motes-tag-suggest-icon {
   display: inline-flex;
   align-items: center;
   opacity: 0.7;
 }
-.memoria-tag-suggest-icon .svg-icon {
+.motes-tag-suggest-icon .svg-icon {
   width: 13px;
   height: 13px;
 }
-.memoria-tag-suggest-name {
+.motes-tag-suggest-name {
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -1779,50 +1779,50 @@
 }
 
 /* ========== Callout 与卡片协调 ========== */
-.memoria-card-body .callout {
+.motes-card-body .callout {
   margin: 0.5em 0;
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 13px;
 }
-.memoria-card-body .callout-title {
+.motes-card-body .callout-title {
   padding: 0;
   font-size: 12px;
   font-weight: 600;
 }
-.memoria-card-body .callout-content {
+.motes-card-body .callout-content {
   margin-top: 4px;
   padding: 0;
   font-size: 13px;
   line-height: 1.55;
 }
-.memoria-card-body .callout-content > *:first-child {
+.motes-card-body .callout-content > *:first-child {
   margin-top: 0;
 }
-.memoria-card-body .callout-content > *:last-child {
+.motes-card-body .callout-content > *:last-child {
   margin-bottom: 0;
 }
-.memoria-card-body .callout-icon {
+.motes-card-body .callout-icon {
   font-size: 14px;
 }
 
 /* ========== 任务列表 ========== */
-.memoria-card-body ul.contains-task-list {
+.motes-card-body ul.contains-task-list {
   padding-left: 1em;
   list-style: none;
 }
-.memoria-card-body li.task-list-item {
+.motes-card-body li.task-list-item {
   padding-left: 0;
 }
-.memoria-card-body li.task-list-item input[type="checkbox"] {
+.motes-card-body li.task-list-item input[type="checkbox"] {
   margin-right: 6px;
   cursor: pointer;
   vertical-align: middle;
   transform: scale(0.95);
 }
-.memoria-card-body li.task-list-item.is-checked,
-.memoria-card-body li[data-task="x"],
-.memoria-card-body li[data-task="X"] {
+.motes-card-body li.task-list-item.is-checked,
+.motes-card-body li[data-task="x"],
+.motes-card-body li[data-task="X"] {
   color: var(--text-faint);
   text-decoration: line-through;
 }
@@ -1830,37 +1830,37 @@
 /* ================== 响应式 ================== */
 
 /* 侧栏切换按钮：桌面端收起侧栏，移动端打开抽屉 */
-.memoria-sidebar-toggle {
+.motes-sidebar-toggle {
   display: inline-flex;
 }
 
 @media (max-width: 860px) {
-  .memoria-sidebar {
+  .motes-sidebar {
     width: 200px;
   }
 }
 
 @media (max-width: 760px) {
-  .memoria-topbar-title {
+  .motes-topbar-title {
     gap: 4px;
   }
-  .memoria-brand {
+  .motes-brand {
     font-size: 16px;
   }
 }
 
 /* 移动端侧栏蒙版（默认隐藏，仅 <=680px 使用） */
-.memoria-sidebar-overlay {
+.motes-sidebar-overlay {
   display: none;
 }
 
 /* ========== 移动端 / 窄视图 ========== */
 @media (max-width: 680px) {
   /* 让侧栏变成"抽屉"样式，从左滑入，默认隐藏 */
-  .memoria-shell {
+  .motes-shell {
     position: relative;
   }
-  .memoria-sidebar {
+  .motes-sidebar {
     position: absolute;
     top: 0;
     left: 0;
@@ -1881,12 +1881,12 @@
     border-bottom: none;
     overflow-y: auto;
   }
-  .memoria-root.memoria-sidebar-open .memoria-sidebar {
+  .motes-root.motes-sidebar-open .motes-sidebar {
     transform: translateX(0);
     box-shadow: 4px 0 18px rgba(0, 0, 0, 0.25);
   }
   /* 蒙版 */
-  .memoria-sidebar-overlay {
+  .motes-sidebar-overlay {
     display: block;
     position: absolute;
     inset: 0;
@@ -1895,32 +1895,32 @@
     transition: background 0.25s;
     z-index: 4;
   }
-  .memoria-root.memoria-sidebar-open .memoria-sidebar-overlay {
+  .motes-root.motes-sidebar-open .motes-sidebar-overlay {
     background: rgba(0, 0, 0, 0.4);
     pointer-events: auto;
     cursor: pointer;
   }
   /* 手机端把侧栏按钮放到左侧，用作抽屉入口 */
-  .memoria-sidebar-toggle {
+  .motes-sidebar-toggle {
     margin-right: 6px;
     order: -1;
   }
   /* 主体占满 */
-  .memoria-main {
+  .motes-main {
     width: 100%;
   }
   /* 顶部紧凑 */
-  .memoria-topbar {
+  .motes-topbar {
     padding: 8px 12px;
     gap: 6px;
   }
-  .memoria-brand {
+  .motes-brand {
     display: none;
   }
-  .memoria-search-wrap {
+  .motes-search-wrap {
     flex: 1;
   }
-  .memoria-search {
+  .motes-search {
     width: 100%;
     min-width: 80px;
   }
@@ -1928,11 +1928,11 @@
    *   input-card 作为 flex item 天然停在 main 底部（flex-direction: column，main overflow:hidden）。
    *   不需要 position:sticky，避免某些 WebView 下 sticky 计算不准。
    */
-  .memoria-list {
+  .motes-list {
     order: 1;
     padding: 12px 12px 16px;
   }
-  .memoria-input-card {
+  .motes-input-card {
     order: 10;
     margin: 0 8px 8px;
     padding: 10px 12px 8px;
@@ -1940,7 +1940,7 @@
     box-shadow: 0 -4px 14px -4px rgba(0, 0, 0, 0.08);
     border-radius: 14px;
   }
-  .memoria-input {
+  .motes-input {
     min-height: 56px;
     font-size: 15px; /* 手机上避免 iOS 自动缩放 */
     /* v1.1.18: 防第三方 OB 主题给 textarea 加 text-indent / padding-left，
@@ -1952,7 +1952,7 @@
      *   又保证字形完整呈现。
      * 右侧补齐对称 padding，避免最后一字在滚动条出现时被压到。
      * v1.4.16: 补 padding-top/bottom。
-     *   根因：PC 端原 .memoria-input 有 `padding: 0`（简写覆盖四边），
+     *   根因：PC 端原 .motes-input 有 `padding: 0`（简写覆盖四边），
      *   v1.4.14 移动端只补了左右，垂直方向仍然是 0。iOS WebView 里中文字首行顶部
      *   反锯齿像素会超出 content box 被裁（"测""试""此"等字右上点画会丢 1-2px），
      *   表现为\"顶部笔画被咬掉\"。加 padding-top:2px 提供垂直安全区，对称加
@@ -1965,62 +1965,62 @@
     -webkit-appearance: none;
     appearance: none;
   }
-.memoria-editor-host {
+.motes-editor-host {
   margin: 0;
   padding: 0;
   height: 280px !important;
   max-height: 45vh !important;
   overflow: hidden !important;
 }
-.memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .memoria-editor-host {
+.motes-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .motes-editor-host {
   height: 56px !important;
 }
-.memoria-input-card.is-focused .memoria-editor-host,
-.memoria-input-card.has-content .memoria-editor-host,
-.memoria-input-card.is-editing .memoria-editor-host {
+.motes-input-card.is-focused .motes-editor-host,
+.motes-input-card.has-content .motes-editor-host,
+.motes-input-card.is-editing .motes-editor-host {
   height: 280px !important;
 }
 /* 隐藏编辑器多余的 chrome，保留 CodeMirror 渲染样式 */
-.memoria-editor-host * {
+.motes-editor-host * {
   max-height: none !important;
 }
-.memoria-editor-host .inline-title {
+.motes-editor-host .inline-title {
   display: none !important;
 }
-.memoria-editor-host .view-header,
-.memoria-editor-host .view-header-nav-buttons,
-.memoria-editor-host .view-header-title-container {
+.motes-editor-host .view-header,
+.motes-editor-host .view-header-nav-buttons,
+.motes-editor-host .view-header-title-container {
   display: none !important;
   visibility: hidden !important;
 }
-.memoria-editor-host .metadata-container,
-.memoria-editor-host .cm-panels {
+.motes-editor-host .metadata-container,
+.motes-editor-host .cm-panels {
   display: none !important;
 }
-.memoria-editor-host .workspace-leaf,
-.memoria-editor-host .workspace-leaf-content,
-.memoria-editor-host .markdown-source-view {
+.motes-editor-host .workspace-leaf,
+.motes-editor-host .workspace-leaf-content,
+.motes-editor-host .markdown-source-view {
   height: 100% !important;
   max-height: 100% !important;
   padding: 0 !important;
 }
-.memoria-editor-host .cm-editor {
+.motes-editor-host .cm-editor {
   background: transparent !important;
   height: 100% !important;
   max-height: 100% !important;
 }
-.memoria-editor-host .cm-scroller {
+.motes-editor-host .cm-scroller {
   font-family: var(--font-text);
   font-size: var(--font-text-size, 14px);
   line-height: var(--line-height-normal, 1.6);
   padding: 0 !important;
   overflow-y: auto !important;
 }
-.memoria-editor-host .cm-sizer {
+.motes-editor-host .cm-sizer {
   min-height: 0 !important;
   padding: 0 !important;
 }
-.memoria-editor-host .cm-content {
+.motes-editor-host .cm-content {
   min-height: 0 !important;
   max-height: 100% !important;
   height: auto !important;
@@ -2028,25 +2028,25 @@
   padding-bottom: 0 !important;
   box-sizing: border-box !important;
 }
-.memoria-editor-host .cm-active.cm-line {
+.motes-editor-host .cm-active.cm-line {
   height: auto !important;
   min-height: 0 !important;
 }
-.memoria-editor-host .cm-content::after {
+.motes-editor-host .cm-content::after {
   display: none !important;
 }
-.memoria-editor-host .cm-gutters {
+.motes-editor-host .cm-gutters {
   display: none !important;
 }
 /* CodeMirror 实时编辑器 */
-.memoria-editor-host {
+.motes-editor-host {
   margin: 0;
   padding: 0;
   min-height: 80px;
   max-height: 55vh;
   overflow: hidden !important;
 }
-.memoria-editor-host .cm-scroller {
+.motes-editor-host .cm-scroller {
   font-family: var(--font-text);
   font-size: var(--font-text-size, 14px);
   line-height: var(--line-height-normal, 1.6);
@@ -2054,51 +2054,51 @@
   overflow-y: auto !important;
 }
 
-.memoria-input-hint {
+.motes-input-hint {
     display: none;
   }
   /* 卡片紧凑 */
-  .memoria-card {
+  .motes-card {
     padding: 12px 14px;
   }
-  .memoria-card-body {
+  .motes-card-body {
     font-size: 15px;
   }
   /* 操作按钮始终可见（手机没有 hover） */
-  .memoria-card-actions {
+  .motes-card-actions {
     opacity: 1;
   }
   /* 统计页顶部统计条字体缩小 */
-  .memoria-stats {
+  .motes-stats {
     padding: 4px 6px 10px;
   }
-  .memoria-stat-num {
+  .motes-stat-num {
     font-size: 20px;
   }
   /* 图片更小 */
-  .memoria-img-grid {
+  .motes-img-grid {
     max-width: 100%;
   }
-  .memoria-img-grid-1 {
+  .motes-img-grid-1 {
     max-width: 220px;
   }
-  .memoria-img-grid-1 .memoria-img,
-  .memoria-img-grid-1 .memoria-img-cell {
+  .motes-img-grid-1 .motes-img,
+  .motes-img-grid-1 .motes-img-cell {
     max-height: 200px;
   }
-  .memoria-img-grid-2,
-  .memoria-img-grid-4 {
+  .motes-img-grid-2,
+  .motes-img-grid-4 {
     max-width: 220px;
   }
-  .memoria-img-grid-5,
-  .memoria-img-grid-6,
-  .memoria-img-grid-7,
-  .memoria-img-grid-8,
-  .memoria-img-grid-9 {
+  .motes-img-grid-5,
+  .motes-img-grid-6,
+  .motes-img-grid-7,
+  .motes-img-grid-8,
+  .motes-img-grid-9 {
     max-width: 320px;
   }
   /* Lightbox 按钮更小 */
-  .memoria-lightbox-nav {
+  .motes-lightbox-nav {
     width: 36px;
     height: 48px;
     font-size: 28px;
@@ -2112,30 +2112,30 @@
  *
  * v1.1.6: 直接把"出血框"padding 放在 view-content 上 —— 这样 Obsidian 移动端
  *   给 .view-content 加的任何内置 padding / inset 都被我们覆盖，同时子元素
- *   .memoria-stats-view 只负责最大宽度约束和居中，不再管留白，避免"padding 叠加又被裁掉"。
+ *   .motes-stats-view 只负责最大宽度约束和居中，不再管留白，避免"padding 叠加又被裁掉"。
  */
 /* v1.1.6: 桌面：left/right 56px 舒适留白
  * v1.1.17: 真正让手机端生效 —— 之前 is-mobile 和默认规则给的 padding 一样，
  *   等于没区分。现在桌面 48/56/64，手机 24/16/48（上/左右/下），释放横向空间
  *   给 24 小时柱状图和总览四宫格用。
  */
-.workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
+.workspace-leaf-content[data-type="motes-stats-view"] .view-content {
   padding: 48px 56px 64px;
   overflow-y: auto;
   display: block;
   background: var(--background-primary);
   box-sizing: border-box;
 }
-.is-mobile .workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
+.is-mobile .workspace-leaf-content[data-type="motes-stats-view"] .view-content {
   padding: 24px 16px 48px;
 }
 @media (max-width: 520px) {
-  .workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
+  .workspace-leaf-content[data-type="motes-stats-view"] .view-content {
     padding: 24px 16px 48px;
   }
 }
 
-.memoria-stats-view {
+.motes-stats-view {
   display: block;
   padding: 0;
   max-width: 1000px;
@@ -2145,7 +2145,7 @@
   box-sizing: border-box;
 }
 
-.memoria-stats-body {
+.motes-stats-body {
   display: block;
 }
 
@@ -2176,23 +2176,23 @@
 }
 
 /* 通用 section 样式（替代原 modal 前缀） */
-.memoria-stats-view .mstat-section {
+.motes-stats-view .mstat-section {
   margin-bottom: 36px;
 }
 /* v1.1.5: section 之间加细分隔线（第 2 个开始），制造"章节"节奏感 */
-.memoria-stats-view .mstat-section + .mstat-section {
+.motes-stats-view .mstat-section + .mstat-section {
   margin-top: 8px;
   padding-top: 36px;
   border-top: 1px solid var(--background-modifier-border);
 }
-.memoria-stats-view .mstat-title {
+.motes-stats-view .mstat-title {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 14px;
   letter-spacing: 0.3px;
 }
-.memoria-stats-view .mstat-title-row {
+.motes-stats-view .mstat-title-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -2200,27 +2200,27 @@
   margin-bottom: 14px;
   flex-wrap: wrap; /* 窄屏自动换行 */
 }
-.memoria-stats-view .mstat-title-row .mstat-title {
+.motes-stats-view .mstat-title-row .mstat-title {
   margin-bottom: 0;
 }
-.memoria-stats-view .mstat-subtitle {
+.motes-stats-view .mstat-subtitle {
   font-size: 11px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
 /* 空 bucket 柱子保留极弱的视觉，便于看到刻度连续性 */
-.memoria-stats-view .mstat-bar.is-empty {
+.motes-stats-view .mstat-bar.is-empty {
   background: var(--background-modifier-border);
   opacity: 0.5;
 }
 
 /* 总览四宫格 */
-.memoria-stats-view .mstat-overview {
+.motes-stats-view .mstat-overview {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
-.memoria-stats-view .mstat-bignum {
+.motes-stats-view .mstat-bignum {
   padding: 26px 10px 22px;
   background: var(--background-primary-alt, var(--background-secondary));
   border: 1px solid var(--background-modifier-border);
@@ -2230,7 +2230,7 @@
   position: relative;
   transition: border-color 0.18s, transform 0.18s, box-shadow 0.18s;
 }
-.memoria-stats-view .mstat-bignum::before {
+.motes-stats-view .mstat-bignum::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -2239,17 +2239,17 @@
   opacity: 0.6;
   transition: opacity 0.18s;
 }
-.memoria-stats-view .mstat-bignum:hover {
+.motes-stats-view .mstat-bignum:hover {
   border-color: color-mix(in srgb, var(--interactive-accent) 50%, var(--background-modifier-border));
   transform: translateY(-2px);
   box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--interactive-accent) 40%, transparent);
 }
-.memoria-stats-view .mstat-bignum:hover::before {
+.motes-stats-view .mstat-bignum:hover::before {
   opacity: 1;
 }
   box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--interactive-accent) 40%, transparent);
 }
-.memoria-stats-view .mstat-bignum-num {
+.motes-stats-view .mstat-bignum-num {
   /* v1.1.5: 桌面 40px，视觉分量更足 */
   font-size: 36px;
   font-weight: 700;
@@ -2264,7 +2264,7 @@
   background-clip: text;
   color: transparent;
 }
-.memoria-stats-view .mstat-bignum-label {
+.motes-stats-view .mstat-bignum-label {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 8px;
@@ -2272,7 +2272,7 @@
 }
 
 /* 365 天热力图 */
-.memoria-stats-view .mstat-yh-title-row {
+.motes-stats-view .mstat-yh-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2280,15 +2280,15 @@
   gap: 12px;
   flex-wrap: wrap; /* v1.1.5: 窄屏换行避免挤压 */
 }
-.memoria-stats-view .mstat-yh-title-row .mstat-title {
+.motes-stats-view .mstat-yh-title-row .mstat-title {
   margin-bottom: 0;
 }
-.memoria-stats-view .mstat-yh-year-nav {
+.motes-stats-view .mstat-yh-year-nav {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
-.memoria-stats-view button.mstat-yh-year-arrow {
+.motes-stats-view button.mstat-yh-year-arrow {
   width: 26px;
   height: 26px;
   padding: 0;
@@ -2303,16 +2303,16 @@
   box-shadow: none;
   transition: background 0.12s, color 0.12s;
 }
-.memoria-stats-view button.mstat-yh-year-arrow:hover {
+.motes-stats-view button.mstat-yh-year-arrow:hover {
   background: var(--background-modifier-hover);
   color: var(--interactive-accent);
   border-color: color-mix(in srgb, var(--interactive-accent) 50%, var(--background-modifier-border));
 }
-.memoria-stats-view button.mstat-yh-year-arrow .svg-icon {
+.motes-stats-view button.mstat-yh-year-arrow .svg-icon {
   width: 13px;
   height: 13px;
 }
-.memoria-stats-view button.mstat-yh-year-btn {
+.motes-stats-view button.mstat-yh-year-btn {
   padding: 4px 14px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-primary);
@@ -2323,61 +2323,61 @@
   font-variant-numeric: tabular-nums;
   box-shadow: none;
 }
-.memoria-stats-view button.mstat-yh-year-btn:hover {
+.motes-stats-view button.mstat-yh-year-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-stats-view .mstat-yh-wrap {
+.motes-stats-view .mstat-yh-wrap {
   display: flex;
   gap: 3px;
   padding-bottom: 2px;
 }
-.memoria-stats-view .mstat-yh-col {
+.motes-stats-view .mstat-yh-col {
   display: flex;
   flex-direction: column;
   gap: 3px;
   flex-shrink: 0;
 }
-.memoria-stats-view .mstat-yh-cell {
+.motes-stats-view .mstat-yh-cell {
   width: 13px;
   height: 13px;
   border-radius: 2px;
   background: var(--background-modifier-border);
   flex-shrink: 0;
 }
-.memoria-stats-view .mstat-yh-cell.level-0 {
+.motes-stats-view .mstat-yh-cell.level-0 {
   background: var(--background-modifier-border);
   opacity: 0.45;
 }
-.memoria-stats-view .mstat-yh-cell.level-1 {
+.motes-stats-view .mstat-yh-cell.level-1 {
   background: var(--interactive-accent);
   opacity: 0.3;
 }
-.memoria-stats-view .mstat-yh-cell.level-2 {
+.motes-stats-view .mstat-yh-cell.level-2 {
   background: var(--interactive-accent);
   opacity: 0.55;
 }
-.memoria-stats-view .mstat-yh-cell.level-3 {
+.motes-stats-view .mstat-yh-cell.level-3 {
   background: var(--interactive-accent);
   opacity: 0.8;
 }
-.memoria-stats-view .mstat-yh-cell.level-4 {
+.motes-stats-view .mstat-yh-cell.level-4 {
   background: var(--interactive-accent);
   opacity: 1;
 }
-.memoria-stats-view .mstat-yh-monthlabels {
+.motes-stats-view .mstat-yh-monthlabels {
   position: relative;
   height: 16px;
   margin-top: 4px;
   font-size: 11px;
   color: var(--text-faint);
 }
-.memoria-stats-view .mstat-yh-mlabel {
+.motes-stats-view .mstat-yh-mlabel {
   position: absolute;
   top: 0;
   white-space: nowrap;
 }
-.memoria-stats-view .mstat-yh-legend {
+.motes-stats-view .mstat-yh-legend {
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -2385,37 +2385,37 @@
   font-size: 11px;
   color: var(--text-faint);
 }
-.memoria-stats-view .mstat-yh-legend .mstat-yh-cell {
+.motes-stats-view .mstat-yh-legend .mstat-yh-cell {
   width: 10px;
   height: 10px;
 }
 
 /* 月度分布 */
-.memoria-stats-view .mstat-monthly-title {
+.motes-stats-view .mstat-monthly-title {
   margin-bottom: 12px;
 }
-.memoria-stats-view .mstat-monthly-wrap {
+.motes-stats-view .mstat-monthly-wrap {
   margin-bottom: 28px;
 }
 /* v1.1.5: 月度分布紧跟年度热力图，视为同一组 → 去掉分隔线 */
-.memoria-stats-view .mstat-section.mstat-monthly-title + * {
+.motes-stats-view .mstat-section.mstat-monthly-title + * {
   /* 占位：下一段（月度柱图 wrap）不是 .mstat-section，不需特殊处理 */
 }
-.memoria-stats-view .mstat-section.mstat-monthly-title {
+.motes-stats-view .mstat-section.mstat-monthly-title {
   margin-top: 0;
   padding-top: 0;
   border-top: none;
 }
 
 /* 柱状图 */
-.memoria-stats-view .mstat-bar-chart {
+.motes-stats-view .mstat-bar-chart {
   display: flex;
   align-items: stretch;
   gap: 6px;
   height: 180px;
   padding: 0 2px;
 }
-.memoria-stats-view .mstat-bar-col {
+.motes-stats-view .mstat-bar-col {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -2423,7 +2423,7 @@
   gap: 2px;
   height: 100%;
 }
-.memoria-stats-view .mstat-bar-wrap {
+.motes-stats-view .mstat-bar-wrap {
   flex: 1;
   width: 100%;
   display: flex;
@@ -2431,7 +2431,7 @@
   justify-content: center;
   min-height: 1px;
 }
-.memoria-stats-view .mstat-bar {
+.motes-stats-view .mstat-bar {
   width: 100%;
   background: linear-gradient(
     180deg,
@@ -2443,33 +2443,33 @@
   min-height: 2px;
   transition: opacity 0.15s, transform 0.15s;
 }
-.memoria-stats-view .mstat-bar.is-max {
+.motes-stats-view .mstat-bar.is-max {
   opacity: 1;
 }
-.memoria-stats-view .mstat-bar-col:hover .mstat-bar {
+.motes-stats-view .mstat-bar-col:hover .mstat-bar {
   opacity: 1;
   filter: brightness(1.1);
 }
-.memoria-stats-view .mstat-bar-num {
+.motes-stats-view .mstat-bar-num {
   font-size: 11px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
   height: 13px;
 }
 /* v1.1.5: 0 条月份的数字再弱化一档，保留节奏但不抢视觉 */
-.memoria-stats-view .mstat-bar-num.is-dim {
+.motes-stats-view .mstat-bar-num.is-dim {
   opacity: 0.35;
 }
-.memoria-stats-view .mstat-bar-label {
+.motes-stats-view .mstat-bar-label {
   font-size: 11px;
   color: var(--text-faint);
 }
-.memoria-stats-view .mstat-bar-chart-hour .mstat-bar-label {
+.motes-stats-view .mstat-bar-chart-hour .mstat-bar-label {
   font-size: 10px;
 }
 
 /* 标签云 */
-.memoria-stats-view .mstat-cloud {
+.motes-stats-view .mstat-cloud {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 14px;
@@ -2480,26 +2480,26 @@
   line-height: 1.7;
   align-items: baseline;
 }
-.memoria-stats-view .mstat-cloud-tag {
+.motes-stats-view .mstat-cloud-tag {
   color: var(--interactive-accent);
   cursor: default;
   transition: opacity 0.12s, transform 0.12s;
   padding: 2px 6px;
   border-radius: 4px;
 }
-.memoria-stats-view .mstat-cloud-tag:hover {
+.motes-stats-view .mstat-cloud-tag:hover {
   opacity: 1;
   transform: scale(1.12);
   background: color-mix(in srgb, var(--interactive-accent) 10%, transparent);
 }
 
 /* 高亮发现 */
-.memoria-stats-view .mstat-fact-list {
+.motes-stats-view .mstat-fact-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.memoria-stats-view .mstat-fact {
+.motes-stats-view .mstat-fact {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -2512,35 +2512,35 @@
   color: var(--text-muted);
   transition: border-color 0.15s;
 }
-.memoria-stats-view .mstat-fact:hover {
+.motes-stats-view .mstat-fact:hover {
   border-color: var(--background-modifier-border-hover);
 }
-.memoria-stats-view .mstat-fact.is-egg {
+.motes-stats-view .mstat-fact.is-egg {
   background: color-mix(in srgb, var(--interactive-accent) 8%, var(--background-primary-alt, var(--background-secondary)));
   border-color: color-mix(in srgb, var(--interactive-accent) 30%, var(--background-modifier-border));
 }
-.memoria-stats-view .mstat-fact-icon {
+.motes-stats-view .mstat-fact-icon {
   font-size: 16px;
   flex-shrink: 0;
   line-height: 1.6;
 }
-.memoria-stats-view .mstat-fact-text {
+.motes-stats-view .mstat-fact-text {
   flex: 1;
 }
 
 /* Top 榜 */
-.memoria-stats-view .mstat-hbar-list {
+.motes-stats-view .mstat-hbar-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-.memoria-stats-view .mstat-hbar-row {
+.motes-stats-view .mstat-hbar-row {
   display: grid;
   grid-template-columns: 24px 160px 1fr 36px;
   gap: 12px;
   align-items: center;
 }
-.memoria-stats-view .mstat-hbar-rank {
+.motes-stats-view .mstat-hbar-rank {
   width: 24px;
   height: 24px;
   display: flex;
@@ -2553,40 +2553,40 @@
   background: var(--background-secondary);
 }
 /* v1.1.5: 金银铜改用更有辨识度的饱和色 + 细微内阴影增加质感 */
-.memoria-stats-view .mstat-hbar-rank.rank-1 {
+.motes-stats-view .mstat-hbar-rank.rank-1 {
   background: linear-gradient(135deg, #f4c430, #d79820);
   color: #fff;
   box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(212, 152, 32, 0.3);
 }
-.memoria-stats-view .mstat-hbar-rank.rank-2 {
+.motes-stats-view .mstat-hbar-rank.rank-2 {
   background: linear-gradient(135deg, #c8c8cc, #9a9aa0);
   color: #fff;
   box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.15);
 }
-.memoria-stats-view .mstat-hbar-rank.rank-3 {
+.motes-stats-view .mstat-hbar-rank.rank-3 {
   background: linear-gradient(135deg, #cd7f32, #a0602a);
   color: #fff;
   box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.15);
 }
 /* rank-4 及之后：保持淡灰，把视觉焦点留给前三 */
-.memoria-stats-view .mstat-hbar-rank.rank-4 {
+.motes-stats-view .mstat-hbar-rank.rank-4 {
   background: var(--background-secondary);
   color: var(--text-faint);
 }
-.memoria-stats-view .mstat-hbar-label {
+.motes-stats-view .mstat-hbar-label {
   font-size: 13px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.memoria-stats-view .mstat-hbar-wrap {
+.motes-stats-view .mstat-hbar-wrap {
   height: 16px;
   background: var(--background-modifier-border);
   border-radius: 8px;
   overflow: hidden;
 }
-.memoria-stats-view .mstat-hbar {
+.motes-stats-view .mstat-hbar {
   height: 100%;
   background: linear-gradient(
     90deg,
@@ -2596,7 +2596,7 @@
   border-radius: 8px;
   transition: width 0.3s;
 }
-.memoria-stats-view .mstat-hbar-num {
+.motes-stats-view .mstat-hbar-num {
   font-size: 12px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
@@ -2604,7 +2604,7 @@
 }
 
 /* 结论文字 */
-.memoria-stats-view .mstat-desc {
+.motes-stats-view .mstat-desc {
   margin-top: 12px;
   padding: 10px 14px;
   background: var(--background-modifier-hover);
@@ -2614,12 +2614,12 @@
 }
 
 /* 有趣的发现 */
-.memoria-stats-view .mstat-fact-list {
+.motes-stats-view .mstat-fact-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.memoria-stats-view .mstat-fact {
+.motes-stats-view .mstat-fact {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -2635,17 +2635,17 @@
   /* v1.1.5: hover 时略抬升 + 左边框变深，让每条发现更像"卡片" */
   transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
-.memoria-stats-view .mstat-fact:hover {
+.motes-stats-view .mstat-fact:hover {
   transform: translateX(2px);
   border-left-color: var(--interactive-accent);
   box-shadow: 0 2px 8px -4px color-mix(in srgb, var(--interactive-accent) 40%, transparent);
 }
-.memoria-stats-view .mstat-fact-icon {
+.motes-stats-view .mstat-fact-icon {
   flex-shrink: 0;
   font-size: 18px;
   line-height: 1.4;
 }
-.memoria-stats-view .mstat-empty {
+.motes-stats-view .mstat-empty {
   padding: 16px;
   color: var(--text-faint);
   font-size: 13px;
@@ -2659,60 +2659,60 @@
  *   负 margin 让滚动区域贴齐视口左右边缘（越过 section 的 padding），
  *   这样手指从左滑到右可以看到所有柱子，滚动条也不会被 padding 切掉。
  */
-.memoria-stats-view .mstat-bar-chart-scroll,
-.memoria-stats-view .mstat-yh-scroll {
+.motes-stats-view .mstat-bar-chart-scroll,
+.motes-stats-view .mstat-yh-scroll {
   overflow-x: auto;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   /* 隐藏滚动条但保留滚动能力（移动端更常见），需要手势提示可改为 'thin' */
 }
-.memoria-stats-view .mstat-bar-chart-scroll::-webkit-scrollbar {
+.motes-stats-view .mstat-bar-chart-scroll::-webkit-scrollbar {
   height: 4px;
 }
-.memoria-stats-view .mstat-bar-chart-scroll::-webkit-scrollbar-thumb {
+.motes-stats-view .mstat-bar-chart-scroll::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 2px;
 }
-.memoria-stats-view .mstat-bar-chart-scroll .mstat-bar-chart {
+.motes-stats-view .mstat-bar-chart-scroll .mstat-bar-chart {
   /* 让柱图有固定最小宽度，不被 flex 压扁 */
   min-width: 520px;
 }
-.memoria-stats-view .mstat-bar-chart-scroll .mstat-bar-chart-hour {
+.motes-stats-view .mstat-bar-chart-scroll .mstat-bar-chart-hour {
   /* 24 小时图每列至少 18px + gap，保底约 580px */
   min-width: 580px;
 }
-.memoria-stats-view .mstat-yh-scroll {
+.motes-stats-view .mstat-yh-scroll {
   /* 年度热力图 + 月份标签都在这里面，彼此不会错位 */
   padding-bottom: 2px;
 }
 
 /* 窄屏响应式 */
 @media (max-width: 680px) {
-  .workspace-leaf-content[data-type="memoria-stats-view"] .view-content {
+  .workspace-leaf-content[data-type="motes-stats-view"] .view-content {
     /* v1.1.17: 和主规则一致，16px 左右 padding，释放 8px 给柱图区域 */
     padding: 24px 16px 48px;
   }
-  .memoria-stats-view {
+  .motes-stats-view {
     padding: 0;
   }
   /* 总览四宫格：4 列 → 2×2 */
-  .memoria-stats-view .mstat-overview {
+  .motes-stats-view .mstat-overview {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  .memoria-stats-view .mstat-bignum {
+  .motes-stats-view .mstat-bignum {
     padding: 18px 8px;
   }
-  .memoria-stats-view .mstat-bignum-num {
+  .motes-stats-view .mstat-bignum-num {
     font-size: 28px;
   }
   /* Top 10 标签奖牌行：奖牌 + 标签 + 进度条 + 数字 四列 */
-  .memoria-stats-view .mstat-hbar-row {
+  .motes-stats-view .mstat-hbar-row {
     grid-template-columns: 22px 110px 1fr 30px;
     gap: 8px;
   }
   /* section 节奏感收缩 */
-  .memoria-stats-view .mstat-section + .mstat-section {
+  .motes-stats-view .mstat-section + .mstat-section {
     padding-top: 28px;
     margin-top: 0;
   }
@@ -2723,29 +2723,29 @@
     font-size: 18px;
   }
   /* v1.1.17: 标题 + 副标题在窄屏改为纵向堆叠，副标题不挤压标题 */
-  .memoria-stats-view .mstat-title-row {
+  .motes-stats-view .mstat-title-row {
     flex-wrap: wrap;
     gap: 4px;
   }
-  .memoria-stats-view .mstat-title-row .mstat-subtitle {
+  .motes-stats-view .mstat-title-row .mstat-subtitle {
     flex-basis: 100%;
     margin-top: -2px;
   }
   /* 柱图高度在窄屏收缩 180px → 140px，视觉更紧凑 */
-  .memoria-stats-view .mstat-bar-chart {
+  .motes-stats-view .mstat-bar-chart {
     height: 140px;
   }
   /* 24 小时柱图的两位数字 label 太挤，改成 45° 旋转省空间（如需保水平可注释掉） */
-  .memoria-stats-view .mstat-bar-chart-hour .mstat-bar-label {
+  .motes-stats-view .mstat-bar-chart-hour .mstat-bar-label {
     font-size: 9px;
   }
   /* 有趣发现卡片：padding 收紧 */
-  .memoria-stats-view .mstat-fact {
+  .motes-stats-view .mstat-fact {
     padding: 10px 12px;
     font-size: 13px;
   }
   /* 结论文字 */
-  .memoria-stats-view .mstat-desc {
+  .motes-stats-view .mstat-desc {
     font-size: 12px;
     padding: 8px 12px;
   }
@@ -2757,24 +2757,24 @@
  * 用来暗示"左边可以滑出来一个侧栏"。在我们这个独立的数据报告标签页里完全不需要，
  * 反而显得不够干净。这里只对 stats-view 所在的 leaf 去掉。
  */
-.is-mobile .workspace-leaf.memoria-stats-workspace-leaf::before,
-.is-mobile .workspace-leaf.memoria-stats-workspace-leaf::after,
-.is-mobile .workspace-leaf-content[data-type="memoria-stats-view"]::before,
-.is-mobile .workspace-leaf-content[data-type="memoria-stats-view"]::after,
-.is-mobile .workspace-leaf-content[data-type="memoria-stats-view"] .view-content::before,
-.is-mobile .workspace-leaf-content[data-type="memoria-stats-view"] .view-content::after {
+.is-mobile .workspace-leaf.motes-stats-workspace-leaf::before,
+.is-mobile .workspace-leaf.motes-stats-workspace-leaf::after,
+.is-mobile .workspace-leaf-content[data-type="motes-stats-view"]::before,
+.is-mobile .workspace-leaf-content[data-type="motes-stats-view"]::after,
+.is-mobile .workspace-leaf-content[data-type="motes-stats-view"] .view-content::before,
+.is-mobile .workspace-leaf-content[data-type="motes-stats-view"] .view-content::after {
   display: none;
   box-shadow: none;
   background: none;
   content: none;
 }
-/* 同样覆盖主视图（memoria-view）的翻页渐变 */
-.is-mobile .workspace-leaf.memoria-workspace-leaf::before,
-.is-mobile .workspace-leaf.memoria-workspace-leaf::after,
-.is-mobile .workspace-leaf-content[data-type="memoria-view"]::before,
-.is-mobile .workspace-leaf-content[data-type="memoria-view"]::after,
-.is-mobile .workspace-leaf-content[data-type="memoria-view"] .view-content::before,
-.is-mobile .workspace-leaf-content[data-type="memoria-view"] .view-content::after {
+/* 同样覆盖主视图（motes-view）的翻页渐变 */
+.is-mobile .workspace-leaf.motes-workspace-leaf::before,
+.is-mobile .workspace-leaf.motes-workspace-leaf::after,
+.is-mobile .workspace-leaf-content[data-type="motes-view"]::before,
+.is-mobile .workspace-leaf-content[data-type="motes-view"]::after,
+.is-mobile .workspace-leaf-content[data-type="motes-view"] .view-content::before,
+.is-mobile .workspace-leaf-content[data-type="motes-view"] .view-content::after {
   display: none;
   box-shadow: none;
   background: none;
@@ -2782,13 +2782,13 @@
 }
 
 /* ================== 统计弹窗（兼容保留，以防旧 API 调用） ================== */
-.memoria-stats-modal {
+.motes-stats-modal {
   max-width: 640px;
 }
-.memoria-stats-modal .mstat-section {
+.motes-stats-modal .mstat-section {
   margin-bottom: 24px;
 }
-.memoria-stats-modal .mstat-title {
+.motes-stats-modal .mstat-title {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
@@ -2797,12 +2797,12 @@
 }
 
 /* 总览四宫格 */
-.memoria-stats-modal .mstat-overview {
+.motes-stats-modal .mstat-overview {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
-.memoria-stats-modal .mstat-bignum {
+.motes-stats-modal .mstat-bignum {
   padding: 14px 6px;
   background: linear-gradient(
     135deg,
@@ -2813,7 +2813,7 @@
   border-radius: 10px;
   text-align: center;
 }
-.memoria-stats-modal .mstat-bignum-num {
+.motes-stats-modal .mstat-bignum-num {
   font-size: 24px;
   font-weight: 700;
   color: var(--text-normal);
@@ -2821,7 +2821,7 @@
   line-height: 1.1;
 }
 @supports (background-clip: text) {
-  .memoria-stats-modal .mstat-bignum-num {
+  .motes-stats-modal .mstat-bignum-num {
     background: linear-gradient(
       135deg,
       var(--text-normal),
@@ -2831,23 +2831,23 @@
     color: transparent;
   }
 }
-.memoria-stats-modal .mstat-bignum-label {
+.motes-stats-modal .mstat-bignum-label {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 4px;
 }
 
 /* 365 天热力图 */
-.memoria-stats-modal .mstat-yh-title-row {
+.motes-stats-modal .mstat-yh-title-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 }
-.memoria-stats-modal .mstat-yh-title-row .mstat-title {
+.motes-stats-modal .mstat-yh-title-row .mstat-title {
   margin-bottom: 0;
 }
-.memoria-stats-modal .mstat-yh-year-btn {
+.motes-stats-modal .mstat-yh-year-btn {
   padding: 3px 12px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-primary);
@@ -2858,12 +2858,12 @@
   font-variant-numeric: tabular-nums;
   box-shadow: none;
 }
-.memoria-stats-modal .mstat-yh-year-btn:hover {
+.motes-stats-modal .mstat-yh-year-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 /* 横向滚动容器 */
-.memoria-stats-modal .mstat-yh-wrap {
+.motes-stats-modal .mstat-yh-wrap {
   display: flex;
   gap: 3px;
   overflow-x: auto;
@@ -2871,61 +2871,61 @@
   padding-bottom: 4px;
   /* 自定义滚动条 */
 }
-.memoria-stats-modal .mstat-yh-wrap::-webkit-scrollbar {
+.motes-stats-modal .mstat-yh-wrap::-webkit-scrollbar {
   height: 6px;
 }
-.memoria-stats-modal .mstat-yh-wrap::-webkit-scrollbar-thumb {
+.motes-stats-modal .mstat-yh-wrap::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }
-.memoria-stats-modal .mstat-yh-col {
+.motes-stats-modal .mstat-yh-col {
   display: flex;
   flex-direction: column;
   gap: 3px;
   flex-shrink: 0;
 }
-.memoria-stats-modal .mstat-yh-cell {
+.motes-stats-modal .mstat-yh-cell {
   width: 11px;
   height: 11px;
   border-radius: 2px;
   background: var(--background-modifier-border);
   flex-shrink: 0;
 }
-.memoria-stats-modal .mstat-yh-cell.level-0 {
+.motes-stats-modal .mstat-yh-cell.level-0 {
   background: var(--background-modifier-border);
   opacity: 0.45;
 }
-.memoria-stats-modal .mstat-yh-cell.level-1 {
+.motes-stats-modal .mstat-yh-cell.level-1 {
   background: var(--interactive-accent);
   opacity: 0.3;
 }
-.memoria-stats-modal .mstat-yh-cell.level-2 {
+.motes-stats-modal .mstat-yh-cell.level-2 {
   background: var(--interactive-accent);
   opacity: 0.55;
 }
-.memoria-stats-modal .mstat-yh-cell.level-3 {
+.motes-stats-modal .mstat-yh-cell.level-3 {
   background: var(--interactive-accent);
   opacity: 0.8;
 }
-.memoria-stats-modal .mstat-yh-cell.level-4 {
+.motes-stats-modal .mstat-yh-cell.level-4 {
   background: var(--interactive-accent);
   opacity: 1;
 }
 
 /* 月份标签：绝对定位，不再挤 */
-.memoria-stats-modal .mstat-yh-monthlabels {
+.motes-stats-modal .mstat-yh-monthlabels {
   position: relative;
   height: 14px;
   margin-top: 4px;
   font-size: 10px;
   color: var(--text-faint);
 }
-.memoria-stats-modal .mstat-yh-mlabel {
+.motes-stats-modal .mstat-yh-mlabel {
   position: absolute;
   top: 0;
   white-space: nowrap;
 }
-.memoria-stats-modal .mstat-yh-legend {
+.motes-stats-modal .mstat-yh-legend {
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -2933,42 +2933,42 @@
   font-size: 10px;
   color: var(--text-faint);
 }
-.memoria-stats-modal .mstat-yh-legend .mstat-yh-cell {
+.motes-stats-modal .mstat-yh-legend .mstat-yh-cell {
   width: 9px;
   height: 9px;
 }
 
 /* 月度分布紧跟热力图 */
-.memoria-stats-modal .mstat-monthly-title {
+.motes-stats-modal .mstat-monthly-title {
   margin-bottom: 8px;
 }
-.memoria-stats-modal .mstat-monthly-wrap {
+.motes-stats-modal .mstat-monthly-wrap {
   margin-bottom: 24px;
 }
 
 /* 柱状图 */
-.memoria-stats-modal .mstat-bar-chart {
+.motes-stats-modal .mstat-bar-chart {
   display: flex;
   align-items: flex-end;
   gap: 4px;
   height: 140px;
   padding: 0 2px;
 }
-.memoria-stats-modal .mstat-bar-col {
+.motes-stats-modal .mstat-bar-col {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
 }
-.memoria-stats-modal .mstat-bar-wrap {
+.motes-stats-modal .mstat-bar-wrap {
   flex: 1;
   width: 100%;
   display: flex;
   align-items: flex-end;
   min-height: 1px;
 }
-.memoria-stats-modal .mstat-bar {
+.motes-stats-modal .mstat-bar {
   width: 100%;
   background: linear-gradient(
     180deg,
@@ -2980,29 +2980,29 @@
   min-height: 2px;
   transition: opacity 0.15s, transform 0.15s;
 }
-.memoria-stats-modal .mstat-bar.is-max {
+.motes-stats-modal .mstat-bar.is-max {
   opacity: 1;
 }
-.memoria-stats-modal .mstat-bar-col:hover .mstat-bar {
+.motes-stats-modal .mstat-bar-col:hover .mstat-bar {
   opacity: 1;
   transform: scaleY(1.02);
 }
-.memoria-stats-modal .mstat-bar-num {
+.motes-stats-modal .mstat-bar-num {
   font-size: 10px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
   height: 12px;
 }
-.memoria-stats-modal .mstat-bar-label {
+.motes-stats-modal .mstat-bar-label {
   font-size: 10px;
   color: var(--text-faint);
 }
-.memoria-stats-modal .mstat-bar-chart-hour .mstat-bar-label {
+.motes-stats-modal .mstat-bar-chart-hour .mstat-bar-label {
   font-size: 9px;
 }
 
 /* 标签云 */
-.memoria-stats-modal .mstat-cloud {
+.motes-stats-modal .mstat-cloud {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 12px;
@@ -3012,29 +3012,29 @@
   line-height: 1.6;
   align-items: baseline;
 }
-.memoria-stats-modal .mstat-cloud-tag {
+.motes-stats-modal .mstat-cloud-tag {
   color: var(--interactive-accent);
   cursor: default;
   transition: opacity 0.12s, transform 0.12s;
 }
-.memoria-stats-modal .mstat-cloud-tag:hover {
+.motes-stats-modal .mstat-cloud-tag:hover {
   opacity: 1;
   transform: scale(1.05);
 }
 
 /* 横向柱状图（带排名） */
-.memoria-stats-modal .mstat-hbar-list {
+.motes-stats-modal .mstat-hbar-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.memoria-stats-modal .mstat-hbar-row {
+.motes-stats-modal .mstat-hbar-row {
   display: grid;
   grid-template-columns: 22px 130px 1fr 30px;
   gap: 10px;
   align-items: center;
 }
-.memoria-stats-modal .mstat-hbar-rank {
+.motes-stats-modal .mstat-hbar-rank {
   width: 22px;
   height: 22px;
   display: flex;
@@ -3046,32 +3046,32 @@
   color: var(--text-faint);
   background: var(--background-secondary);
 }
-.memoria-stats-modal .mstat-hbar-rank.rank-1 {
+.motes-stats-modal .mstat-hbar-rank.rank-1 {
   background: linear-gradient(135deg, #ffd700, #ffaa00);
   color: #fff;
 }
-.memoria-stats-modal .mstat-hbar-rank.rank-2 {
+.motes-stats-modal .mstat-hbar-rank.rank-2 {
   background: linear-gradient(135deg, #d0d0d0, #a0a0a0);
   color: #fff;
 }
-.memoria-stats-modal .mstat-hbar-rank.rank-3 {
+.motes-stats-modal .mstat-hbar-rank.rank-3 {
   background: linear-gradient(135deg, #d49060, #b86b30);
   color: #fff;
 }
-.memoria-stats-modal .mstat-hbar-label {
+.motes-stats-modal .mstat-hbar-label {
   font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.memoria-stats-modal .mstat-hbar-wrap {
+.motes-stats-modal .mstat-hbar-wrap {
   height: 14px;
   background: var(--background-modifier-border);
   border-radius: 7px;
   overflow: hidden;
 }
-.memoria-stats-modal .mstat-hbar {
+.motes-stats-modal .mstat-hbar {
   height: 100%;
   background: linear-gradient(
     90deg,
@@ -3081,7 +3081,7 @@
   border-radius: 7px;
   transition: width 0.3s;
 }
-.memoria-stats-modal .mstat-hbar-num {
+.motes-stats-modal .mstat-hbar-num {
   font-size: 11px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
@@ -3089,7 +3089,7 @@
 }
 
 /* 结论文字 */
-.memoria-stats-modal .mstat-desc {
+.motes-stats-modal .mstat-desc {
   margin-top: 10px;
   padding: 8px 12px;
   background: var(--background-modifier-hover);
@@ -3099,12 +3099,12 @@
 }
 
 /* 有趣的发现 */
-.memoria-stats-modal .mstat-fact-list {
+.motes-stats-modal .mstat-fact-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-.memoria-stats-modal .mstat-fact {
+.motes-stats-modal .mstat-fact {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -3117,12 +3117,12 @@
   border-left: 3px solid
     color-mix(in srgb, var(--interactive-accent) 60%, transparent);
 }
-.memoria-stats-modal .mstat-fact-icon {
+.motes-stats-modal .mstat-fact-icon {
   flex-shrink: 0;
   font-size: 16px;
   line-height: 1.4;
 }
-.memoria-stats-modal .mstat-empty {
+.motes-stats-modal .mstat-empty {
   padding: 16px;
   color: var(--text-faint);
   font-size: 12px;
@@ -3135,44 +3135,44 @@
 /* ============================================================
  * v1.1.0: 浠ｇ爜鍧楀鍒舵寜閽?/ 琛ㄦ牸瀹瑰櫒 / 琛ㄦ牸閫夋嫨鍣ㄥ脊绐? * ============================================================ */
 
-/* 代码块样式见上方 .memoria-card-body pre 规则；复制按钮由 Obsidian 原生提供 */
+/* 代码块样式见上方 .motes-card-body pre 规则；复制按钮由 Obsidian 原生提供 */
 
 /* --- 琛ㄦ牸锛氬彲妯悜婊氬姩瀹瑰櫒 + 缇庡寲 --- */
-.memoria-card-body .memoria-table-wrap {
+.motes-card-body .motes-table-wrap {
   max-width: 100%;
   overflow-x: auto;
   margin: 6px 0;
   border-radius: 6px;
   /* 婊氬姩鏉℃煍鍜?*/
 }
-.memoria-card-body .memoria-table-wrap::-webkit-scrollbar {
+.motes-card-body .motes-table-wrap::-webkit-scrollbar {
   height: 6px;
 }
-.memoria-card-body .memoria-table-wrap::-webkit-scrollbar-thumb {
+.motes-card-body .motes-table-wrap::-webkit-scrollbar-thumb {
   background: var(--background-modifier-border);
   border-radius: 3px;
 }
-.memoria-card-body .memoria-table-wrap table {
+.motes-card-body .motes-table-wrap table {
   margin: 0;
   border-collapse: collapse;
   font-size: 13px;
 }
-.memoria-card-body .memoria-table-wrap th,
-.memoria-card-body .memoria-table-wrap td {
+.motes-card-body .motes-table-wrap th,
+.motes-card-body .motes-table-wrap td {
   padding: 6px 10px;
   border: 1px solid var(--background-modifier-border);
   white-space: nowrap;
 }
-.memoria-card-body .memoria-table-wrap th {
+.motes-card-body .motes-table-wrap th {
   background: var(--background-secondary);
   font-weight: 600;
 }
-.memoria-card-body .memoria-table-wrap tr:nth-child(even) td {
+.motes-card-body .motes-table-wrap tr:nth-child(even) td {
   background: color-mix(in srgb, var(--background-secondary) 40%, transparent);
 }
 
 /* --- 琛ㄦ牸閫夋嫨鍣ㄥ脊绐楋紙鎻掑叆琛ㄦ牸鎸夐挳锛?-- */
-.memoria-table-picker {
+.motes-table-picker {
   position: fixed;
   z-index: 999;
   background: var(--background-primary);
@@ -3182,21 +3182,21 @@
   padding: 10px;
   user-select: none;
 }
-.memoria-table-picker-label {
+.motes-table-picker-label {
   font-size: 12px;
   color: var(--text-muted);
   text-align: center;
   margin-bottom: 6px;
   font-variant-numeric: tabular-nums;
 }
-.memoria-table-picker-grid {
+.motes-table-picker-grid {
   display: grid;
   /* v1.1.15: 桌面 8×8 → 6×6，顺便把格子从 18px 放大到 22px，更易点击 */
   grid-template-columns: repeat(6, 22px);
   grid-template-rows: repeat(6, 22px);
   gap: 3px;
 }
-.memoria-table-picker-cell {
+.motes-table-picker-cell {
   width: 22px;
   height: 22px;
   background: var(--background-secondary);
@@ -3205,10 +3205,10 @@
   cursor: pointer;
   transition: background 0.08s ease, border-color 0.08s ease;
 }
-.memoria-table-picker-cell:hover {
+.motes-table-picker-cell:hover {
   border-color: var(--interactive-accent);
 }
-.memoria-table-picker-cell.is-active {
+.motes-table-picker-cell.is-active {
   background: color-mix(in srgb, var(--interactive-accent) 25%, transparent);
   border-color: var(--interactive-accent);
 }
@@ -3218,17 +3218,17 @@
  *   上宽度约 36×5 + 3×4 + 16×2 = 224px，居中显示后两侧各有 48px 余量，永不溢出。
  *   95% 的 md 表格都是 ≤5 列，减少选择后界面干净非常多。
  */
-.memoria-table-picker.is-mobile {
+.motes-table-picker.is-mobile {
   padding: 16px;
   border-radius: 12px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
 }
-.memoria-table-picker.is-mobile .memoria-table-picker-grid {
+.motes-table-picker.is-mobile .motes-table-picker-grid {
   grid-template-columns: repeat(5, 36px);
   grid-template-rows: repeat(5, 36px);
   gap: 4px;
 }
-.memoria-table-picker.is-mobile .memoria-table-picker-cell {
+.motes-table-picker.is-mobile .motes-table-picker-cell {
   width: 36px;
   height: 36px;
   display: flex;
@@ -3236,17 +3236,17 @@
   justify-content: center;
   border-radius: 5px;
 }
-.memoria-table-picker.is-mobile .memoria-table-picker-cell-text {
+.motes-table-picker.is-mobile .motes-table-picker-cell-text {
   font-size: 11px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
   pointer-events: none; /* 点击直接穿透到 cell */
 }
-.memoria-table-picker.is-mobile .memoria-table-picker-cell:active {
+.motes-table-picker.is-mobile .motes-table-picker-cell:active {
   background: color-mix(in srgb, var(--interactive-accent) 35%, transparent);
   border-color: var(--interactive-accent);
 }
-.memoria-table-picker.is-mobile .memoria-table-picker-label {
+.motes-table-picker.is-mobile .motes-table-picker-label {
   font-size: 13px;
   margin-bottom: 12px;
   color: var(--text-normal);
@@ -3255,12 +3255,12 @@
 
 
 /* v1.1.1: 删除确认浮层 —— 警告风格按钮 */
-.memoria-confirm .memoria-modal-btns .mod-warning {
+.motes-confirm .motes-modal-btns .mod-warning {
   background: var(--text-error, #e03131);
   color: #fff;
   border-color: transparent;
 }
-.memoria-confirm .memoria-modal-btns .mod-warning:hover {
+.motes-confirm .motes-modal-btns .mod-warning:hover {
   background: color-mix(in srgb, var(--text-error, #e03131) 85%, #000);
 }
 
@@ -3269,30 +3269,30 @@
  * ================================================================ */
 
 /* —— 卡片 hover 引用按钮（次级可见，从 ⋯ 菜单提到表面） —— */
-.memoria-card-quote {
+.motes-card-quote {
   opacity: 0;
   transition: opacity 0.15s;
 }
-.memoria-card:hover .memoria-card-quote {
+.motes-card:hover .motes-card-quote {
   opacity: 0.7;
 }
-.memoria-card-quote:hover {
+.motes-card-quote:hover {
   opacity: 1;
   color: var(--interactive-accent);
 }
-.memoria-card-quote .svg-icon {
+.motes-card-quote .svg-icon {
   width: 13px;
   height: 13px;
 }
 @media (max-width: 680px) {
   /* 手机没有 hover，常显但柔和 */
-  .memoria-card-quote {
+  .motes-card-quote {
     opacity: 0.45;
   }
 }
 
 /* —— empty 状态跳转按钮（回顾空态的"随机 5 条"）—— */
-.memoria-empty-btn {
+.motes-empty-btn {
   margin-top: 16px;
   padding: 8px 18px;
   display: inline-flex;
@@ -3308,24 +3308,24 @@
   box-shadow: none;
   transition: transform 0.12s, filter 0.12s, box-shadow 0.12s;
 }
-.memoria-empty-btn:hover {
+.motes-empty-btn:hover {
   transform: translateY(-1px);
   filter: brightness(1.05);
   box-shadow: 0 4px 12px -4px
     color-mix(in srgb, var(--interactive-accent) 60%, transparent);
 }
-.memoria-empty-btn .svg-icon {
+.motes-empty-btn .svg-icon {
   width: 14px;
   height: 14px;
 }
 
 /* —— meta 工具条：可能并排两个按钮时的间距 —— */
-.memoria-list-meta {
+.motes-list-meta {
   gap: 10px;
 }
 
 /* —— 数据报告：今日彩蛋 fact 的特殊样式 —— */
-.memoria-stats-view .mstat-fact.is-egg {
+.motes-stats-view .mstat-fact.is-egg {
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--interactive-accent) 10%, var(--background-primary)),
@@ -3344,7 +3344,7 @@
   position: relative;
   overflow: hidden;
 }
-.memoria-stats-view .mstat-fact.is-egg::after {
+.motes-stats-view .mstat-fact.is-egg::after {
   /* 右上角藏一个非常淡的星光装饰 */
   content: "✦";
   position: absolute;
@@ -3355,30 +3355,30 @@
   opacity: 0.25;
   pointer-events: none;
 }
-.memoria-stats-view .mstat-fact.is-egg .mstat-fact-icon {
+.motes-stats-view .mstat-fact.is-egg .mstat-fact-icon {
   font-size: 20px;
 }
 
 /* —— 视觉微调（第四类建议）—— */
 
 /* #17 统计条数字字号略收，label 略放 */
-.memoria-stat-num {
+.motes-stat-num {
   font-size: 20px; /* 22px → 20px */
 }
-.memoria-stat-label {
+.motes-stat-label {
   font-size: 12px; /* 11px → 12px */
 }
 
 /* #16 桌面 logo 文字不再那么粗 */
-.memoria-topbar-title {
+.motes-topbar-title {
   font-size: 18px; /* 20px → 18px */
 }
 
 /* #18 标签胶囊加 hover 反馈 */
-.memoria-tag-pill {
+.motes-tag-pill {
   transition: background 0.12s, color 0.12s, transform 0.08s;
 }
-.memoria-tag-pill:hover {
+.motes-tag-pill:hover {
   background: color-mix(
     in srgb,
     var(--interactive-accent) 16%,
@@ -3389,24 +3389,24 @@
 }
 
 /* #19 月历今日格子字体加粗、颜色更醒目 */
-.memoria-cal-cell.is-today .memoria-cal-num {
+.motes-cal-cell.is-today .motes-cal-num {
   font-weight: 700;
   color: var(--interactive-accent);
 }
 
 /* #20 搜索框在深色主题下有更清晰的背景对比 */
-.memoria-search-wrap {
+.motes-search-wrap {
   background: var(--background-secondary);
 }
 
 /* 卡片之间的节奏感（#6：日期组内的卡片垂直间距） */
-.memoria-day-group .memoria-card + .memoria-card {
+.motes-day-group .motes-card + .motes-card {
   margin-top: 8px;
 }
 
 /* ==================== v1.4.0 → v1.4.1: 每日打卡进度条 ==================== */
 /* 整行：进度条 + 右侧图标组（靶心 + 视图切换） */
-.memoria-daily-goal-row {
+.motes-daily-goal-row {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -3416,7 +3416,7 @@
 }
 
 /* 进度条本体（可点击跳今天） */
-.memoria-daily-goal {
+.motes-daily-goal {
   flex: 1;
   min-width: 0;
   padding: 4px 4px;
@@ -3424,17 +3424,17 @@
   border-radius: 4px;
   transition: background 140ms ease;
 }
-.memoria-daily-goal:hover {
+.motes-daily-goal:hover {
   background: var(--background-modifier-hover);
 }
-.memoria-daily-goal-bar {
+.motes-daily-goal-bar {
   height: 4px;
   background: var(--background-modifier-border);
   border-radius: 2px;
   overflow: hidden;
   position: relative;
 }
-.memoria-daily-goal-fill {
+.motes-daily-goal-fill {
   height: 100%;
   width: 0%;
   /* v1.4.1: 颜色跟随主题 accent，自动适配深浅/用户自定义主题 */
@@ -3443,34 +3443,34 @@
   transition: width 320ms ease, box-shadow 220ms ease;
 }
 /* 已完成（≥目标）：细微发光，暗示"达成" */
-.memoria-daily-goal-row.is-done .memoria-daily-goal-fill {
+.motes-daily-goal-row.is-done .motes-daily-goal-fill {
   box-shadow: 0 0 6px color-mix(in srgb, var(--interactive-accent) 45%, transparent);
 }
 
 /* 右侧图标组 */
-.memoria-daily-goal-actions {
+.motes-daily-goal-actions {
   display: flex;
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
 }
-.memoria-daily-goal-target,
-.memoria-daily-goal-switch {
+.motes-daily-goal-target,
+.motes-daily-goal-switch {
   padding: 3px 4px;
   color: var(--text-faint);
   cursor: pointer;
 }
-.memoria-daily-goal-target:hover,
-.memoria-daily-goal-switch:hover {
+.motes-daily-goal-target:hover,
+.motes-daily-goal-switch:hover {
   color: var(--interactive-accent);
 }
-.memoria-daily-goal-target .svg-icon,
-.memoria-daily-goal-switch .svg-icon {
+.motes-daily-goal-target .svg-icon,
+.motes-daily-goal-switch .svg-icon {
   width: 15px;
   height: 15px;
 }
 /* 已完成时靶心图标变 accent 色，给一点"鼓励感" */
-.memoria-daily-goal-row.is-done .memoria-daily-goal-target {
+.motes-daily-goal-row.is-done .motes-daily-goal-target {
   color: var(--interactive-accent);
 }
 
@@ -3479,12 +3479,12 @@
    v2.1.3: 加 overflow: hidden 配合 .is-collapsed 的 negative-margin 技巧
      （详见下面 .is-collapsed 的注释）。卡片内本身没有依赖溢出显示的子元素
      （绝对定位元素都在卡片内部 padding 区，不会被裁），所以这个改动是安全的。 */
-.memoria-card {
+.motes-card {
   position: relative;
   overflow: hidden;
 }
-.memoria-card-body.is-collapsed {
-  max-height: var(--memoria-collapse-max, 240px);
+.motes-card-body.is-collapsed {
+  max-height: var(--motes-collapse-max, 240px);
   overflow: hidden;
   position: relative;
   transition: max-height 180ms ease;
@@ -3506,8 +3506,8 @@
    *   但 overflow: hidden 的裁切边界整体外扩，原来被裁的负 margin 区域
    *   现在落在 padding 内 → 完整显示。
    *
-   *   - 取 18px：刚好等于 .memoria-card 的 padding 18px，body 扩张到的
-   *     新边界正好贴卡片内边框，不溢出卡片背景区，配合 .memoria-card
+   *   - 取 18px：刚好等于 .motes-card 的 padding 18px，body 扩张到的
+   *     新边界正好贴卡片内边框，不溢出卡片背景区，配合 .motes-card
    *     新加的 overflow: hidden 防止任何意外溢出。
    *   - 这样 task-list 的 ul / li / checkbox 完全不需要任何额外样式，
    *     折叠/未折叠两态共享相同样式 → 视觉位置 100% 一致。
@@ -3528,7 +3528,7 @@
        半行 li（含 padding 的 task-list 高度 ~28-32px）完整盖住
      stop 保持 0% → 100% 的连续渐变（**保留视觉柔和**，不做硬切，
      避免用户反馈的"渐变生硬像被截断"）。 */
-.memoria-card-body.is-collapsed::after {
+.motes-card-body.is-collapsed::after {
   content: "";
   position: absolute;
   left: 0;
@@ -3543,7 +3543,7 @@
   pointer-events: none;
 }
 /* 置顶卡片用 accent 混色背景，遮罩也要跟着变 */
-.memoria-card.is-pinned .memoria-card-body.is-collapsed::after {
+.motes-card.is-pinned .motes-card-body.is-collapsed::after {
   background: linear-gradient(
     to bottom,
     transparent 0%,
@@ -3555,7 +3555,7 @@
    v1.3.6: 按钮挂在卡片的"最后一个可见元素"内（tagRow / imgGrid / body 优先级），
    margin-left:auto 让它在该元素的末尾右对齐。
    不再需要 is-peek / is-expanded 两态切换 —— 展开/折叠位置完全相同。 */
-.memoria-root button.memoria-collapse-toggle {
+.motes-root button.motes-collapse-toggle {
   /* 对抗 Obsidian 主题对 button 的默认样式 */
   -webkit-appearance: none;
   appearance: none;
@@ -3581,20 +3581,20 @@
   position: relative;
   z-index: 2;
 }
-.memoria-root button.memoria-collapse-toggle:hover {
+.motes-root button.motes-collapse-toggle:hover {
   color: var(--interactive-accent);
   background: transparent;
 }
-.memoria-root button.memoria-collapse-toggle:focus,
-.memoria-root button.memoria-collapse-toggle:focus-visible {
+.motes-root button.motes-collapse-toggle:focus,
+.motes-root button.motes-collapse-toggle:focus-visible {
   outline: none;
   box-shadow: none;
 }
-.memoria-root button.memoria-collapse-toggle .memoria-collapse-icon {
+.motes-root button.motes-collapse-toggle .motes-collapse-icon {
   display: inline-flex;
   align-items: center;
 }
-.memoria-collapse-toggle .memoria-collapse-icon .svg-icon {
+.motes-collapse-toggle .motes-collapse-icon .svg-icon {
   width: 12px;
   height: 12px;
 }
@@ -3610,7 +3610,7 @@
      用下面的 block 右对齐规则统一处理。card 是普通 block 容器，宽度等于
      卡片可视宽度，margin-left: auto 让 fit-content 的按钮整块右对齐 —— 永远
      视觉对齐到卡片右下角，不论有没有图、有没有折叠。 */
-.memoria-card > .memoria-collapse-toggle {
+.motes-card > .motes-collapse-toggle {
   display: block;
   width: fit-content;
   margin-top: 4px;
@@ -3622,17 +3622,17 @@
 /* ================================================================
  * v1.4.5: 顶部工具区（方案 A）
  *   把数据报告按钮从 search-wrap 内抽出来，与新增的"年度全景图"
- *   按钮并排放到独立的 .memoria-topbar-tools 容器里。
+ *   按钮并排放到独立的 .motes-topbar-tools 容器里。
  *   语义上"左内容右工具"，并为未来更多入口留好位置。
  * ================================================================ */
-.memoria-topbar-tools {
+.motes-topbar-tools {
   display: flex;
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
   margin-left: 8px;
 }
-.memoria-topbar-tools .memoria-icon-btn .svg-icon {
+.motes-topbar-tools .motes-icon-btn .svg-icon {
   /* 比 search-wrap 内的 14px 稍大，与 topbar 字号协调 */
   width: 16px;
   height: 16px;
@@ -3644,23 +3644,23 @@
  *   截图风格：白/暗底 + accent 色圆角方块标记有记录的日期
  * ================================================================ */
 /* v1.4.7: 出血边距挪到 view-content 上（和数据报告视图一样做法）
- *   原因：v1.4.6 把 padding 放在内层 .memoria-year-view 上，
+ *   原因：v1.4.6 把 padding 放在内层 .motes-year-view 上，
  *   但 Obsidian 的 .view-content 自身有 padding/inset，某些主题下会把我们内层的
  *   padding 视觉上压缩到紧贴边缘。直接把 56/80 的出血框写在 view-content 上，
  *   用 覆盖宿主，彻底解决贴边问题。
  */
-.workspace-leaf-content[data-type="memoria-year-view"] .view-content {
+.workspace-leaf-content[data-type="motes-year-view"] .view-content {
   padding: 64px 80px 80px;
   overflow-y: auto;
   display: block;
   background: var(--background-primary);
   box-sizing: border-box;
 }
-.is-mobile .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
+.is-mobile .workspace-leaf-content[data-type="motes-year-view"] .view-content {
   padding: 32px 20px 56px;
 }
 
-.memoria-year-view {
+.motes-year-view {
   /* v1.4.7: 自身 padding 归零（出血框已上移到 view-content），
    *   只负责 max-width + 居中 + 色彩上下文 */
   padding: 0;
@@ -3671,20 +3671,20 @@
 }
 
 /* ---- 顶部：年份大标题 + 切换 ---- */
-.memoria-year-header {
+.motes-year-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
 }
-.memoria-year-title {
+.motes-year-title {
   font-size: 36px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: var(--text-normal);
   line-height: 1;
 }
-.memoria-year-nav {
+.motes-year-nav {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -3693,8 +3693,8 @@
   padding: 3px;
   background: var(--background-secondary);
 }
-.memoria-year-view button.memoria-year-nav-btn,
-.memoria-year-view button.memoria-year-today-btn {
+.motes-year-view button.motes-year-nav-btn,
+.motes-year-view button.motes-year-today-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3705,30 +3705,30 @@
   box-shadow: none;
   transition: background 0.12s, color 0.12s;
 }
-.memoria-year-view button.memoria-year-nav-btn {
+.motes-year-view button.motes-year-nav-btn {
   width: 28px;
   height: 28px;
   border-radius: 50%;
   padding: 0;
 }
-.memoria-year-view button.memoria-year-today-btn {
+.motes-year-view button.motes-year-today-btn {
   padding: 4px 14px;
   border-radius: 999px;
   font-size: 13px;
   color: var(--text-muted);
 }
-.memoria-year-view button.memoria-year-nav-btn:hover,
-.memoria-year-view button.memoria-year-today-btn:hover {
+.motes-year-view button.motes-year-nav-btn:hover,
+.motes-year-view button.motes-year-today-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-year-view button.memoria-year-nav-btn .svg-icon {
+.motes-year-view button.motes-year-nav-btn .svg-icon {
   width: 14px;
   height: 14px;
 }
 
 /* ---- 12 个月网格（卡片化后 gap 放大，月与月之间视觉呼吸） ---- */
-.memoria-year-grid {
+.motes-year-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 28px;
@@ -3738,20 +3738,20 @@
  *   - 淡底 + 细描边 + 圆角，视觉上月份是独立单元
  *   - 内 padding 给"纸卡"感
  */
-.memoria-year-month {
+.motes-year-month {
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
   padding: 18px 16px 14px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.memoria-year-month:hover {
+.motes-year-month:hover {
   border-color: var(--background-modifier-border-hover);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* 月份英文缩写标签 + 下方细分隔线 */
-.memoria-year-month-label {
+.motes-year-month-label {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -3765,10 +3765,10 @@
   align-items: center;
   gap: 8px;
 }
-.memoria-year-month-label:hover {
+.motes-year-month-label:hover {
   color: var(--interactive-accent);
 }
-.memoria-year-month-count {
+.motes-year-month-count {
   font-size: 11px;
   font-weight: 500;
   background: var(--interactive-accent);
@@ -3779,22 +3779,22 @@
   line-height: 1.4;
 }
 /* 当前月份高亮 */
-.memoria-year-month.is-current {
+.motes-year-month.is-current {
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 12%, transparent);
 }
-.memoria-year-month.is-current .memoria-year-month-label {
+.motes-year-month.is-current .motes-year-month-label {
   color: var(--interactive-accent);
 }
 
 /* 星期头（日一二三四五六） */
-.memoria-year-weekhead {
+.motes-year-weekhead {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
   margin-bottom: 4px;
 }
-.memoria-year-wday {
+.motes-year-wday {
   text-align: center;
   font-size: 10px;
   color: var(--text-faint);
@@ -3803,7 +3803,7 @@
 }
 
 /* 日期网格：6 行 × 7 列，gap 略微拉开让圆点更清爽 */
-.memoria-year-grid-days {
+.motes-year-grid-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
@@ -3816,7 +3816,7 @@
  *   之前用 aspect-ratio:1 + 拉伸到整格，宽屏下圆点会随列宽变大显得粗壮；
  *   现在 max-width/height 限死 20px，格子内居中，宽屏时圆点周围会自动留白。
  */
-.memoria-year-day {
+.motes-year-day {
   width: 100%;
   aspect-ratio: 1;
   max-width: 20px;
@@ -3833,13 +3833,13 @@
 }
 
 /* 本月外日期（前一个月末 / 下一个月头）：很淡，让本月焦点更突出 */
-.memoria-year-day.is-out {
+.motes-year-day.is-out {
   color: var(--text-faint);
   opacity: 0.28;
 }
 
 /* 有笔记的日期：accent 色圆点 + 浅色数字 */
-.memoria-year-day.has-memo {
+.motes-year-day.has-memo {
   background: var(--interactive-accent);
   color: var(--text-on-accent, #fff);
   font-weight: 500;
@@ -3851,43 +3851,43 @@
  *   不用 opacity 是因为那会把数字也变淡，圆点多了以后看不清；
  *   color-mix 只改背景色保持文字清晰。
  */
-.memoria-year-day.has-memo.level-1 {
+.motes-year-day.has-memo.level-1 {
   background: color-mix(in srgb, var(--interactive-accent) 30%, var(--background-secondary));
   color: var(--text-normal);
 }
-.memoria-year-day.has-memo.level-2 {
+.motes-year-day.has-memo.level-2 {
   background: color-mix(in srgb, var(--interactive-accent) 55%, var(--background-secondary));
   color: var(--text-on-accent, #fff);
 }
-.memoria-year-day.has-memo.level-3 {
+.motes-year-day.has-memo.level-3 {
   background: color-mix(in srgb, var(--interactive-accent) 80%, var(--background-secondary));
   color: var(--text-on-accent, #fff);
 }
-.memoria-year-day.has-memo.level-4 {
+.motes-year-day.has-memo.level-4 {
   background: var(--interactive-accent);
   color: var(--text-on-accent, #fff);
 }
 
-.memoria-year-day.has-memo:hover {
+.motes-year-day.has-memo:hover {
   /* v1.4.7: 发光环同步缩小（配合 20px 圆点） */
   box-shadow: 0 0 0 1.5px var(--background-secondary),
     0 0 0 3px var(--interactive-accent);
 }
 
 /* 今天：不管有没有笔记都要明显标记 */
-.memoria-year-day.is-today:not(.has-memo) {
+.motes-year-day.is-today:not(.has-memo) {
   box-shadow: inset 0 0 0 1.5px var(--interactive-accent);
   color: var(--interactive-accent);
   font-weight: 600;
 }
-.memoria-year-day.is-today.has-memo {
+.motes-year-day.is-today.has-memo {
   /* 有笔记又是今天：双环效果 */
   box-shadow: 0 0 0 1.5px var(--background-secondary),
     0 0 0 3px var(--interactive-accent);
 }
 
 /* ---- 底部小统计行 ---- */
-.memoria-year-foot {
+.motes-year-foot {
   margin-top: 48px;
   display: flex;
   align-items: center;
@@ -3896,58 +3896,58 @@
   font-size: 13px;
   justify-content: center;
 }
-.memoria-year-foot-item {
+.motes-year-foot-item {
   /* 数字等宽字形，统计行读起来更稳 */
   font-variant-numeric: tabular-nums;
 }
-.memoria-year-foot-sep {
+.motes-year-foot-sep {
   opacity: 0.35;
 }
 
 /* ---- 响应式：窄屏降级 ---- */
 @media (max-width: 1200px) {
-  .memoria-year-grid {
+  .motes-year-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
   }
-  .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
+  .workspace-leaf-content[data-type="motes-year-view"] .view-content {
     padding: 56px 56px 72px;
   }
 }
 @media (max-width: 900px) {
-  .memoria-year-grid {
+  .motes-year-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
-  .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
+  .workspace-leaf-content[data-type="motes-year-view"] .view-content {
     padding: 40px 32px 56px;
   }
-  .memoria-year-title {
+  .motes-year-title {
     font-size: 28px;
   }
 }
 @media (max-width: 560px) {
-  .memoria-year-grid {
+  .motes-year-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  .workspace-leaf-content[data-type="memoria-year-view"] .view-content {
+  .workspace-leaf-content[data-type="motes-year-view"] .view-content {
     padding: 28px 20px 48px;
   }
-  .memoria-year-header {
+  .motes-year-header {
     margin-bottom: 24px;
   }
-  .memoria-year-title {
+  .motes-year-title {
     font-size: 24px;
   }
-  .memoria-year-day {
+  .motes-year-day {
     /* 手机单列时容器更宽，圆点也相应放大一点，配合手指触控 */
     max-width: 26px;
     max-height: 26px;
     font-size: 12px;
   }
   /* 移动端 topbar 工具区收紧 */
-  .memoria-topbar-tools {
+  .motes-topbar-tools {
     margin-left: 4px;
   }
 }
@@ -3957,7 +3957,7 @@
 /* ==================== v2.0.0 鏂板鏍峰紡 ==================== */
 
 /* 鎼滅储鍛戒腑楂樹寒 */
-.memoria-search-hit {
+.motes-search-hit {
   background: var(--text-highlight-bg, rgba(255, 208, 0, 0.35));
   color: inherit;
   padding: 0 1px;
@@ -3966,38 +3966,38 @@
 
 /* 鎯呮劅鑹插僵鍙鍖栵細鍗＄墖宸﹁竟鑹叉潯
    color-coding 鏄惎鍙戝紡鍒ゆ柇锛岄粯璁ゅ叧闂紝寮€鍚悗鑹叉潯鍙湪鍛戒腑鍏抽敭璇嶆椂鍑虹幇 */
-.memoria-card.memoria-mood-happy {
+.motes-card.motes-mood-happy {
   box-shadow: inset 3px 0 0 0 #f5c76a;
 }
-.memoria-card.memoria-mood-touched {
+.motes-card.motes-mood-touched {
   box-shadow: inset 3px 0 0 0 #e88eb4;
 }
 /* v2.0.2: 新增 inspired（鼓励/励志/加油） */
-.memoria-card.memoria-mood-inspired {
+.motes-card.motes-mood-inspired {
   box-shadow: inset 3px 0 0 0 #e89a5c;
 }
-.memoria-card.memoria-mood-sad {
+.motes-card.motes-mood-sad {
   box-shadow: inset 3px 0 0 0 #7a93b0;
 }
-.memoria-card.memoria-mood-angry {
+.motes-card.motes-mood-angry {
   box-shadow: inset 3px 0 0 0 #c77764;
 }
 /* v2.0.1: 新增 fear（暗紫）和 tired（浅灰棕）两个维度 */
-.memoria-card.memoria-mood-fear {
+.motes-card.motes-mood-fear {
   box-shadow: inset 3px 0 0 0 #6e5a8f;
 }
-.memoria-card.memoria-mood-tired {
+.motes-card.motes-mood-tired {
   box-shadow: inset 3px 0 0 0 #a89684;
 }
 /* 缃《 / 鏀惰棌宸茬粡鏈?box-shadow锛屽拰 mood 鍙兘鍐茬獊銆俶ood 鐢?left-inset锛?   缃《鐢?border-top锛屼笉鍐茬獊锛涘拰 is-pinned 骞跺垪鏃朵紭鍏?mood 鐨勫乏鑹叉潯銆?*/
 
 /* 绱у噾瑙嗗浘妯″紡锛氶檺鍒舵瘡寮犲崱姝ｆ枃楂樺害 + 鍥剧墖缂╁皬 */
-.memoria-list.is-compact .memoria-card-body {
+.motes-list.is-compact .motes-card-body {
   max-height: 6em;
   overflow: hidden;
   position: relative;
 }
-.memoria-list.is-compact .memoria-card-body::after {
+.motes-list.is-compact .motes-card-body::after {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -4007,28 +4007,28 @@
   content: "";
   background: linear-gradient(to bottom, transparent, var(--background-primary));
 }
-.memoria-list.is-compact .memoria-card {
+.motes-list.is-compact .motes-card {
   padding: 10px 14px;
 }
-.memoria-list.is-compact .memoria-img-grid {
+.motes-list.is-compact .motes-img-grid {
   max-height: 80px;
   overflow: hidden;
 }
-.memoria-list.is-compact .memoria-card-body p {
+.motes-list.is-compact .motes-card-body p {
   margin: 0.3em 0;
 }
 /* v2.0.5: 紧密模式下 card-body overflow: hidden 会裁掉 Obsidian task-list
    复选框的负 margin-left（默认复选框会溢出到 li 左侧）
    → 给 ul.contains-task-list 加左内边距，把复选框整体向右挤出来 */
-.memoria-list.is-compact .memoria-card-body ul.contains-task-list {
+.motes-list.is-compact .motes-card-body ul.contains-task-list {
   padding-left: 1.8em;
 }
-.memoria-list.is-compact .memoria-card-body ul.contains-task-list li.task-list-item input[type="checkbox"] {
+.motes-list.is-compact .motes-card-body ul.contains-task-list li.task-list-item input[type="checkbox"] {
   margin-left: 0;
 }
 
 /* Vim 閫変腑鎬?*/
-.memoria-card.is-vim-selected {
+.motes-card.is-vim-selected {
   outline: 2px solid var(--interactive-accent);
   outline-offset: -2px;
   transform: translateX(2px);
@@ -4036,7 +4036,7 @@
 }
 
 /* 鐑姏鍥惧寮?tooltip */
-.memoria-heatmap-tooltip {
+.motes-heatmap-tooltip {
   background: var(--background-secondary);
   border: 1px solid var(--background-modifier-border);
   border-radius: 8px;
@@ -4047,13 +4047,13 @@
   font-size: 12px;
   color: var(--text-normal);
   pointer-events: none;
-  animation: memoria-tip-in 0.12s ease;
+  animation: motes-tip-in 0.12s ease;
 }
-@keyframes memoria-tip-in {
+@keyframes motes-tip-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.memoria-heatmap-tooltip-head {
+.motes-heatmap-tooltip-head {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -4061,23 +4061,23 @@
   padding-bottom: 4px;
   border-bottom: 1px dashed var(--background-modifier-border);
 }
-.memoria-heatmap-tooltip-count {
+.motes-heatmap-tooltip-count {
   font-size: 11px;
   color: var(--text-muted);
 }
-.memoria-heatmap-tooltip-row {
+.motes-heatmap-tooltip-row {
   display: flex;
   gap: 8px;
   margin: 4px 0;
   line-height: 1.5;
 }
-.memoria-heatmap-tooltip-time {
+.motes-heatmap-tooltip-time {
   flex-shrink: 0;
   color: var(--text-muted);
   font-family: "SF Mono", Consolas, monospace;
   font-size: 11px;
 }
-.memoria-heatmap-tooltip-text {
+.motes-heatmap-tooltip-text {
   color: var(--text-normal);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4085,7 +4085,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-.memoria-heatmap-tooltip-more {
+.motes-heatmap-tooltip-more {
   font-size: 11px;
   color: var(--text-muted);
   text-align: center;
@@ -4094,10 +4094,10 @@
 }
 
 /* 鐑姏鍥炬牸瀛?hover 鏀惧ぇ鏁堟灉 */
-.memoria-heatmap-cell {
+.motes-heatmap-cell {
   transition: transform 0.08s, filter 0.1s;
 }
-.memoria-heatmap-cell:hover {
+.motes-heatmap-cell:hover {
   transform: scale(1.35);
   filter: brightness(1.15);
   z-index: 2;
@@ -4117,7 +4117,7 @@
  */
 
 /* ==========================================================
- * Memoria Buddy（v2.1.0-iter14 克制版重排）
+ * motes Buddy（v2.1.0-iter14 克制版重排）
  *
  * 设计哲学：
  *   - 卡片本身无边框无背景 —— 完全融入侧栏
@@ -4129,7 +4129,7 @@
  * ========================================================== */
 
 /* 卡片容器：完全去除装饰，纯垂直布局 */
-.memoria-buddy {
+.motes-buddy {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -4151,7 +4151,7 @@
  *   之前用 visibility: hidden 顶栏还占着 ~14px 高度，导致宠物上方有大留白。
  *   现在改为绝对定位浮在卡片顶部，hover 才显现。
  */
-.memoria-buddy-topbar {
+.motes-buddy-topbar {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -4170,7 +4170,7 @@
   transition: opacity 0.25s ease, visibility 0.25s;
   pointer-events: none;
 }
-.memoria-buddy:hover .memoria-buddy-topbar {
+.motes-buddy:hover .motes-buddy-topbar {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -4183,10 +4183,10 @@
  *   理由：手机屏幕大、用完即走，"普通/成年/天数"心智开支问题不像 PC 久看那么明显
  */
 @media (hover: none) {
-  .memoria-buddy {
+  .motes-buddy {
     padding-top: 4px; /* 给顶栏让回一点空间 */
   }
-  .memoria-buddy-topbar {
+  .motes-buddy-topbar {
     position: static;        /* 回到正常布局流 */
     top: auto;
     left: auto;
@@ -4196,29 +4196,29 @@
     visibility: visible;
     pointer-events: auto;
   }
-  .memoria-buddy-sprite-wrap {
+  .motes-buddy-sprite-wrap {
     margin-top: 0;           /* 已经被顶栏挤过，不再额外加 */
   }
 }
-.memoria-buddy-rarity-wrap {
+.motes-buddy-rarity-wrap {
   display: inline-flex;
   align-items: baseline;
   gap: 3px;
 }
-.memoria-buddy-rarity {
+.motes-buddy-rarity {
   color: var(--text-muted);
   letter-spacing: 0.5px;
 }
-.memoria-buddy-shiny-tag {
+.motes-buddy-shiny-tag {
   color: #e8b64a;
-  animation: memoria-buddy-shiny-blink 1.6s ease-in-out infinite;
+  animation: motes-buddy-shiny-blink 1.6s ease-in-out infinite;
 }
-@keyframes memoria-buddy-shiny-blink {
+@keyframes motes-buddy-shiny-blink {
   0%, 100% { opacity: 0.6; }
   50%      { opacity: 1; }
 }
 /* 陪伴天数 —— 弱化（更小字号 + 更淡颜色），它是"情感数据"不是"信息" */
-.memoria-buddy-days {
+.motes-buddy-days {
   font-size: 9.5px;
   color: var(--text-faint);
   letter-spacing: 0.2px;
@@ -4226,7 +4226,7 @@
 }
 
 /* ========== 主角区：ASCII 精灵 ========== */
-.memoria-buddy-sprite-wrap {
+.motes-buddy-sprite-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4236,7 +4236,7 @@
    * v2.1.0-iter18: 上 margin 直接归零，ASCII 紧贴卡片顶（顶栏 hover 时浮在边界外）*/
   margin: 0 0 8px;
 }
-.memoria-buddy-sprite {
+.motes-buddy-sprite {
   font-family: var(--font-monospace);
   font-size: 12px;
   line-height: 1.18;
@@ -4248,16 +4248,16 @@
 }
 
 /* 稀有度对应的 sprite 微妙色调（除 legendary 外都很克制）*/
-.memoria-buddy-common    .memoria-buddy-sprite { color: var(--text-normal); }
-.memoria-buddy-uncommon  .memoria-buddy-sprite { color: var(--text-normal); }
-.memoria-buddy-rare      .memoria-buddy-sprite { color: var(--text-normal); }
-.memoria-buddy-epic      .memoria-buddy-sprite { color: var(--text-normal); }
-.memoria-buddy-legendary .memoria-buddy-sprite {
+.motes-buddy-common    .motes-buddy-sprite { color: var(--text-normal); }
+.motes-buddy-uncommon  .motes-buddy-sprite { color: var(--text-normal); }
+.motes-buddy-rare      .motes-buddy-sprite { color: var(--text-normal); }
+.motes-buddy-epic      .motes-buddy-sprite { color: var(--text-normal); }
+.motes-buddy-legendary .motes-buddy-sprite {
   color: var(--text-normal);
   text-shadow: 0 0 6px rgba(232, 182, 74, 0.25);
-  animation: memoria-buddy-legendary-pulse 3s ease-in-out infinite;
+  animation: motes-buddy-legendary-pulse 3s ease-in-out infinite;
 }
-@keyframes memoria-buddy-legendary-pulse {
+@keyframes motes-buddy-legendary-pulse {
   0%, 100% { text-shadow: 0 0 6px rgba(232, 182, 74, 0.20); }
   50%      { text-shadow: 0 0 10px rgba(232, 182, 74, 0.40); }
 }
@@ -4265,7 +4265,7 @@
 /* ========== 名字行：名字 · 物种 ========== */
 /* v2.1.0-iter15: 移除阶段标签（移到顶栏）+ 移除 Motto 独立行
  *   名字行下方需要补一点间距，让它和 stats 之间有视觉断隔（之前 Motto 担任了"分隔"角色）*/
-.memoria-buddy-name-row {
+.motes-buddy-name-row {
   text-align: center;
   font-size: 12px;
   color: var(--text-normal);
@@ -4273,35 +4273,35 @@
   margin-bottom: 14px;
   letter-spacing: 0.3px;
 }
-.memoria-buddy-name {
+.motes-buddy-name {
   font-weight: 600;
   color: var(--text-normal);
 }
-.memoria-buddy-name.is-clickable {
+.motes-buddy-name.is-clickable {
   cursor: pointer;
   border-radius: 3px;
   padding: 0 2px;
   transition: background 0.15s;
 }
-.memoria-buddy-name.is-clickable:hover {
+.motes-buddy-name.is-clickable:hover {
   background: var(--background-modifier-hover);
 }
-.memoria-buddy-species {
+.motes-buddy-species {
   color: var(--text-muted);
   font-size: 11px;
 }
-.memoria-buddy-stage {
+.motes-buddy-stage {
   font-size: 10.5px;
   letter-spacing: 0.3px;
 }
-.memoria-buddy-stage-tag-baby  { color: var(--text-faint); }
-.memoria-buddy-stage-tag-teen  { color: #82c590; }
-.memoria-buddy-stage-tag-adult { color: #d4a85a; }
+.motes-buddy-stage-tag-baby  { color: var(--text-faint); }
+.motes-buddy-stage-tag-teen  { color: #82c590; }
+.motes-buddy-stage-tag-adult { color: #d4a85a; }
 
 /* v2.1.0-iter15: Motto 改为收进物种 hover title，不再独占一行 */
 
 /* ========== 数据区：5 维属性（去框去背景）========== */
-.memoria-buddy-stats {
+.motes-buddy-stats {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -4310,7 +4310,7 @@
   border: none;
   padding: 0 4px;
 }
-.memoria-buddy-stat-row {
+.motes-buddy-stat-row {
   display: grid;
   grid-template-columns: minmax(58px, max-content) minmax(66px, 1fr) 22px;
   align-items: center;
@@ -4319,7 +4319,7 @@
   white-space: nowrap;
   font-family: var(--font-monospace);
 }
-.memoria-buddy-stat-label {
+.motes-buddy-stat-label {
   color: var(--text-muted);
   letter-spacing: 0.2px;
   white-space: nowrap;
@@ -4327,7 +4327,7 @@
   text-overflow: ellipsis;
 }
 /* 进度条：极薄 + 无背景框 + 进度条本身降饱和度 */
-.memoria-buddy-stat-bar {
+.motes-buddy-stat-bar {
   display: block;
   height: 4px;
   background: var(--background-modifier-border);
@@ -4336,18 +4336,18 @@
   position: relative;
   /* 关键：去掉之前的内嵌边框 */
 }
-.memoria-buddy-stat-fill {
+.motes-buddy-stat-fill {
   display: block;
   height: 100%;
   border-radius: 2px;
   background: var(--text-muted);
   opacity: 0.6;
 }
-.memoria-buddy-common    .memoria-buddy-stat-fill { background: #a8a4a0; }
-.memoria-buddy-uncommon  .memoria-buddy-stat-fill { background: #82c590; }
-.memoria-buddy-rare      .memoria-buddy-stat-fill { background: #82b4d8; }
-.memoria-buddy-epic      .memoria-buddy-stat-fill { background: #c598e0; }
-.memoria-buddy-legendary .memoria-buddy-stat-fill {
+.motes-buddy-common    .motes-buddy-stat-fill { background: #a8a4a0; }
+.motes-buddy-uncommon  .motes-buddy-stat-fill { background: #82c590; }
+.motes-buddy-rare      .motes-buddy-stat-fill { background: #82b4d8; }
+.motes-buddy-epic      .motes-buddy-stat-fill { background: #c598e0; }
+.motes-buddy-legendary .motes-buddy-stat-fill {
   background: #e8b64a;
   opacity: 0.8;
 }
@@ -4361,7 +4361,7 @@
  *
  * 根因：
  *   v1.4.14 / v1.4.16 已经修过这个 iOS WebView 字渲染 quirk —— 给
- *   .memoria-input 加 padding-left: 4px / padding-top: 2px / -webkit-appearance
+ *   .motes-input 加 padding-left: 4px / padding-top: 2px / -webkit-appearance
  *   做安全区。但**那段修复包在 @media (max-width: 680px) 里**，只对手机生效。
  *   iPad 横屏 1180px / 纵屏 820px 都超过 680，走的是桌面通用规则
  *   （padding: 0），iOS WebView 上同样的字渲染问题再次出现。
@@ -4379,7 +4379,7 @@
  *   后定义的（这一段）覆盖前面，对手机也无害（值完全一致）。
  * ================================================================ */
 @media (hover: none) and (pointer: coarse) {
-  .memoria-input {
+  .motes-input {
     /* 防中文首字符笔画被 iOS WebView 裁切（v1.4.14 / v1.4.16 思路）*/
     padding-left: 4px;
     padding-right: 4px;
@@ -4389,7 +4389,7 @@
     appearance: none;
   }
 }
-.memoria-buddy-stat-val {
+.motes-buddy-stat-val {
   color: var(--text-faint);
   font-size: 9.5px;
   text-align: right;
@@ -4397,7 +4397,7 @@
 }
 
 /* ========== 气泡：去框去背景，纯文字碎碎念 ========== */
-.memoria-buddy-bubble {
+.motes-buddy-bubble {
   margin: 14px 4px 0;
   text-align: center;
   font-size: 11px;
@@ -4407,22 +4407,22 @@
   /* v2.1.0-iter16: 去掉斜体（font-style: italic）—— 中文字符斜体渲染普遍很糊，
    *   清晰度比"语气感"更重要。气泡的轻量感靠灰色 + 小字号 + 引号已经足够。*/
 }
-.memoria-buddy-bubble::before {
+.motes-buddy-bubble::before {
   content: "\300C";
   margin-right: 1px;
   opacity: 0.7;
 }
-.memoria-buddy-bubble::after {
+.motes-buddy-bubble::after {
   content: "\300D";
   margin-left: 1px;
   opacity: 0.7;
 }
-.memoria-buddy-bubble-text {
+.motes-buddy-bubble-text {
   display: inline;
 }
 
 /* ========== 阶段气场（少年 / 成年）========== */
-.memoria-buddy-aura {
+.motes-buddy-aura {
   font-family: var(--font-monospace);
   font-size: 10px;
   letter-spacing: 2px;
@@ -4431,36 +4431,36 @@
   pointer-events: none;
   text-align: center;
 }
-.memoria-buddy-aura-top {
-  animation: memoria-buddy-aura-float 3s ease-in-out infinite;
+.motes-buddy-aura-top {
+  animation: motes-buddy-aura-float 3s ease-in-out infinite;
 }
-@keyframes memoria-buddy-aura-float {
+@keyframes motes-buddy-aura-float {
   0%, 100% { transform: translateY(0); opacity: 0.55; }
   50%      { transform: translateY(-1px); opacity: 0.85; }
 }
-.memoria-buddy-aura-bottom {
-  animation: memoria-buddy-aura-pulse 3s ease-in-out infinite;
+.motes-buddy-aura-bottom {
+  animation: motes-buddy-aura-pulse 3s ease-in-out infinite;
   letter-spacing: 1px;
 }
-@keyframes memoria-buddy-aura-pulse {
+@keyframes motes-buddy-aura-pulse {
   0%, 100% { opacity: 0.3; transform: scaleX(0.92); }
   50%      { opacity: 0.7; transform: scaleX(1); }
 }
-.memoria-buddy-stage-teen .memoria-buddy-aura {
+.motes-buddy-stage-teen .motes-buddy-aura {
   color: #82c590;
 }
-.memoria-buddy-stage-adult .memoria-buddy-aura {
+.motes-buddy-stage-adult .motes-buddy-aura {
   color: #d4a85a;
 }
-.memoria-buddy-stage-adult .memoria-buddy-sprite {
+.motes-buddy-stage-adult .motes-buddy-sprite {
   text-shadow: 0 0 4px rgba(212, 168, 90, 0.18);
 }
 
 /* ========== 孵化破壳动画（仅刚孵化时播一次）========== */
-.memoria-buddy.is-just-hatched {
-  animation: memoria-buddy-hatch-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+.motes-buddy.is-just-hatched {
+  animation: motes-buddy-hatch-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-@keyframes memoria-buddy-hatch-in {
+@keyframes motes-buddy-hatch-in {
   0%   { opacity: 0; transform: translateY(20px) scale(0.85); }
   60%  { opacity: 1; transform: translateY(-3px) scale(1.03); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -4469,36 +4469,36 @@
 /* ========================================================== *
  * 蛋（未孵化状态）—— 保留原有装饰，未变
  * ========================================================== */
-.memoria-buddy-egg {
+.motes-buddy-egg {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 12px 8px;
   gap: 6px;
 }
-.memoria-buddy-egg .memoria-buddy-sprite {
+.motes-buddy-egg .motes-buddy-sprite {
   font-size: 14px;
   color: var(--text-muted);
-  animation: memoria-buddy-egg-wobble 2.4s ease-in-out infinite;
+  animation: motes-buddy-egg-wobble 2.4s ease-in-out infinite;
 }
-.memoria-buddy-egg.is-ready .memoria-buddy-sprite {
+.motes-buddy-egg.is-ready .motes-buddy-sprite {
   color: #e8b64a;
-  animation: memoria-buddy-egg-wobble 0.9s ease-in-out infinite;
+  animation: motes-buddy-egg-wobble 0.9s ease-in-out infinite;
 }
-@keyframes memoria-buddy-egg-wobble {
+@keyframes motes-buddy-egg-wobble {
   0%, 100% { transform: rotate(-2deg); }
   50%      { transform: rotate(2deg); }
 }
-.memoria-buddy-egg-title {
+.motes-buddy-egg-title {
   font-size: 12px;
   color: var(--text-normal);
   margin-top: 4px;
 }
-.memoria-buddy-egg-desc {
+.motes-buddy-egg-desc {
   font-size: 11px;
   color: var(--text-muted);
 }
-.memoria-buddy-egg-input {
+.motes-buddy-egg-input {
   width: 100%;
   padding: 5px 8px;
   font-size: 12px;
@@ -4508,20 +4508,20 @@
   color: var(--text-normal);
   transition: border 0.15s;
 }
-.memoria-buddy-egg-input:focus {
+.motes-buddy-egg-input:focus {
   border-color: var(--interactive-accent);
   outline: none;
 }
-.memoria-buddy-egg-input.is-error {
+.motes-buddy-egg-input.is-error {
   border-color: var(--text-error);
-  animation: memoria-buddy-shake 0.4s ease;
+  animation: motes-buddy-shake 0.4s ease;
 }
-@keyframes memoria-buddy-shake {
+@keyframes motes-buddy-shake {
   0%, 100% { transform: translateX(0); }
   25%      { transform: translateX(-4px); }
   75%      { transform: translateX(4px); }
 }
-.memoria-buddy-egg-btn {
+.motes-buddy-egg-btn {
   padding: 5px 14px;
   font-size: 12px;
   background: var(--interactive-accent);
@@ -4531,10 +4531,10 @@
   cursor: pointer;
   transition: opacity 0.15s;
 }
-.memoria-buddy-egg-btn:hover {
+.motes-buddy-egg-btn:hover {
   opacity: 0.9;
 }
-.memoria-buddy-egg-btn:disabled {
+.motes-buddy-egg-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -4552,7 +4552,7 @@
  *      - 桌面把 OB 窗口拉到手机宽度（≤ 680px）→ 也生效，让用户能在桌面预览
  *        移动端体验，跟 OB 移动端样式（@media max-width: 680px）保持一致触发口径
  *      - 桌面正常宽度 → 永远不进入这段，零影响
- *   2. .memoria-input-fab-mode 类挂在 root（.memoria-root）——
+ *   2. .motes-input-fab-mode 类挂在 root（.motes-root）——
  *      由 settings.mobileInputStyle === "fab" 触发；用户切回 "always-visible"
  *      时该 class 被移除，FAB 隐藏、输入框恢复常驻
  *   3. .is-fab-expanded 类同样挂在 root —— 表示"FAB 触发后输入框已展开"
@@ -4565,16 +4565,16 @@
  *
  * 默认状态（桌面 + 任何 mobileInputStyle）—— FAB 完全隐藏：
  * ================================================================ */
-.memoria-fab {
+.motes-fab {
   display: none;
 }
-.memoria-input-close {
+.motes-input-close {
   display: none;
 }
 
 @media (hover: none) and (pointer: coarse), (max-width: 680px) {
   /* ============= FAB 按钮（仅 fab 模式 + 未展开时显示） ============= */
-  .memoria-root.memoria-input-fab-mode .memoria-fab {
+  .motes-root.motes-input-fab-mode .motes-fab {
     display: flex;
     position: fixed;
     right: 20px;
@@ -4608,14 +4608,14 @@
     appearance: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .memoria-root.memoria-input-fab-mode .memoria-fab:active {
+  .motes-root.motes-input-fab-mode .motes-fab:active {
     /* 按下反馈：略缩 + 阴影变小，模拟"按下去"的物理感 */
     transform: scale(0.92);
     box-shadow:
       0 2px 6px -1px color-mix(in srgb, var(--interactive-accent) 35%, rgba(0, 0, 0, 0.3)),
       0 1px 2px rgba(0, 0, 0, 0.1);
   }
-  .memoria-root.memoria-input-fab-mode .memoria-fab .svg-icon {
+  .motes-root.motes-input-fab-mode .motes-fab .svg-icon {
     width: 24px;
     height: 24px;
     /* 用 stroke 表达图标线条粗细 */
@@ -4628,7 +4628,7 @@
 
      注意：必须用 max-height 不能直接 height，因为输入框高度会随内容动态变化；
      给 max-height 一个足够大的上限（500px），实际高度由内容决定。 */
-  .memoria-root.memoria-input-fab-mode:not(.is-fab-expanded) .memoria-input-card {
+  .motes-root.motes-input-fab-mode:not(.is-fab-expanded) .motes-input-card {
     /* 完全隐藏 + 不可交互（不占空间，不抢焦点）*/
     max-height: 0;
     min-height: 0;
@@ -4643,7 +4643,7 @@
     transition: max-height 0.22s ease, opacity 0.18s ease,
       padding 0.22s ease, margin 0.22s ease;
   }
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-card {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-input-card {
     /* v2.3.3: 展开态改为 position: fixed 贴屏幕底部固定。
      *
      * 为什么要 fixed（解决 v2.3.2 真机暴露的 3 个问题）：
@@ -4657,7 +4657,7 @@
      * fixed 贴底从根上解决：卡片固定吸附在屏幕底部（iOS 键盘弹起时 Obsidian
      *   WebView 收缩 layout viewport，bottom: 0 自动落在键盘正上方，跟常驻底部
      *   输入框一直好用同理），不再随内容增高而移动。内容超高由 textarea 内部
-     *   滚动消化（见下方 .memoria-input 的 max-height + overflow-y）。
+     *   滚动消化（见下方 .motes-input 的 max-height + overflow-y）。
      *   ✕ 按钮 absolute 在固定卡片内，永远可见、不被滚走。 */
     position: fixed;
     left: 8px;
@@ -4672,7 +4672,7 @@
   }
 
   /* 已展开时 FAB 自身淡出 + 缩小消失（不是直接 display: none，留过渡感）*/
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-fab {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-fab {
     transform: scale(0.4);
     opacity: 0;
     /* 动画结束后用 visibility:hidden 彻底退出 hit-test，避免被键盘遮住时还
@@ -4685,7 +4685,7 @@
      v2.3.0: 原 28×28 容器 + 16×16 图标，在移动端实际显示"针尖大小几乎看不见"。
        放大为 36×36 容器 + 20×20 图标，并加一个常驻的淡背景圆底 + 更深的图标
        颜色，让它在输入卡片右上角清晰可辨、好点。 */
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-close {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-input-close {
     display: inline-flex;
     position: absolute;
     top: 8px;
@@ -4706,11 +4706,11 @@
     -webkit-tap-highlight-color: transparent;
     transition: background 0.12s ease, color 0.12s ease;
   }
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-close:active {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-input-close:active {
     background: var(--background-modifier-active-hover, var(--interactive-accent));
     color: var(--text-on-accent);
   }
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-close .svg-icon {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-input-close .svg-icon {
     width: 20px;
     height: 20px;
     stroke-width: 2.4;
@@ -4718,26 +4718,26 @@
   /* v2.3.3: fixed 贴底的输入卡片用 flex 纵向布局，让 textarea 可伸缩、
      工具栏行固定在底部。配合 textarea 的 max-height 内部滚动，整张卡片
      高度被 max-height: 60vh 限制住，长内容在 textarea 内部滚动而不撑高卡片。 */
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-card {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-input-card {
     display: flex;
     flex-direction: column;
   }
   /* textarea 内部滚动：超过 38vh 就在 textarea 内滚，不再撑高整张卡片。
      这样卡片总高（textarea + 工具栏 + padding）始终 ≤ max-height: 60vh，
      底部工具栏/发送按钮永远贴在卡片底、跟着卡片 fixed 在键盘上方可见。 */
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-input {
     max-height: 38vh;
     overflow-y: auto;
     /* 给 ✕ 按钮（右上角 36px）让出空间，避免首行末尾文字被盖 */
     padding-right: 44px;
   }
   /* 工具栏行不收缩，始终完整显示在卡片底部 */
-  .memoria-root.memoria-input-fab-mode.is-fab-expanded .memoria-input-toolbar {
+  .motes-root.motes-input-fab-mode.is-fab-expanded .motes-input-toolbar {
     flex-shrink: 0;
   }
 }
 
-.memoria-clickable {
+.motes-clickable {
   cursor: pointer;
 }
 
@@ -4749,26 +4749,26 @@
  * A few declarations intentionally remain important because some Obsidian
  * themes mark their generic button chrome important as well.
  */
-.memoria-root button.memoria-icon-btn,
-.memoria-root button.memoria-tool-btn,
-.memoria-root button.memoria-cal-nav,
-.memoria-root button.memoria-overview-btn,
-.memoria-root button.memoria-collapse-toggle {
+.motes-root button.motes-icon-btn,
+.motes-root button.motes-tool-btn,
+.motes-root button.motes-cal-nav,
+.motes-root button.motes-overview-btn,
+.motes-root button.motes-collapse-toggle {
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
-.memoria-root button.memoria-submit-btn {
+.motes-root button.motes-submit-btn {
   border: none !important;
   background: var(--interactive-accent) !important;
   color: var(--text-on-accent) !important;
   box-shadow: none !important;
 }
 
-.memoria-root
-  .memoria-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging)
-  button.memoria-submit-btn {
+.motes-root
+  .motes-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging)
+  button.motes-submit-btn {
   background: color-mix(
     in srgb,
     var(--interactive-accent) 32%,
@@ -4779,25 +4779,25 @@
   filter: saturate(0.72) !important;
 }
 
-.memoria-root button.memoria-submit-btn:hover {
+.motes-root button.motes-submit-btn:hover {
   background: var(--interactive-accent-hover, var(--interactive-accent)) !important;
   color: var(--text-on-accent) !important;
 }
 
-.memoria-stats-view button,
-.memoria-year-view button {
+.motes-stats-view button,
+.motes-year-view button {
   text-shadow: none;
   box-shadow: none !important;
 }
 
-.memoria-root input.memoria-search,
-.memoria-root input.memoria-search:hover,
-.memoria-root input.memoria-search:focus,
-.memoria-root input.memoria-search:active,
-.memoria-root input.memoria-review-input,
-.memoria-root input.memoria-review-input:hover,
-.memoria-root input.memoria-review-input:focus,
-.memoria-root input.memoria-review-input:active {
+.motes-root input.motes-search,
+.motes-root input.motes-search:hover,
+.motes-root input.motes-search:focus,
+.motes-root input.motes-search:active,
+.motes-root input.motes-review-input,
+.motes-root input.motes-review-input:hover,
+.motes-root input.motes-review-input:focus,
+.motes-root input.motes-review-input:active {
   border: none !important;
   background: transparent !important;
   outline: none !important;
@@ -4805,19 +4805,19 @@
 }
 
 /* ================== 独立侧栏视图 ================== */
-.workspace-leaf-content[data-type="memoria-sidebar-view"] .view-content {
+.workspace-leaf-content[data-type="motes-sidebar-view"] .view-content {
   padding: 0 !important;
   overflow-y: auto !important;
   background: var(--background-primary);
 }
-.memoria-sidebar-view {
+.motes-sidebar-view {
   font-size: 13px;
   color: var(--text-muted);
   padding: 16px 10px 24px;
   padding-bottom: max(var(--safe-area-inset-bottom), 24px);
 }
 /* 和内嵌侧栏保持一致的导航项样式 */
-.memoria-sidebar-view .memoria-nav-item {
+.motes-sidebar-view .motes-nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -4831,16 +4831,16 @@
   overflow: hidden;
   transition: background 0.12s, color 0.12s;
 }
-.memoria-sidebar-view .memoria-nav-item:hover {
+.motes-sidebar-view .motes-nav-item:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
-.memoria-sidebar-view .memoria-nav-item.active {
+.motes-sidebar-view .motes-nav-item.active {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   font-weight: 500;
 }
-.memoria-sidebar-view .memoria-nav-icon {
+.motes-sidebar-view .motes-nav-icon {
   flex-shrink: 0;
   width: 16px;
   height: 16px;
@@ -4849,40 +4849,40 @@
   justify-content: center;
   opacity: 0.85;
 }
-.memoria-sidebar-view .memoria-nav-icon .svg-icon {
+.motes-sidebar-view .motes-nav-icon .svg-icon {
   width: 16px;
   height: 16px;
 }
-.memoria-sidebar-view .memoria-nav-count {
+.motes-sidebar-view .motes-nav-count {
   font-size: 11px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
-.memoria-sidebar-view .memoria-stats {
+.motes-sidebar-view .motes-stats {
   display: flex;
   align-items: center;
   justify-content: space-around;
   padding: 4px 4px 14px;
 }
-.memoria-sidebar-view .memoria-stat {
+.motes-sidebar-view .motes-stat {
   text-align: center;
   flex: 1;
 }
-.memoria-sidebar-view .memoria-stat-num {
+.motes-sidebar-view .motes-stat-num {
   font-size: 22px;
   font-weight: 700;
   color: var(--text-normal);
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
-.memoria-sidebar-view .memoria-stat-label {
+.motes-sidebar-view .motes-stat-label {
   font-size: 11px;
   color: var(--text-faint);
   margin-top: 4px;
   letter-spacing: 0.4px;
 }
 /* 分区标题和内嵌侧栏一致 */
-.memoria-sidebar-view .memoria-sidebar-section {
+.motes-sidebar-view .motes-sidebar-section {
   padding: 14px 12px 6px;
   font-size: 11px;
   font-weight: 600;
@@ -4890,40 +4890,40 @@
   letter-spacing: 0.6px;
   text-transform: uppercase;
 }
-.memoria-sidebar-view .memoria-section-collapsible {
+.motes-sidebar-view .motes-section-collapsible {
   cursor: pointer;
   user-select: none;
   display: flex;
   align-items: center;
   transition: color 0.12s;
 }
-.memoria-sidebar-view .memoria-section-collapsible:hover {
+.motes-sidebar-view .motes-section-collapsible:hover {
   color: var(--text-muted);
 }
-.memoria-sidebar-view .memoria-section-arrow {
+.motes-sidebar-view .motes-section-arrow {
   display: inline-block;
   width: 12px;
   font-size: 10px;
 }
 /* 清除内嵌侧栏的卡片装饰泄漏 */
-.memoria-sidebar-view .memoria-overview {
+.motes-sidebar-view .motes-overview {
   background: transparent !important;
   padding: 10px 6px 6px;
 }
-.memoria-sidebar-view .memoria-heatmap {
+.motes-sidebar-view .motes-heatmap {
   gap: 3px;
   padding: 8px 6px 8px;
 }
-.memoria-sidebar-view .memoria-heatmap-col {
+.motes-sidebar-view .motes-heatmap-col {
   gap: 3px;
 }
-.memoria-sidebar-view .memoria-heatmap-cell {
+.motes-sidebar-view .motes-heatmap-cell {
   border-radius: 2px;
 }
-.memoria-sidebar-view button {
+.motes-sidebar-view button {
   box-shadow: none !important;
 }
-.memoria-sidebar-view .memoria-daily-goal-row {
+.motes-sidebar-view .motes-daily-goal-row {
   margin: 0;
   padding: 6px 8px;
 }

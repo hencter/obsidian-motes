@@ -223,7 +223,7 @@ export function highlightTerms(text: string, terms: string[]): string {
   const pattern = escapedTerms.join("|");
   if (!pattern) return escapedText;
   const re = new RegExp(`(${pattern})`, "gi");
-  return escapedText.replace(re, '<mark class="memoria-search-hit">$1</mark>');
+  return escapedText.replace(re, '<mark class="Motes-search-hit">$1</mark>');
 }
 
 function escapeHtml(s: string): string {

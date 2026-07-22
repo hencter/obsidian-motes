@@ -1,7 +1,7 @@
 // ================= 标签联想下拉框 =================
 // 监听 textarea 输入，当光标处于 #xxx 这种"未闭合标签"时弹出建议
 // 数据来源：Obsidian 整个 Vault 的 metadataCache（含所有笔记的标签）
-//          + 当前 Memoria 的标签（已包含在内）
+//          + 当前 Motes 的标签（已包含在内）
 
 import { App, getAllTags, setIcon } from "obsidian";
 import { replaceTextareaRange } from "./textarea-utils";
@@ -197,7 +197,7 @@ export class TagSuggest {
 
   private render(): void {
     if (!this.dropdown) {
-      this.dropdown = activeDocument.body.createDiv({ cls: "memoria-tag-suggest" });
+      this.dropdown = activeDocument.body.createDiv({ cls: "Motes-tag-suggest" });
       // 阻止点击下拉框时 textarea 的 blur 抢先关闭
       this.dropdown.addEventListener("mousedown", (e) => e.preventDefault());
     }
@@ -205,11 +205,11 @@ export class TagSuggest {
     this.items.forEach((name, i) => {
       const item = this.dropdown!.createDiv({
         cls:
-          "memoria-tag-suggest-item" + (i === this.active ? " active" : ""),
+          "Motes-tag-suggest-item" + (i === this.active ? " active" : ""),
       });
-      const icon = item.createSpan({ cls: "memoria-tag-suggest-icon" });
+      const icon = item.createSpan({ cls: "Motes-tag-suggest-icon" });
       setIcon(icon, "hash");
-      item.createSpan({ cls: "memoria-tag-suggest-name", text: name });
+      item.createSpan({ cls: "Motes-tag-suggest-name", text: name });
       item.addEventListener("click", () => {
         this.active = i;
         this.applySelected();
@@ -220,7 +220,7 @@ export class TagSuggest {
 
   private refreshActive(): void {
     if (!this.dropdown) return;
-    const items = this.dropdown.querySelectorAll(".memoria-tag-suggest-item");
+    const items = this.dropdown.querySelectorAll(".Motes-tag-suggest-item");
     items.forEach((el, i) => {
       el.toggleClass("active", i === this.active);
     });

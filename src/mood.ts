@@ -29,7 +29,7 @@
  * ⚠️ 局限性：基于**关键词词典**的启发式判断，不是 AI。
  *    像「人类的悲欢并不相通」这种隐喻性表达不会触发（关键词里没有"悲""欢"的裸字）。
  *    如果要完美识别需要 LLM 级别语义理解，那会引入隐私/成本/延迟问题。
- *    Memoria 保持"关键词"方案，是在"有用"和"克制"间的平衡。
+ *    Motes 保持"关键词"方案，是在"有用"和"克制"间的平衡。
  *
  * 匹配规则：
  *   1. 遍历所有情感类别的关键词，统计每类命中次数
@@ -163,5 +163,5 @@ export function detectMood(text: string): Mood {
 
 /** 给 mood 提供 CSS class 名字（view.ts 用这个挂到卡片上） */
 export function moodClass(mood: Mood): string {
-  return `memoria-mood-${mood}`;
+  return `Motes-mood-${mood}`;
 }

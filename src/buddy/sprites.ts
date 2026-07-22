@@ -4,7 +4,7 @@
  * ASCII art adapted from Claude Code Buddy (Anthropic, 2026 Aprilfool release).
  * Original source: claude-code v2.1.88 npm leak, buddy/sprites.ts
  *
- * 我们做了 Memoria 化的适配：
+ * 我们做了 Motes 化的适配：
  *   - 不抄袭逻辑代码，只复刻视觉资源
  *   - 5 维属性、文案池、孵化流程全部原创
  *   - 致敬式移植，README 中明确标注来源

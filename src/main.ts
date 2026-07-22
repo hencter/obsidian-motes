@@ -1,4 +1,4 @@
-// ================= Memoria 插件入口 =================
+// ================= Motes 插件入口 =================
 
 import {
   Plugin,
@@ -8,23 +8,23 @@ import {
 } from "obsidian";
 import {
   DEFAULT_SETTINGS,
-  MemoriaSettings,
-  VIEW_TYPE_MEMORIA,
-  VIEW_TYPE_MEMORIA_STATS,
-  VIEW_TYPE_MEMORIA_YEAR,
-  VIEW_TYPE_MEMORIA_SIDEBAR,
+  MotesSettings,
+  VIEW_TYPE_Motes,
+  VIEW_TYPE_Motes_STATS,
+  VIEW_TYPE_Motes_YEAR,
+  VIEW_TYPE_Motes_SIDEBAR,
 } from "./types";
 import { MemoStore } from "./store";
 import { renderMemo } from "./parser";
-import { MemoriaView } from "./view";
-import { MemoriaSidebarView } from "./sidebar-view";
-import { MemoriaSettingTab } from "./settings";
+import { MotesView } from "./view";
+import { MotesSidebarView } from "./sidebar-view";
+import { MotesSettingTab } from "./settings";
 import { StatsView } from "./stats";
 import { YearPanoramaView } from "./year-panorama";
 import { initLocale, t } from "./i18n";
 
-export default class MemoriaPlugin extends Plugin {
-  settings!: MemoriaSettings;
+export default class MotesPlugin extends Plugin {
+  settings!: MotesSettings;
   store!: MemoStore;
 
   async onload(): Promise<void> {
@@ -37,30 +37,30 @@ export default class MemoriaPlugin extends Plugin {
 
     // 注册视图
     this.registerView(
-      VIEW_TYPE_MEMORIA,
-      (leaf: WorkspaceLeaf) => new MemoriaView(leaf, this.store, this.settings, this)
+      VIEW_TYPE_Motes,
+      (leaf: WorkspaceLeaf) => new MotesView(leaf, this.store, this.settings, this)
     );
     this.registerView(
-      VIEW_TYPE_MEMORIA_SIDEBAR,
-      (leaf: WorkspaceLeaf) => new MemoriaSidebarView(leaf, this.store, this.settings, this)
+      VIEW_TYPE_Motes_SIDEBAR,
+      (leaf: WorkspaceLeaf) => new MotesSidebarView(leaf, this.store, this.settings, this)
     );
     this.registerView(
-      VIEW_TYPE_MEMORIA_STATS,
+      VIEW_TYPE_Motes_STATS,
       (leaf: WorkspaceLeaf) => new StatsView(leaf, this.store)
     );
     this.registerView(
-      VIEW_TYPE_MEMORIA_YEAR,
+      VIEW_TYPE_Motes_YEAR,
       (leaf: WorkspaceLeaf) => new YearPanoramaView(leaf, this.store)
     );
 
     // 注册为 Page Preview 的 hover-link 来源，让 [[双链]] 悬浮预览走 Obsidian 原生弹窗
-    this.registerHoverLinkSource(VIEW_TYPE_MEMORIA, {
+    this.registerHoverLinkSource(VIEW_TYPE_Motes, {
       defaultMod: false,
       display: "Motes",
     });
 
     // Ribbon 按钮
-    this.addRibbonIcon("feather", t("ribbon.openMemoria"), () => {
+    this.addRibbonIcon("feather", t("ribbon.openMotes"), () => {
       void this.activateView();
     });
 
@@ -70,15 +70,15 @@ export default class MemoriaPlugin extends Plugin {
 
     // 命令
     this.addCommand({
-      id: "open-memoria",
-      name: t("command.openMemoria"),
+      id: "open-Motes",
+      name: t("command.openMotes"),
       callback: () => {
         void this.activateView();
       },
     });
 
     this.addCommand({
-      id: "open-memoria-stats",
+      id: "open-Motes-stats",
       name: t("command.openStats"),
       callback: () => {
         void this.activateStatsView();
@@ -86,7 +86,7 @@ export default class MemoriaPlugin extends Plugin {
     });
 
     this.addCommand({
-      id: "open-memoria-year",
+      id: "open-Motes-year",
       name: t("command.openYear"),
       callback: () => {
         void this.activateYearView();
@@ -94,7 +94,7 @@ export default class MemoriaPlugin extends Plugin {
     });
 
     this.addCommand({
-      id: "memoria-quick-capture",
+      id: "Motes-quick-capture",
       name: t("command.quickCapture"),
       callback: () => {
         void this.quickCapture();
@@ -102,7 +102,7 @@ export default class MemoriaPlugin extends Plugin {
     });
 
     this.addCommand({
-      id: "memoria-normalize-all",
+      id: "Motes-normalize-all",
       name: t("command.normalizeAll"),
       callback: () => {
         void this.normalizeAll();
@@ -110,7 +110,7 @@ export default class MemoriaPlugin extends Plugin {
     });
 
     this.addCommand({
-      id: "memoria-migrate-daily-to-yearly",
+      id: "Motes-migrate-daily-to-yearly",
       name: t("command.migrateDailyToYearly"),
       callback: () => {
         void this.migrateDailyToYearly();
@@ -118,7 +118,7 @@ export default class MemoriaPlugin extends Plugin {
     });
 
     this.addCommand({
-      id: "open-memoria-sidebar",
+      id: "open-Motes-sidebar",
       name: t("command.openSidebar"),
       callback: () => {
         void this.activateSidebarView();
@@ -154,7 +154,7 @@ export default class MemoriaPlugin extends Plugin {
       })
     );
 
-    this.addSettingTab(new MemoriaSettingTab(this.app, this));
+    this.addSettingTab(new MotesSettingTab(this.app, this));
   }
 
   onunload(): void {
@@ -165,7 +165,7 @@ export default class MemoriaPlugin extends Plugin {
     const loaded: unknown = await this.loadData();
     const persisted =
       typeof loaded === "object" && loaded !== null
-        ? (loaded as Partial<MemoriaSettings>)
+        ? (loaded as Partial<MotesSettings>)
         : {};
     this.settings = { ...DEFAULT_SETTINGS, ...persisted };
   }
@@ -177,14 +177,14 @@ export default class MemoriaPlugin extends Plugin {
   }
 
   async activateView(): Promise<void> {
-    const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA);
+    const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes);
     if (existing.length) {
       await this.app.workspace.revealLeaf(existing[0]);
       return;
     }
     const leaf = this.app.workspace.getLeaf("tab");
     await leaf.setViewState({
-      type: VIEW_TYPE_MEMORIA,
+      type: VIEW_TYPE_Motes,
       active: true,
     });
     await this.app.workspace.revealLeaf(leaf);
@@ -192,7 +192,7 @@ export default class MemoriaPlugin extends Plugin {
 
   async activateStatsView(): Promise<void> {
     const existing = this.app.workspace.getLeavesOfType(
-      VIEW_TYPE_MEMORIA_STATS
+      VIEW_TYPE_Motes_STATS
     );
     if (existing.length) {
       await this.app.workspace.revealLeaf(existing[0]);
@@ -200,7 +200,7 @@ export default class MemoriaPlugin extends Plugin {
     }
     const leaf = this.app.workspace.getLeaf("tab");
     await leaf.setViewState({
-      type: VIEW_TYPE_MEMORIA_STATS,
+      type: VIEW_TYPE_Motes_STATS,
       active: true,
     });
     await this.app.workspace.revealLeaf(leaf);
@@ -208,7 +208,7 @@ export default class MemoriaPlugin extends Plugin {
 
   async activateYearView(): Promise<void> {
     const existing = this.app.workspace.getLeavesOfType(
-      VIEW_TYPE_MEMORIA_YEAR
+      VIEW_TYPE_Motes_YEAR
     );
     if (existing.length) {
       await this.app.workspace.revealLeaf(existing[0]);
@@ -216,21 +216,21 @@ export default class MemoriaPlugin extends Plugin {
     }
     const leaf = this.app.workspace.getLeaf("tab");
     await leaf.setViewState({
-      type: VIEW_TYPE_MEMORIA_YEAR,
+      type: VIEW_TYPE_Motes_YEAR,
       active: true,
     });
     await this.app.workspace.revealLeaf(leaf);
   }
 
   async activateSidebarView(): Promise<void> {
-    const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR);
+    const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes_SIDEBAR);
     if (existing.length) {
       await this.app.workspace.revealLeaf(existing[0]);
       return;
     }
     const leaf = this.app.workspace.getLeftLeaf(false);
     if (leaf) {
-      await leaf.setViewState({ type: VIEW_TYPE_MEMORIA_SIDEBAR, active: true });
+      await leaf.setViewState({ type: VIEW_TYPE_Motes_SIDEBAR, active: true });
       await this.app.workspace.revealLeaf(leaf);
     }
   }
@@ -285,11 +285,11 @@ export default class MemoriaPlugin extends Plugin {
   private confirmAsync(message: string): Promise<boolean> {
     return new Promise((resolve) => {
       const backdrop = activeDocument.body.createDiv({
-        cls: "memoria-modal-backdrop",
+        cls: "Motes-modal-backdrop",
       });
-      const box = backdrop.createDiv({ cls: "memoria-modal memoria-confirm" });
-      box.createDiv({ cls: "memoria-modal-title", text: message });
-      const btns = box.createDiv({ cls: "memoria-modal-btns" });
+      const box = backdrop.createDiv({ cls: "Motes-modal Motes-confirm" });
+      box.createDiv({ cls: "Motes-modal-title", text: message });
+      const btns = box.createDiv({ cls: "Motes-modal-btns" });
       const cancel = btns.createEl("button", { text: t("input.cancel") });
       const ok = btns.createEl("button", {
         text: t("notice.confirmContinue"),
@@ -327,7 +327,7 @@ export default class MemoriaPlugin extends Plugin {
     // v1.1.15: 防重复打开 —— 连按两次 Ctrl+Shift+M 之前会挂两层 backdrop，
     //   第一次关只能关最上层，底下一层变成拦截所有点击的"幽灵蒙版"。
     const existing = activeDocument.querySelector(
-      ".memoria-modal-backdrop"
+      ".Motes-modal-backdrop"
     );
     if (existing) {
       const ta0 = existing.querySelector<HTMLTextAreaElement>("textarea");
@@ -336,17 +336,17 @@ export default class MemoriaPlugin extends Plugin {
     }
 
     const backdrop = activeDocument.createElement("div");
-    backdrop.addClass("memoria-modal-backdrop");
-    const box = backdrop.createDiv({ cls: "memoria-modal" });
+    backdrop.addClass("Motes-modal-backdrop");
+    const box = backdrop.createDiv({ cls: "Motes-modal" });
     box.createDiv({
-      cls: "memoria-modal-title",
+      cls: "Motes-modal-title",
       text: t("quickCapture.title"),
     });
     const ta = box.createEl("textarea", {
-      cls: "memoria-modal-textarea",
+      cls: "Motes-modal-textarea",
       attr: { placeholder: t("quickCapture.placeholder") },
     });
-    const btnRow = box.createDiv({ cls: "memoria-modal-btns" });
+    const btnRow = box.createDiv({ cls: "Motes-modal-btns" });
     const cancel = btnRow.createEl("button", { text: t("quickCapture.cancel") });
     const save = btnRow.createEl("button", {
       text: t("quickCapture.send"),

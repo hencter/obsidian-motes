@@ -1,4 +1,4 @@
-// ================= Memoria 主视图 =================
+// ================= Motes 主视图 =================
 
 import {
   ItemView,
@@ -16,7 +16,7 @@ import {
   HoverPopover,
   normalizePath,
 } from "obsidian";
-import { Memo, MemoriaSettings, RESERVED_TAGS, VIEW_TYPE_MEMORIA, VIEW_TYPE_MEMORIA_STATS, VIEW_TYPE_MEMORIA_YEAR, VIEW_TYPE_MEMORIA_SIDEBAR } from "./types";
+import { Memo, MotesSettings, RESERVED_TAGS, VIEW_TYPE_Motes, VIEW_TYPE_Motes_STATS, VIEW_TYPE_Motes_YEAR, VIEW_TYPE_Motes_SIDEBAR } from "./types";
 import { MemoStore } from "./store";
 import { TagSuggest } from "./tag-suggest";
 import { extractImages, renderImageGrid, openLightbox } from "./image-grid";
@@ -68,7 +68,7 @@ interface ReviewFilters {
   keyword: string;
 }
 
-export class MemoriaView extends ItemView implements HoverParent {
+export class MotesView extends ItemView implements HoverParent {
   hoverPopover: HoverPopover | null = null;
   private workspaceLeafEl: HTMLElement | null = null;
   private filter: Filter = { ...getFilter() };
@@ -136,7 +136,7 @@ export class MemoriaView extends ItemView implements HoverParent {
   constructor(
     leaf: WorkspaceLeaf,
     private store: MemoStore,
-    private settings: MemoriaSettings,
+    private settings: MotesSettings,
     private plugin: { saveSettings(): Promise<void> }
   ) {
     super(leaf);
@@ -149,7 +149,7 @@ export class MemoriaView extends ItemView implements HoverParent {
   }
 
   getViewType(): string {
-    return VIEW_TYPE_MEMORIA;
+    return VIEW_TYPE_Motes;
   }
   getDisplayText(): string {
     return "Motes";
@@ -160,8 +160,8 @@ export class MemoriaView extends ItemView implements HoverParent {
 
   async onOpen(): Promise<void> {
     this.workspaceLeafEl = this.contentEl.closest(".workspace-leaf");
-    this.workspaceLeafEl?.addClass("memoria-workspace-leaf");
-    this.contentEl.addClass("memoria-root");
+    this.workspaceLeafEl?.addClass("Motes-workspace-leaf");
+    this.contentEl.addClass("Motes-root");
     this.buildLayout();
     this.unsubscribe = this.store.onChange(() => this.renderAll());
 
@@ -199,7 +199,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     try {
       await this.store.reloadAll();
     } catch (err) {
-      console.error("[Memoria] reloadAll failed:", err);
+      console.error("[Motes] reloadAll failed:", err);
     }
     // v1.1.7: 恢复上次未发送的草稿（编辑器就绪后由 setupNativeEditor 处理）
     this.autoResizeInput();
@@ -208,7 +208,7 @@ export class MemoriaView extends ItemView implements HoverParent {
   }
 
   async onClose(): Promise<void> {
-    this.workspaceLeafEl?.removeClass("memoria-workspace-leaf");
+    this.workspaceLeafEl?.removeClass("Motes-workspace-leaf");
     this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
     if (this.filterUnsub) { this.filterUnsub(); this.filterUnsub = null; }
@@ -225,27 +225,27 @@ export class MemoriaView extends ItemView implements HoverParent {
   private buildLayout(): void {
     const root = this.contentEl;
     root.empty();
-    root.addClass("memoria-container");
+    root.addClass("Motes-container");
 
-    const shell = root.createDiv({ cls: "memoria-shell" });
-    this.sidebarEl = shell.createDiv({ cls: "memoria-sidebar" });
+    const shell = root.createDiv({ cls: "Motes-shell" });
+    this.sidebarEl = shell.createDiv({ cls: "Motes-sidebar" });
     // 移动端蒙版
-    const overlay = shell.createDiv({ cls: "memoria-sidebar-overlay" });
+    const overlay = shell.createDiv({ cls: "Motes-sidebar-overlay" });
     overlay.addEventListener("click", () => this.toggleSidebar(false));
-    const main = shell.createDiv({ cls: "memoria-main" });
+    const main = shell.createDiv({ cls: "Motes-main" });
 
     // 顶部 bar
-    const topBar = main.createDiv({ cls: "memoria-topbar" });
-    const titleWrap = topBar.createDiv({ cls: "memoria-topbar-title" });
-    const logoEl = titleWrap.createSpan({ cls: "memoria-logo" });
+    const topBar = main.createDiv({ cls: "Motes-topbar" });
+    const titleWrap = topBar.createDiv({ cls: "Motes-topbar-title" });
+    const logoEl = titleWrap.createSpan({ cls: "Motes-logo" });
     setIcon(logoEl, "feather");
-    titleWrap.createSpan({ cls: "memoria-brand", text: this.settings.brandName || "" });
+    titleWrap.createSpan({ cls: "Motes-brand", text: this.settings.brandName || "" });
 
-    const searchWrap = topBar.createDiv({ cls: "memoria-search-wrap" });
-    const searchIcon = searchWrap.createDiv({ cls: "memoria-search-icon" });
+    const searchWrap = topBar.createDiv({ cls: "Motes-search-wrap" });
+    const searchIcon = searchWrap.createDiv({ cls: "Motes-search-icon" });
     setIcon(searchIcon, "search");
     this.searchEl = searchWrap.createEl("input", {
-      cls: "memoria-search",
+      cls: "Motes-search",
       attr: {
         // v1.1.15: placeholder 回归简洁，去掉 v1.1.11 加的"支持 #标签 关键词"提示
         //   功能还在，但 UI 上保持干净；感兴趣的用户会在 README / 设置页看到说明
@@ -265,18 +265,18 @@ export class MemoriaView extends ItemView implements HoverParent {
     this.searchEl.addEventListener("input", doSearch);
     // v1.1.19: 删除"刷新"按钮 —— 文件变化监听（vault.on modify/create/delete/rename）
     //   已经会实时更新数据，手动刷新几乎没有实际用途，反而占位。
-    //   如果某天真需要，可以走命令面板"Memoria: 刷新"（保留 reloadAll 能力）。
+    //   如果某天真需要，可以走命令面板"Motes: 刷新"（保留 reloadAll 能力）。
 
     // v1.4.5: 顶部工具区（独立于搜索框），右侧放「数据报告」「年度全景」
     //   之前把数据报告按钮塞在 search-wrap 里，会让人误以为和搜索是同一组功能，
     //   现在改成独立的 topbar-tools 区域，语义上"左内容右工具"，也方便未来扩展。
-    const tools = topBar.createDiv({ cls: "memoria-topbar-tools" });
+    const tools = topBar.createDiv({ cls: "Motes-topbar-tools" });
 
     // v2.0.0: 密度切换按钮 —— 紧凑 / 宽松两档切换
     //   紧凑模式每张卡片只显示前几行，适合"找某条"的高密度浏览
     //   宽松模式是默认，适合阅读沉浸
     const densityBtn = tools.createEl("button", {
-      cls: "memoria-icon-btn",
+      cls: "Motes-icon-btn",
       attr: { "aria-label": t("density.toggle") },
     });
     const updateDensityIcon = () => {
@@ -297,13 +297,13 @@ export class MemoriaView extends ItemView implements HoverParent {
       this.mdCache.clear();
       this.renderList();
       })().catch((err) => {
-        console.error("[Memoria] Failed to toggle density:", err);
+        console.error("[Motes] Failed to toggle density:", err);
       });
     });
 
     // v2.0.0: 导出按钮 —— 点击弹 Menu 选格式
     const exportBtn = tools.createEl("button", {
-      cls: "memoria-icon-btn",
+      cls: "Motes-icon-btn",
       attr: { "aria-label": t("card.exportTooltip") },
     });
     setIcon(exportBtn, "download");
@@ -331,14 +331,14 @@ export class MemoriaView extends ItemView implements HoverParent {
     });
 
     const yearBtn = tools.createEl("button", {
-      cls: "memoria-icon-btn",
+      cls: "Motes-icon-btn",
       attr: { "aria-label": t("toolbar.yearPanorama") },
     });
     setIcon(yearBtn, "calendar-days");
     yearBtn.addEventListener("click", () => {
       void (async () => {
       const existing = this.app.workspace.getLeavesOfType(
-        VIEW_TYPE_MEMORIA_YEAR
+        VIEW_TYPE_Motes_YEAR
       );
       if (existing.length) {
         await this.app.workspace.revealLeaf(existing[0]);
@@ -346,17 +346,17 @@ export class MemoriaView extends ItemView implements HoverParent {
       }
       const leaf = this.app.workspace.getLeaf("tab");
       await leaf.setViewState({
-        type: VIEW_TYPE_MEMORIA_YEAR,
+        type: VIEW_TYPE_Motes_YEAR,
         active: true,
       });
       await this.app.workspace.revealLeaf(leaf);
       })().catch((err) => {
-        console.error("[Memoria] Failed to open year panorama:", err);
+        console.error("[Motes] Failed to open year panorama:", err);
       });
     });
 
     const statsBtn = tools.createEl("button", {
-      cls: "memoria-icon-btn",
+      cls: "Motes-icon-btn",
       attr: { "aria-label": t("toolbar.statsReport") },
     });
     setIcon(statsBtn, "bar-chart-3");
@@ -364,7 +364,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       void (async () => {
       // 在新标签页打开数据报告视图
       const existing = this.app.workspace.getLeavesOfType(
-        VIEW_TYPE_MEMORIA_STATS
+        VIEW_TYPE_Motes_STATS
       );
       if (existing.length) {
         await this.app.workspace.revealLeaf(existing[0]);
@@ -372,18 +372,18 @@ export class MemoriaView extends ItemView implements HoverParent {
       }
       const leaf = this.app.workspace.getLeaf("tab");
       await leaf.setViewState({
-        type: VIEW_TYPE_MEMORIA_STATS,
+        type: VIEW_TYPE_Motes_STATS,
         active: true,
       });
       await this.app.workspace.revealLeaf(leaf);
       })().catch((err) => {
-        console.error("[Memoria] Failed to open stats view:", err);
+        console.error("[Motes] Failed to open stats view:", err);
       });
     });
 
     // 侧栏切换按钮：桌面端收起侧栏，移动端打开抽屉
     const toggleBtn = topBar.createEl("button", {
-      cls: "memoria-icon-btn memoria-sidebar-toggle",
+      cls: "Motes-icon-btn Motes-sidebar-toggle",
       attr: {
         "aria-label": t("toolbar.toggleSidebar"),
         title: t("toolbar.toggleSidebar"),
@@ -391,7 +391,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     });
     const syncSidebarToggleIcon = () => {
       toggleBtn.empty();
-      const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR).length > 0;
+      const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes_SIDEBAR).length > 0;
       if (standaloneOpen) {
         setIcon(toggleBtn, "panel-left");
       } else if (this.isMobileSidebarLayout()) {
@@ -399,7 +399,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       } else {
         setIcon(
           toggleBtn,
-          this.contentEl.hasClass("memoria-sidebar-collapsed")
+          this.contentEl.hasClass("Motes-sidebar-collapsed")
             ? "panel-left-open"
             : "panel-left-close"
         );
@@ -407,15 +407,15 @@ export class MemoriaView extends ItemView implements HoverParent {
     };
     syncSidebarToggleIcon();
     toggleBtn.addEventListener("click", () => {
-      const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR).length > 0;
+      const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes_SIDEBAR).length > 0;
       if (standaloneOpen) {
-        this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR)[0].detach();
+        this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes_SIDEBAR)[0].detach();
         this.toggleDesktopSidebar(false);
       } else if (this.isMobileSidebarLayout()) {
-        this.toggleSidebar(!this.contentEl.hasClass("memoria-sidebar-open"));
+        this.toggleSidebar(!this.contentEl.hasClass("Motes-sidebar-open"));
       } else {
         this.toggleDesktopSidebar(
-          !this.contentEl.hasClass("memoria-sidebar-collapsed")
+          !this.contentEl.hasClass("Motes-sidebar-collapsed")
         );
       }
       syncSidebarToggleIcon();
@@ -428,18 +428,18 @@ export class MemoriaView extends ItemView implements HoverParent {
     const resizeObserver = new ResizeObserver(() => {
       const w = root.clientWidth;
       const isMobile = w <= MOBILE_BREAK;
-      const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR).length > 0;
+      const standaloneOpen = this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes_SIDEBAR).length > 0;
       if (isMobile || standaloneOpen) return;
       const shouldCollapse = w <= MEDIUM_BREAK;
-      root.classList.toggle("memoria-auto-collapse", shouldCollapse);
+      root.classList.toggle("Motes-auto-collapse", shouldCollapse);
       if (shouldCollapse && !lastAutoState) {
-        if (!root.dataset.memoriaAutoCollapsed) {
-          root.dataset.memoriaAutoCollapsed = "true";
+        if (!root.dataset.MotesAutoCollapsed) {
+          root.dataset.MotesAutoCollapsed = "true";
           this.toggleDesktopSidebar(true);
         }
       } else if (!shouldCollapse && lastAutoState) {
-        if (root.dataset.memoriaAutoCollapsed === "true") {
-          delete root.dataset.memoriaAutoCollapsed;
+        if (root.dataset.MotesAutoCollapsed === "true") {
+          delete root.dataset.MotesAutoCollapsed;
           this.toggleDesktopSidebar(false);
         }
       }
@@ -457,7 +457,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     this.buildInputCard(main);
 
     // 列表
-    this.listEl = main.createDiv({ cls: "memoria-list" });
+    this.listEl = main.createDiv({ cls: "Motes-list" });
     this.listEl.addEventListener("scroll", () => {
       if (
         this.listEl.scrollTop + this.listEl.clientHeight >=
@@ -491,7 +491,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // v2.2.0: 移动端 FAB 浮动入口按钮
     //   挂在 contentEl 末尾（不是 main），避免被 main 的 flex / overflow 影响。
-    //   可见性由 CSS 控制：仅 (hover: none) and (pointer: coarse) + .memoria-input-fab-mode
+    //   可见性由 CSS 控制：仅 (hover: none) and (pointer: coarse) + .Motes-input-fab-mode
     //   时才显示。桌面端永远 display: none，零运行时成本。
     this.buildFab();
   }
@@ -500,7 +500,7 @@ export class MemoriaView extends ItemView implements HoverParent {
    *  整体策略：
    *    - FAB 按钮挂在 contentEl 末尾（position: fixed 全局定位）
    *    - 输入卡片右上角加 close-btn（仅 fab 模式 + 已展开时可见）
-   *    - 模式切换通过 root 上的 .memoria-input-fab-mode 类（CSS 控制可见性）
+   *    - 模式切换通过 root 上的 .Motes-input-fab-mode 类（CSS 控制可见性）
    *    - 展开/收起通过 root 上的 .is-fab-expanded 类
    *  CSS 全部用 (hover: none) and (pointer: coarse) 媒体查询包裹，桌面零影响。
    */
@@ -508,7 +508,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // FAB 按钮
     this.fabEl = this.contentEl.createEl("button", {
-      cls: "memoria-fab",
+      cls: "Motes-fab",
       attr: { "aria-label": t("fab.aria") },
     });
     setIcon(this.fabEl, "plus");
@@ -519,11 +519,11 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // 输入卡片内的关闭按钮（fab 模式下才显示，CSS 控制可见性）
     const inputCard = this.inputEl?.closest(
-      ".memoria-input-card"
+      ".Motes-input-card"
     );
     if (inputCard) {
       const closeBtn = inputCard.createEl("button", {
-        cls: "memoria-input-close",
+        cls: "Motes-input-close",
         attr: { "aria-label": t("fab.close") },
       });
       setIcon(closeBtn, "x");
@@ -542,15 +542,15 @@ export class MemoriaView extends ItemView implements HoverParent {
     this.syncFabMode();
   }
 
-  /** v2.2.0: 根据 settings.mobileInputStyle 同步 root 上的 .memoria-input-fab-mode 类。
+  /** v2.2.0: 根据 settings.mobileInputStyle 同步 root 上的 .Motes-input-fab-mode 类。
    *  CSS 媒体查询会在桌面端忽略所有 fab-mode 规则，所以这里不需要判断设备 —— 闭眼加就行。
    *  在 onOpen / renderAll / 设置变更后都调用一次，保证 class 跟 settings 一致。 */
   private syncFabMode(): void {
     const isFab = this.settings.mobileInputStyle === "fab";
     if (isFab) {
-      this.contentEl.addClass("memoria-input-fab-mode");
+      this.contentEl.addClass("Motes-input-fab-mode");
     } else {
-      this.contentEl.removeClass("memoria-input-fab-mode");
+      this.contentEl.removeClass("Motes-input-fab-mode");
       // 切回常驻模式时，强制清掉展开 class，避免遗留状态
       this.contentEl.removeClass("is-fab-expanded");
     }
@@ -559,7 +559,7 @@ export class MemoriaView extends ItemView implements HoverParent {
   // ============== 快捷筛选 Tab 栏 ==============
 
   private buildQuickTabs(parent: HTMLElement): void {
-    this.quickTabsEl = parent.createDiv({ cls: "memoria-quick-tabs" });
+    this.quickTabsEl = parent.createDiv({ cls: "Motes-quick-tabs" });
   }
 
   private renderQuickTabs(): void {
@@ -576,11 +576,11 @@ export class MemoriaView extends ItemView implements HoverParent {
     for (const tab of tabs) {
       const active = filter.preset === tab.key && !filter.tag && !filter.year;
       const btn = this.quickTabsEl.createEl("button", {
-        cls: "memoria-quick-tab" + (active ? " is-active" : ""),
+        cls: "Motes-quick-tab" + (active ? " is-active" : ""),
       });
-      const icon = btn.createSpan({ cls: "memoria-quick-tab-icon" });
+      const icon = btn.createSpan({ cls: "Motes-quick-tab-icon" });
       setIcon(icon, tab.icon);
-      btn.createSpan({ cls: "memoria-quick-tab-label", text: tab.label });
+      btn.createSpan({ cls: "Motes-quick-tab-label", text: tab.label });
       btn.addEventListener("click", () => {
         this.filter.preset = tab.key;
         this.filter.tag = null;
@@ -631,15 +631,15 @@ export class MemoriaView extends ItemView implements HoverParent {
   }
 
   private buildInputCard(parent: HTMLElement): void {
-    const inputCard = parent.createDiv({ cls: "memoria-input-card" });
+    const inputCard = parent.createDiv({ cls: "Motes-input-card" });
 
     this.inputEl = inputCard.createEl("textarea", {
-      cls: "memoria-input",
+      cls: "Motes-input",
       attr: { rows: "1" },
     });
     this.inputEl.style.display = "none";
 
-      this.editorHostEl = inputCard.createDiv({ cls: "memoria-editor-host" });
+      this.editorHostEl = inputCard.createDiv({ cls: "Motes-editor-host" });
     // 设置初始高度
     const h = this.settings.editorHeight || 200;
     this.editorHostEl.style.height = `${h}px`;
@@ -660,46 +660,46 @@ export class MemoriaView extends ItemView implements HoverParent {
     // 标签联想（仍然绑定 textarea，但编辑器输入同步到 textarea 后 TagSuggest 可工作）
     this.tagSuggest = new TagSuggest(this.app, this.inputEl);
 
-    const inputToolbar = inputCard.createDiv({ cls: "memoria-input-toolbar" });
-    const toolLeft = inputToolbar.createDiv({ cls: "memoria-input-tools" });
+    const inputToolbar = inputCard.createDiv({ cls: "Motes-input-toolbar" });
+    const toolLeft = inputToolbar.createDiv({ cls: "Motes-input-tools" });
 
     const addTagBtn = toolLeft.createEl("button", {
-      cls: "memoria-tool-btn",
+      cls: "Motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertTag") },
     });
     setIcon(addTagBtn, "hash");
     addTagBtn.addEventListener("click", () => this.insertAtCursor("#"));
 
     const addImageBtn = toolLeft.createEl("button", {
-      cls: "memoria-tool-btn",
+      cls: "Motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertImage") },
     });
     setIcon(addImageBtn, "image");
     addImageBtn.addEventListener("click", () => this.pickImageFromDisk());
 
     const ulBtn = toolLeft.createEl("button", {
-      cls: "memoria-tool-btn",
+      cls: "Motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertUL") },
     });
     setIcon(ulBtn, "list");
     ulBtn.addEventListener("click", () => this.insertListAtCursor("- "));
 
     const olBtn = toolLeft.createEl("button", {
-      cls: "memoria-tool-btn",
+      cls: "Motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertOL") },
     });
     setIcon(olBtn, "list-ordered");
     olBtn.addEventListener("click", () => this.insertOrderedListAtCursor());
 
     const taskBtn = toolLeft.createEl("button", {
-      cls: "memoria-tool-btn",
+      cls: "Motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertTask") },
     });
     setIcon(taskBtn, "square-check");
     taskBtn.addEventListener("click", () => this.insertListAtCursor("- [ ] "));
 
     const addTableBtn = toolLeft.createEl("button", {
-      cls: "memoria-tool-btn",
+      cls: "Motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertTable") },
     });
     setIcon(addTableBtn, "table");
@@ -712,22 +712,22 @@ export class MemoriaView extends ItemView implements HoverParent {
       }
     });
 
-    const submitWrap = inputToolbar.createDiv({ cls: "memoria-submit-wrap" });
+    const submitWrap = inputToolbar.createDiv({ cls: "Motes-submit-wrap" });
     const editDateTimeInput = submitWrap.createEl("input", {
-      cls: "memoria-edit-datetime memoria-hidden",
+      cls: "Motes-edit-datetime Motes-hidden",
       type: "datetime-local",
       attr: { step: "60", title: t("input.editTimeTitle") },
     });
     this.editDateTimeEl = editDateTimeInput;
     const cancelBtn = submitWrap.createEl("button", {
-      cls: "memoria-cancel-btn memoria-hidden",
+      cls: "Motes-cancel-btn Motes-hidden",
       text: t("input.cancel"),
     });
     cancelBtn.addEventListener("click", () => this.exitEditMode());
     this.editBannerEl = cancelBtn;
 
     const submitBtn = submitWrap.createEl("button", {
-      cls: "memoria-submit-btn",
+      cls: "Motes-submit-btn",
       attr: {
         "aria-label": t("input.submit"),
         title: t("input.submit"),
@@ -777,7 +777,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     if (!el) return;
     // v2.0.17: 给 height 设 inline 值时临时禁用 transition，避免 0.7s 慢动画拖住打字手感
     //   （CSS 里的 transition 覆盖 min-height + height 两者，下一帧恢复）。
-    el.classList.add("memoria-no-transition");
+    el.classList.add("Motes-no-transition");
 
     // v2.0.17-iter15: 空内容直接清 inline height，让 CSS min-height 接管。
     //   这一步必须放在 scrollHeight 测量之前 —— 否则会踩这个坑：
@@ -790,7 +790,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     if (el.value.length === 0) {
       el.setCssStyles({ height: "" });
       window.requestAnimationFrame(() => {
-        el.classList.remove("memoria-no-transition");
+        el.classList.remove("Motes-no-transition");
       });
       return;
     }
@@ -814,7 +814,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     }
     // 下一帧恢复 transition（hover/focus 切换时动画正常）
     window.requestAnimationFrame(() => {
-      el.classList.remove("memoria-no-transition");
+      el.classList.remove("Motes-no-transition");
     });
   }
 
@@ -831,7 +831,7 @@ export class MemoriaView extends ItemView implements HoverParent {
    */
   private syncInputCardContentState(): void {
     if (!this.inputEl) return;
-    const card = this.inputEl.closest(".memoria-input-card");
+    const card = this.inputEl.closest(".Motes-input-card");
     if (!card) return;
     const hasContent = this.inputEl.value.length > 0;
     card.toggleClass("has-content", hasContent);
@@ -1087,7 +1087,7 @@ export class MemoriaView extends ItemView implements HoverParent {
    */
   private showTablePicker(anchor: HTMLElement): void {
     // 若已有弹层则关闭
-    const existing = activeDocument.querySelector(".memoria-table-picker");
+    const existing = activeDocument.querySelector(".Motes-table-picker");
     if (existing) {
       existing.remove();
       return;
@@ -1099,27 +1099,27 @@ export class MemoriaView extends ItemView implements HoverParent {
     const isMobile = Platform.isMobile;
     const MAX = isMobile ? 5 : 6;
     const pop = activeDocument.body.createDiv({
-      cls: "memoria-table-picker" + (isMobile ? " is-mobile" : ""),
+      cls: "Motes-table-picker" + (isMobile ? " is-mobile" : ""),
     });
 
     // 标题 & 尺寸提示
     const label = pop.createDiv({
-      cls: "memoria-table-picker-label",
+      cls: "Motes-table-picker-label",
       text: isMobile ? "点击格子直接插入" : "0 × 0",
     });
 
-    const grid = pop.createDiv({ cls: "memoria-table-picker-grid" });
+    const grid = pop.createDiv({ cls: "Motes-table-picker-grid" });
     const cells: HTMLElement[][] = [];
     for (let r = 0; r < MAX; r++) {
       cells[r] = [];
       for (let c = 0; c < MAX; c++) {
-        const cell = grid.createDiv({ cls: "memoria-table-picker-cell" });
+        const cell = grid.createDiv({ cls: "Motes-table-picker-cell" });
         cell.dataset.row = String(r);
         cell.dataset.col = String(c);
         // 手机端：给每个格子显示 "R×C" 小数字，让用户明确知道点了会插几行几列
         if (isMobile) {
           cell.createSpan({
-            cls: "memoria-table-picker-cell-text",
+            cls: "Motes-table-picker-cell-text",
             text: `${r + 1}×${c + 1}`,
           });
         }
@@ -1144,7 +1144,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     if (!isMobile) {
       grid.addEventListener("mouseover", (e) => {
         const t = e.target as HTMLElement;
-        if (!t.hasClass("memoria-table-picker-cell")) return;
+        if (!t.hasClass("Motes-table-picker-cell")) return;
         const r = parseInt(t.dataset.row ?? "0", 10);
         const c = parseInt(t.dataset.col ?? "0", 10);
         updateHighlight(r, c);
@@ -1152,7 +1152,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
       grid.addEventListener("click", (e) => {
         const t = e.target as HTMLElement;
-        if (!t.hasClass("memoria-table-picker-cell")) return;
+        if (!t.hasClass("Motes-table-picker-cell")) return;
         this.insertTable(selR + 1, selC + 1);
         pop.remove();
       });
@@ -1161,8 +1161,8 @@ export class MemoriaView extends ItemView implements HoverParent {
       grid.addEventListener("click", (e) => {
         let t = e.target as HTMLElement;
         // 允许点到格子里的 span
-        if (!t.hasClass("memoria-table-picker-cell")) {
-          t = t.closest(".memoria-table-picker-cell") as HTMLElement;
+        if (!t.hasClass("Motes-table-picker-cell")) {
+          t = t.closest(".Motes-table-picker-cell") as HTMLElement;
         }
         if (!t) return;
         const r = parseInt(t.dataset.row ?? "0", 10);
@@ -1267,7 +1267,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       const files = Array.from(inp.files ?? []);
       for (const f of files) await this.handleImageFile(f);
       })().catch((err) => {
-        console.error("[Memoria] Failed to import selected image:", err);
+        console.error("[Motes] Failed to import selected image:", err);
       });
     });
     inp.click();
@@ -1403,12 +1403,12 @@ export class MemoriaView extends ItemView implements HoverParent {
   /** v1.1.7: 草稿持久化（localStorage）
    *  v1.1.14: key 带上 vault 名，避免在多 vault 之间切换时草稿串味。
    */
-  private static DRAFT_KEY_PREFIX = "memoria:input-draft";
+  private static DRAFT_KEY_PREFIX = "Motes:input-draft";
   private draftKey(): string {
     try {
-      return `${MemoriaView.DRAFT_KEY_PREFIX}:${this.app.vault.getName()}`;
+      return `${MotesView.DRAFT_KEY_PREFIX}:${this.app.vault.getName()}`;
     } catch {
-      return MemoriaView.DRAFT_KEY_PREFIX;
+      return MotesView.DRAFT_KEY_PREFIX;
     }
   }
   private saveDraft(text: string): void {
@@ -1493,16 +1493,16 @@ export class MemoriaView extends ItemView implements HoverParent {
 
   /** 切换侧栏抽屉（移动端用） */
   private toggleSidebar(open: boolean): void {
-    this.contentEl.toggleClass("memoria-sidebar-open", open);
+    this.contentEl.toggleClass("Motes-sidebar-open", open);
   }
 
   /** 收起桌面侧栏，让主内容区获得完整宽度 */
   private toggleDesktopSidebar(collapsed: boolean): void {
-    this.contentEl.toggleClass("memoria-sidebar-collapsed", collapsed);
+    this.contentEl.toggleClass("Motes-sidebar-collapsed", collapsed);
     if (collapsed) this.toggleSidebar(false);
   }
 
-  /** v2.0.0: 导出当前筛选结果到 vault 的 Memoria/exports/ 目录 */
+  /** v2.0.0: 导出当前筛选结果到 vault 的 Motes/exports/ 目录 */
   private async doExport(format: ExportFormat): Promise<void> {
     try {
       const memos = this.getFilteredMemos();
@@ -1580,7 +1580,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     const key = e.key;
     // 收集所有卡片
     const cards = Array.from(
-      this.listEl.querySelectorAll<HTMLElement>(".memoria-card")
+      this.listEl.querySelectorAll<HTMLElement>(".Motes-card")
     );
     if (cards.length === 0 && !["i", "/"].includes(key)) return;
 
@@ -1699,10 +1699,10 @@ export class MemoriaView extends ItemView implements HoverParent {
    */
   private updateEditBanner(): void {
     if (!this.editBannerEl) return;
-    const inputCard = this.inputEl.closest(".memoria-input-card");
+    const inputCard = this.inputEl.closest(".Motes-input-card");
     if (this.editingMemo) {
-      this.editBannerEl.removeClass("memoria-hidden");
-      this.editDateTimeEl?.removeClass("memoria-hidden");
+      this.editBannerEl.removeClass("Motes-hidden");
+      this.editDateTimeEl?.removeClass("Motes-hidden");
       inputCard?.addClass("is-editing");
       this.inputEl.setAttr(
         "placeholder",
@@ -1712,8 +1712,8 @@ export class MemoriaView extends ItemView implements HoverParent {
         })
       );
     } else {
-      this.editBannerEl.addClass("memoria-hidden");
-      this.editDateTimeEl?.addClass("memoria-hidden");
+      this.editBannerEl.addClass("Motes-hidden");
+      this.editDateTimeEl?.addClass("Motes-hidden");
       inputCard?.removeClass("is-editing");
       // v2.0.13: 如果当前按某个标签筛选，placeholder 提示用户保存时会自动加该标签
       if (this.filter.tag) {
@@ -1748,7 +1748,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     this.syncFabMode();
     // 同步筛选状态到独立侧栏
     setFilter({ ...this.filter });
-    const hasStandaloneSidebar = this.app.workspace.getLeavesOfType(VIEW_TYPE_MEMORIA_SIDEBAR).length > 0;
+    const hasStandaloneSidebar = this.app.workspace.getLeavesOfType(VIEW_TYPE_Motes_SIDEBAR).length > 0;
     if (hasStandaloneSidebar) {
       this.sidebarEl.style.display = "none";
     } else {
@@ -1813,7 +1813,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       if (effectiveTags.length === 0) noTagCount++;
     }
 
-    const stats = this.sidebarEl.createDiv({ cls: "memoria-stats" });
+    const stats = this.sidebarEl.createDiv({ cls: "Motes-stats" });
     this.renderStatItem(stats, memos.length.toString(), t("stats.memos"));
     this.renderStatItem(stats, tagSet.size.toString(), t("stats.tags"));
     this.renderStatItem(stats, daySet.size.toString(), t("stats.days"));
@@ -1827,7 +1827,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // 视图区
     this.sidebarEl.createDiv({
-      cls: "memoria-sidebar-section",
+      cls: "Motes-sidebar-section",
       text: t("sidebar.section.views"),
     });
     const presets: Array<{
@@ -1861,7 +1861,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // 检索式
     this.sidebarEl.createDiv({
-      cls: "memoria-sidebar-section",
+      cls: "Motes-sidebar-section",
       text: t("sidebar.section.search"),
     });
     this.renderNavItem("no-tag", "tag", t("sidebar.noTag"), noTagCount);
@@ -1876,7 +1876,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     }
     if (this.settings.showSidebarYears && yearCount.size) {
       this.sidebarEl.createDiv({
-        cls: "memoria-sidebar-section",
+        cls: "Motes-sidebar-section",
         text: t("sidebar.section.years"),
       });
       const years = [...yearCount.entries()].sort((a, b) =>
@@ -1885,13 +1885,13 @@ export class MemoriaView extends ItemView implements HoverParent {
       for (const [y, c] of years) {
         const el = this.sidebarEl.createDiv({
           cls:
-            "memoria-nav-item" +
+            "Motes-nav-item" +
             (this.filter.year === y ? " active" : ""),
         });
-        const icon = el.createDiv({ cls: "memoria-nav-icon" });
+        const icon = el.createDiv({ cls: "Motes-nav-icon" });
         setIcon(icon, "calendar");
-        el.createSpan({ cls: "memoria-nav-text", text: y });
-        el.createSpan({ cls: "memoria-nav-count", text: String(c) });
+        el.createSpan({ cls: "Motes-nav-text", text: y });
+        el.createSpan({ cls: "Motes-nav-count", text: String(c) });
         el.addEventListener("click", () => {
           this.filter.year = this.filter.year === y ? null : y;
           this.filter.preset = "all";
@@ -1912,10 +1912,10 @@ export class MemoriaView extends ItemView implements HoverParent {
 
       if (tagCount.size) {
         const sectionHead = this.sidebarEl.createDiv({
-          cls: "memoria-sidebar-section memoria-section-collapsible",
+          cls: "Motes-sidebar-section Motes-section-collapsible",
         });
         sectionHead.createSpan({
-          cls: "memoria-section-arrow",
+          cls: "Motes-section-arrow",
           text: this.tagsExpanded ? "▾" : "▸",
         });
         sectionHead.createSpan({ text: ` ${t("sidebar.section.tags")} (${tagCount.size})` });
@@ -1940,13 +1940,13 @@ export class MemoriaView extends ItemView implements HoverParent {
     const isActive =
       this.filter.preset === key && !this.filter.tag && !this.filter.year;
     const el = this.sidebarEl.createDiv({
-      cls: "memoria-nav-item" + (isActive ? " active" : ""),
+      cls: "Motes-nav-item" + (isActive ? " active" : ""),
     });
-    const iconEl = el.createDiv({ cls: "memoria-nav-icon" });
+    const iconEl = el.createDiv({ cls: "Motes-nav-icon" });
     setIcon(iconEl, icon);
-    el.createSpan({ cls: "memoria-nav-text", text });
+    el.createSpan({ cls: "Motes-nav-text", text });
     if (count !== undefined) {
-      el.createSpan({ cls: "memoria-nav-count", text: String(count) });
+      el.createSpan({ cls: "Motes-nav-count", text: String(count) });
     }
     el.addEventListener("click", () => {
       this.filter.preset = key;
@@ -1965,17 +1965,17 @@ export class MemoriaView extends ItemView implements HoverParent {
     num: string,
     label: string
   ): void {
-    const item = parent.createDiv({ cls: "memoria-stat" });
-    item.createDiv({ cls: "memoria-stat-num", text: num });
-    item.createDiv({ cls: "memoria-stat-label", text: label });
+    const item = parent.createDiv({ cls: "Motes-stat" });
+    item.createDiv({ cls: "Motes-stat-num", text: num });
+    item.createDiv({ cls: "Motes-stat-label", text: label });
   }
 
   /** 热力图 / 月历 / 宠物视图容器（v2.1.0 三态切换，按钮在统计条上） */
   private renderOverview(parent: HTMLElement, memos: Memo[]): void {
-    const wrap = parent.createDiv({ cls: "memoria-overview" });
+    const wrap = parent.createDiv({ cls: "Motes-overview" });
 
     // 内容区
-    const content = wrap.createDiv({ cls: "memoria-overview-content" });
+    const content = wrap.createDiv({ cls: "Motes-overview-content" });
     if (this.overviewMode === "heatmap") {
       this.renderHeatmap(content, memos);
     } else if (this.overviewMode === "calendar") {
@@ -2020,7 +2020,7 @@ export class MemoriaView extends ItemView implements HoverParent {
         this.buddyJustHatched = true;
         this.renderSidebar();
         })().catch((err) => {
-          console.error("[Memoria] Failed to hatch buddy:", err);
+          console.error("[Motes] Failed to hatch buddy:", err);
         });
       });
       return;
@@ -2053,7 +2053,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     renderBuddy(parent, buddy, memos, this.buddyQuipCache, {
       onRename: () => {
         void this.openBuddyRename(buddy.name).catch((err) => {
-          console.error("[Memoria] Failed to rename buddy:", err);
+          console.error("[Motes] Failed to rename buddy:", err);
         });
       },
       justHatched,
@@ -2075,14 +2075,14 @@ export class MemoriaView extends ItemView implements HoverParent {
   /** v2.1.0-iter10: 异步输入弹窗（基于 confirmAsync 改造）—— 比浏览器原生 prompt() 不劫持焦点 */
   private promptAsync(title: string, defaultValue: string): Promise<string | null> {
     return new Promise((resolve) => {
-      const backdrop = activeDocument.body.createDiv({ cls: "memoria-modal-backdrop" });
-      const box = backdrop.createDiv({ cls: "memoria-modal memoria-confirm" });
-      box.createDiv({ cls: "memoria-modal-title", text: title });
+      const backdrop = activeDocument.body.createDiv({ cls: "Motes-modal-backdrop" });
+      const box = backdrop.createDiv({ cls: "Motes-modal Motes-confirm" });
+      box.createDiv({ cls: "Motes-modal-title", text: title });
       const input = box.createEl("input", {
-        cls: "memoria-buddy-egg-input",
+        cls: "Motes-buddy-egg-input",
         attr: { type: "text", maxlength: "20", value: defaultValue },
       });
-      const btns = box.createDiv({ cls: "memoria-modal-btns" });
+      const btns = box.createDiv({ cls: "Motes-modal-btns" });
       const cancel = btns.createEl("button", { text: t("buddy.rename.cancel") });
       const ok = btns.createEl("button", {
         text: t("buddy.rename.save"),
@@ -2188,12 +2188,12 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // 外层 row：进度条 + 右侧图标组
     const row = parent.createDiv({
-      cls: `memoria-daily-goal-row${isDone ? " is-done" : ""}`,
+      cls: `Motes-daily-goal-row${isDone ? " is-done" : ""}`,
     });
 
     // 进度条（可点击跳今天视图）
     const barWrap = row.createDiv({
-      cls: "memoria-daily-goal",
+      cls: "Motes-daily-goal",
       attr: {
         // v1.4.2: 只用 aria-label（Obsidian 会转成气泡），删掉 title 避免双层 tooltip
         "aria-label": goalTooltip,
@@ -2206,16 +2206,16 @@ export class MemoriaView extends ItemView implements HoverParent {
       this.pageLimit = this.getInitialPageLimit();
       this.renderAll();
     });
-    const bar = barWrap.createDiv({ cls: "memoria-daily-goal-bar" });
-    const fill = bar.createDiv({ cls: "memoria-daily-goal-fill" });
+    const bar = barWrap.createDiv({ cls: "Motes-daily-goal-bar" });
+    const fill = bar.createDiv({ cls: "Motes-daily-goal-fill" });
     fill.style.width = `${pct}%`;
 
     // 右侧图标组
-    const actions = row.createDiv({ cls: "memoria-daily-goal-actions" });
+    const actions = row.createDiv({ cls: "Motes-daily-goal-actions" });
 
     // v1.4.2: 图标从 target（圆形甜甜圈）换成 crosshair（十字准星，辨识度更高且不像甜甜圈）
     const targetBtn = actions.createEl("button", {
-      cls: "memoria-icon-btn memoria-daily-goal-target",
+      cls: "Motes-icon-btn Motes-daily-goal-target",
       attr: {
         "aria-label": goalTooltip,
       },
@@ -2245,7 +2245,7 @@ export class MemoriaView extends ItemView implements HoverParent {
         : "toolbar.toHeatmap";
 
     const switchBtn = actions.createEl("button", {
-      cls: "memoria-icon-btn memoria-daily-goal-switch",
+      cls: "Motes-icon-btn Motes-daily-goal-switch",
       attr: {
         "aria-label": t(nextLabelKey),
       },
@@ -2272,9 +2272,9 @@ export class MemoriaView extends ItemView implements HoverParent {
     const dayMap = new Map<string, number>();
     for (const m of memos) dayMap.set(m.date, (dayMap.get(m.date) ?? 0) + 1);
 
-    const grid = parent.createDiv({ cls: "memoria-heatmap" });
+    const grid = parent.createDiv({ cls: "Motes-heatmap" });
     for (let w = 0; w < weeks; w++) {
-      const col = grid.createDiv({ cls: "memoria-heatmap-col" });
+      const col = grid.createDiv({ cls: "Motes-heatmap-col" });
       for (let d = 0; d < 7; d++) {
         const day = new Date(startSunday);
         day.setDate(startSunday.getDate() + w * 7 + d);
@@ -2283,7 +2283,7 @@ export class MemoriaView extends ItemView implements HoverParent {
         const level =
           count === 0 ? 0 : count < 2 ? 1 : count < 4 ? 2 : count < 7 ? 3 : 4;
         const cell = col.createDiv({
-          cls: `memoria-heatmap-cell level-${level}`,
+          cls: `Motes-heatmap-cell level-${level}`,
         });
         if (day > today) cell.addClass("future");
         // v2.0.0: 热力图 hover 增强 —— 显示那天的首条笔记预览
@@ -2303,7 +2303,7 @@ export class MemoriaView extends ItemView implements HoverParent {
             this.filter.preset = "all";
             this.renderList();
           });
-          cell.addClass("memoria-clickable");
+          cell.addClass("Motes-clickable");
         } else {
           cell.setAttr(
             "title",
@@ -2322,18 +2322,18 @@ export class MemoriaView extends ItemView implements HoverParent {
     memos: Memo[]
   ): void {
     this.hideHeatmapTooltip();
-    const tip = activeDocument.body.createDiv({ cls: "memoria-heatmap-tooltip" });
-    const head = tip.createDiv({ cls: "memoria-heatmap-tooltip-head" });
+    const tip = activeDocument.body.createDiv({ cls: "Motes-heatmap-tooltip" });
+    const head = tip.createDiv({ cls: "Motes-heatmap-tooltip-head" });
     head.createSpan({ text: dateKey });
     head.createSpan({
-      cls: "memoria-heatmap-tooltip-count",
+      cls: "Motes-heatmap-tooltip-count",
       text: t("list.totalCount", { n: memos.length }),
     });
     // 首条 + 最多 2 条预览
     const preview = memos.slice(0, 2);
     for (const m of preview) {
-      const row = tip.createDiv({ cls: "memoria-heatmap-tooltip-row" });
-      row.createSpan({ cls: "memoria-heatmap-tooltip-time", text: m.time });
+      const row = tip.createDiv({ cls: "Motes-heatmap-tooltip-row" });
+      row.createSpan({ cls: "Motes-heatmap-tooltip-time", text: m.time });
       // 取前 50 字的纯内容（剥掉标签和图片语法）
       const imgTag = t("list.imageHolder");
       const snippet = m.content
@@ -2344,13 +2344,13 @@ export class MemoriaView extends ItemView implements HoverParent {
         .trim()
         .slice(0, 50);
       row.createSpan({
-        cls: "memoria-heatmap-tooltip-text",
+        cls: "Motes-heatmap-tooltip-text",
         text: snippet || t("list.noText"),
       });
     }
     if (memos.length > 2) {
       tip.createDiv({
-        cls: "memoria-heatmap-tooltip-more",
+        cls: "Motes-heatmap-tooltip-more",
         text: t("list.heatmapMore", { n: memos.length - 2 }),
       });
     }
@@ -2422,17 +2422,17 @@ export class MemoriaView extends ItemView implements HoverParent {
       // Bug fix (v1.1.2): 之前子节点 renderTagTree 的 parent 传的是顶层 sidebarEl，
       //   导致深层标签（如 #A/B/C）全部挤在列表末尾，视觉嵌套关系错乱。
       //   现在给每个节点套一个 wrap，子节点渲染到 wrap 里紧跟父节点下方。
-      const wrap = parent.createDiv({ cls: "memoria-tag-node" });
+      const wrap = parent.createDiv({ cls: "Motes-tag-node" });
       const el = wrap.createDiv({
         cls:
-          "memoria-nav-item memoria-tag-item" +
+          "Motes-nav-item Motes-tag-item" +
           (this.filter.tag === c.full ? " active" : ""),
       });
       el.style.paddingLeft = `${12 + depth * 14}px`;
-      const icon = el.createDiv({ cls: "memoria-nav-icon" });
+      const icon = el.createDiv({ cls: "Motes-nav-icon" });
       icon.setText("#");
-      el.createSpan({ cls: "memoria-nav-text", text: c.name });
-      el.createSpan({ cls: "memoria-nav-count", text: String(c.count) });
+      el.createSpan({ cls: "Motes-nav-text", text: c.name });
+      el.createSpan({ cls: "Motes-nav-count", text: String(c.count) });
       el.addEventListener("click", () => {
         this.filter.tag = this.filter.tag === c.full ? null : c.full;
         this.filter.preset = "all";
@@ -2480,7 +2480,7 @@ export class MemoriaView extends ItemView implements HoverParent {
   }
 
   private renderReviewToolbar(parent: HTMLElement): void {
-    const bar = parent.createDiv({ cls: "memoria-review-toolbar" });
+    const bar = parent.createDiv({ cls: "Motes-review-toolbar" });
 
     const makeSelect = <T extends string>(
       label: string,
@@ -2488,13 +2488,13 @@ export class MemoriaView extends ItemView implements HoverParent {
       options: Array<{ value: T; label: string }>,
       onChange: (value: T) => void
     ): void => {
-      const wrap = bar.createDiv({ cls: "memoria-review-control" });
-      const selectWrap = wrap.createDiv({ cls: "memoria-review-select-wrap" });
+      const wrap = bar.createDiv({ cls: "Motes-review-control" });
+      const selectWrap = wrap.createDiv({ cls: "Motes-review-select-wrap" });
       const select = selectWrap.createEl("select", {
-        cls: "memoria-review-select",
+        cls: "Motes-review-select",
         attr: { "aria-label": label },
       });
-      const chevron = selectWrap.createDiv({ cls: "memoria-review-select-icon" });
+      const chevron = selectWrap.createDiv({ cls: "Motes-review-select-icon" });
       setIcon(chevron, "chevron-down");
       for (const option of options) {
         select.createEl("option", {
@@ -2558,12 +2558,12 @@ export class MemoriaView extends ItemView implements HoverParent {
       }
     );
 
-    const keywordWrap = bar.createDiv({ cls: "memoria-review-control memoria-review-keyword" });
-    const keywordBox = keywordWrap.createDiv({ cls: "memoria-review-search-wrap" });
-    const keywordIcon = keywordBox.createDiv({ cls: "memoria-review-search-icon" });
+    const keywordWrap = bar.createDiv({ cls: "Motes-review-control Motes-review-keyword" });
+    const keywordBox = keywordWrap.createDiv({ cls: "Motes-review-search-wrap" });
+    const keywordIcon = keywordBox.createDiv({ cls: "Motes-review-search-icon" });
     setIcon(keywordIcon, "search");
     const keywordInput = keywordBox.createEl("input", {
-      cls: "memoria-review-input",
+      cls: "Motes-review-input",
       attr: {
         type: "text",
         placeholder: t("review.keyword.placeholder"),
@@ -2579,7 +2579,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       this.filter.randomSeed = Date.now();
       this.pageLimit = this.getInitialPageLimit();
       this.renderList();
-      const nextInput = this.listEl.querySelector<HTMLInputElement>(".memoria-review-input");
+      const nextInput = this.listEl.querySelector<HTMLInputElement>(".Motes-review-input");
       nextInput?.focus();
       nextInput?.setSelectionRange(cursor, cursor);
     };
@@ -2597,8 +2597,8 @@ export class MemoriaView extends ItemView implements HoverParent {
       if (!isComposingKeyword) applyKeyword();
     });
 
-    const actions = bar.createDiv({ cls: "memoria-review-actions" });
-    const rerollBtn = actions.createEl("button", { cls: "memoria-meta-btn" });
+    const actions = bar.createDiv({ cls: "Motes-review-actions" });
+    const rerollBtn = actions.createEl("button", { cls: "Motes-meta-btn" });
     setIcon(rerollBtn.createSpan(), "shuffle");
     rerollBtn.createSpan({ text: t("meta.reroll") });
     rerollBtn.addEventListener("click", () => {
@@ -2607,7 +2607,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       this.renderList();
     });
 
-    const resetBtn = actions.createEl("button", { cls: "memoria-meta-btn" });
+    const resetBtn = actions.createEl("button", { cls: "Motes-meta-btn" });
     setIcon(resetBtn.createSpan(), "rotate-ccw");
     resetBtn.createSpan({ text: t("review.filter.reset") });
     resetBtn.addEventListener("click", () => {
@@ -2616,7 +2616,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       this.renderList();
     });
 
-    const backBtn = actions.createEl("button", { cls: "memoria-meta-btn" });
+    const backBtn = actions.createEl("button", { cls: "Motes-meta-btn" });
     setIcon(backBtn.createSpan(), "history");
     backBtn.createSpan({ text: t("meta.backToOnThisDay") });
     backBtn.addEventListener("click", () => {
@@ -2732,9 +2732,9 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     const memos = this.getFilteredMemos();
 
-    const meta = this.listEl.createDiv({ cls: "memoria-list-meta" });
+    const meta = this.listEl.createDiv({ cls: "Motes-list-meta" });
     meta.createDiv({
-      cls: "memoria-list-meta-left",
+      cls: "Motes-list-meta-left",
       text: this.describeFilter(memos.length),
     });
 
@@ -2744,26 +2744,26 @@ export class MemoriaView extends ItemView implements HoverParent {
     //   - "on-this-day" 且 empty 时，在 empty state 里给"随机 5 条"跳转
     if (this.filter.preset === "random" || this.filter.preset === "on-this-day") {
       meta.createDiv({
-        cls: "memoria-list-meta-right",
+        cls: "Motes-list-meta-right",
         text: t("review.poolCount", { n: this.getReviewFilterPoolCount() }),
       });
       this.renderReviewToolbar(this.listEl);
     }
     if (memos.length === 0) {
-      const empty = this.listEl.createDiv({ cls: "memoria-empty" });
+      const empty = this.listEl.createDiv({ cls: "Motes-empty" });
       // v1.1.19: 在"回顾-每日"模式下给随机 5 条的跳转，避免死页面
       if (this.filter.preset === "on-this-day") {
-        empty.createDiv({ cls: "memoria-empty-emoji", text: "🕰️" });
+        empty.createDiv({ cls: "Motes-empty-emoji", text: "🕰️" });
         empty.createDiv({
-          cls: "memoria-empty-text",
+          cls: "Motes-empty-text",
           text: t("empty.onThisDay"),
         });
         empty.createDiv({
-          cls: "memoria-empty-sub",
+          cls: "Motes-empty-sub",
           text: t("empty.onThisDaySub"),
         });
         const jumpBtn = empty.createEl("button", {
-          cls: "memoria-empty-btn",
+          cls: "Motes-empty-btn",
         });
         setIcon(jumpBtn.createSpan(), "shuffle");
         jumpBtn.createSpan({ text: t("empty.onThisDayBtn") });
@@ -2776,24 +2776,24 @@ export class MemoriaView extends ItemView implements HoverParent {
       }
       // v1.5.0: "待办"视图的友好 empty state —— 所有待办都已勾完才是最棒的结局
       if (this.filter.preset === "todo") {
-        empty.createDiv({ cls: "memoria-empty-emoji", text: "🎉" });
+        empty.createDiv({ cls: "Motes-empty-emoji", text: "🎉" });
         empty.createDiv({
-          cls: "memoria-empty-text",
+          cls: "Motes-empty-text",
           text: t("empty.todo"),
         });
         empty.createDiv({
-          cls: "memoria-empty-sub",
+          cls: "Motes-empty-sub",
           text: t("empty.todoSub"),
         });
         return;
       }
-      empty.createDiv({ cls: "memoria-empty-emoji", text: "📭" });
+      empty.createDiv({ cls: "Motes-empty-emoji", text: "📭" });
       empty.createDiv({
-        cls: "memoria-empty-text",
+        cls: "Motes-empty-text",
         text: t("empty.default"),
       });
       empty.createDiv({
-        cls: "memoria-empty-sub",
+        cls: "Motes-empty-sub",
         text: t("empty.defaultSub"),
       });
       return;
@@ -2805,12 +2805,12 @@ export class MemoriaView extends ItemView implements HoverParent {
     const normalMemos = visible.filter((m) => !m.isPinned);
 
     const waterfall = this.settings.waterfallLayout;
-    this.listEl.toggleClass("memoria-waterfall", waterfall);
+    this.listEl.toggleClass("Motes-waterfall", waterfall);
 
     // 瀑布流模式下，卡片放到独立网格容器里，和 meta bar 分开
     let cardContainer: HTMLElement;
     if (waterfall) {
-      cardContainer = this.listEl.createDiv({ cls: "memoria-waterfall-grid" });
+      cardContainer = this.listEl.createDiv({ cls: "Motes-waterfall-grid" });
     } else {
       cardContainer = this.listEl;
     }
@@ -2822,12 +2822,12 @@ export class MemoriaView extends ItemView implements HoverParent {
         for (const m of pinnedMemos) this.renderMemoCard(cardContainer, m, true);
       } else {
         const pinGroup = cardContainer.createDiv({
-          cls: "memoria-day-group memoria-pin-group",
+          cls: "Motes-day-group Motes-pin-group",
         });
         const pinHead = pinGroup.createDiv({
-          cls: "memoria-day-head memoria-pin-head",
+          cls: "Motes-day-head Motes-pin-head",
         });
-        const pinIcon = pinHead.createSpan({ cls: "memoria-pin-head-icon" });
+        const pinIcon = pinHead.createSpan({ cls: "Motes-pin-head-icon" });
         setIcon(pinIcon, "pin");
         pinHead.createSpan({ text: t("list.pinnedHead", { n: pinnedMemos.length }) });
         for (const m of pinnedMemos) this.renderMemoCard(pinGroup, m, false);
@@ -2851,9 +2851,9 @@ export class MemoriaView extends ItemView implements HoverParent {
       const yesterdayStr = fmtDateLocal(ydDate);
 
       for (const [date, list] of groups) {
-        const group = cardContainer.createDiv({ cls: "memoria-day-group" });
+        const group = cardContainer.createDiv({ cls: "Motes-day-group" });
         group.dataset.date = date;
-        const head = group.createDiv({ cls: "memoria-day-head" });
+        const head = group.createDiv({ cls: "Motes-day-head" });
         const d = new Date(date + "T00:00:00");
         const wd = t(`weekday.${d.getDay()}`);
         let label = `${date}  ${wd}`;
@@ -2865,7 +2865,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     }
 
     if (this.pageLimit < memos.length) {
-      const more = cardContainer.createDiv({ cls: "memoria-load-more" });
+      const more = cardContainer.createDiv({ cls: "Motes-load-more" });
       more.setText(t("list.loadMore", { n: memos.length - this.pageLimit }));
     }
   }
@@ -2895,9 +2895,9 @@ export class MemoriaView extends ItemView implements HoverParent {
     newLimit: number
   ): void {
     // 移除旧的 load-more 提示和 empty
-    const oldMore = this.listEl.querySelector(".memoria-load-more");
+    const oldMore = this.listEl.querySelector(".Motes-load-more");
     oldMore?.remove();
-    const oldEmpty = this.listEl.querySelector(".memoria-empty");
+    const oldEmpty = this.listEl.querySelector(".Motes-empty");
     oldEmpty?.remove();
 
     // 取新切片；只考虑"非置顶"部分（置顶已经一次性渲染在顶上）
@@ -2920,7 +2920,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     // 找到当前列表最后一个 day-group，取其日期（通过 data 属性反查不方便，
     // 我们靠"第一个新日期"是否等于最后一个已渲染 group 的日期）
     const allGroups = this.listEl.querySelectorAll<HTMLElement>(
-      ".memoria-day-group:not(.memoria-pin-group)"
+      ".Motes-day-group:not(.Motes-pin-group)"
     );
     const lastGroup =
       allGroups.length > 0 ? allGroups[allGroups.length - 1] : null;
@@ -2932,9 +2932,9 @@ export class MemoriaView extends ItemView implements HoverParent {
       if (isFirstGroup && lastGroup && date === lastGroupDate) {
         for (const m of list) this.renderMemoCard(lastGroup, m);
       } else {
-        const group = this.listEl.createDiv({ cls: "memoria-day-group" });
+        const group = this.listEl.createDiv({ cls: "Motes-day-group" });
         group.dataset.date = date;
-        const head = group.createDiv({ cls: "memoria-day-head" });
+        const head = group.createDiv({ cls: "Motes-day-head" });
         const d = new Date(date + "T00:00:00");
         const wd = t(`weekday.${d.getDay()}`);
         let label = `${date}  ${wd}`;
@@ -2948,7 +2948,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // 重新加 load-more 提示（如果还有）
     if (this.pageLimit < allMemos.length) {
-      const more = this.listEl.createDiv({ cls: "memoria-load-more" });
+      const more = this.listEl.createDiv({ cls: "Motes-load-more" });
       more.setText(t("list.loadMore", { n: allMemos.length - this.pageLimit }));
     }
   }
@@ -2993,7 +2993,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     }
     const card = parent.createDiv({
       cls:
-        "memoria-card" +
+        "Motes-card" +
         (memo.isPinned ? " is-pinned" : "") +
         (memo.isStarred ? " is-starred" : "") +
         (this.editingMemo === memo ? " is-editing" : "") +
@@ -3003,7 +3003,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     card.addEventListener("dblclick", (e) => {
       // 避免双击图片/链接时误触
       const target = e.target as HTMLElement;
-      if (target.closest(".memoria-img-cell")) return;
+      if (target.closest(".Motes-img-cell")) return;
       if (target.tagName === "A") return;
       this.enterEditMode(memo);
     });
@@ -3024,7 +3024,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       card.addEventListener("pointerdown", (e) => {
         const t = e.target as HTMLElement;
         if (
-          t.closest(".memoria-img-cell") ||
+          t.closest(".Motes-img-cell") ||
           t.closest("a") ||
           t.closest("button") ||
           t.closest('input[type="checkbox"]')
@@ -3052,27 +3052,27 @@ export class MemoriaView extends ItemView implements HoverParent {
       card.addEventListener("pointerleave", cancel);
     }
 
-    const head = card.createDiv({ cls: "memoria-card-head" });
-    const timeWrap = head.createDiv({ cls: "memoria-card-time-wrap" });
+    const head = card.createDiv({ cls: "Motes-card-head" });
+    const timeWrap = head.createDiv({ cls: "Motes-card-time-wrap" });
     if (memo.isPinned) {
-      const pinIcon = timeWrap.createSpan({ cls: "memoria-card-pin" });
+      const pinIcon = timeWrap.createSpan({ cls: "Motes-card-pin" });
       setIcon(pinIcon, "pin");
       pinIcon.setAttr("aria-label", t("card.pinnedMark"));
     }
     if (memo.isStarred) {
-      const starIcon = timeWrap.createSpan({ cls: "memoria-card-star" });
+      const starIcon = timeWrap.createSpan({ cls: "Motes-card-star" });
       setIcon(starIcon, "star");
       starIcon.setAttr("aria-label", t("card.starredMark"));
     }
     timeWrap.createSpan({
-      cls: "memoria-card-time",
+      cls: "Motes-card-time",
       text: `${memo.date} ${memo.time}`,
     });
 
-    const actions = head.createDiv({ cls: "memoria-card-actions" });
+    const actions = head.createDiv({ cls: "Motes-card-actions" });
     // v1.1.19: 引用 —— hover 时次级可见（原来藏在 ⋯ 菜单里第 4 项，发现率太低）
     const quoteBtn = actions.createEl("button", {
-      cls: "memoria-icon-btn memoria-card-quote",
+      cls: "Motes-icon-btn Motes-card-quote",
       attr: { "aria-label": t("toolbar.quote") },
     });
     setIcon(quoteBtn, "quote");
@@ -3082,7 +3082,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     });
 
     const menuBtn = actions.createEl("button", {
-      cls: "memoria-icon-btn",
+      cls: "Motes-icon-btn",
       attr: { "aria-label": t("toolbar.more") },
     });
     setIcon(menuBtn, "more-horizontal");
@@ -3105,7 +3105,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     // 3) 渲染纯文本部分
     if (textForMd.trim()) {
-      const body = card.createDiv({ cls: "memoria-card-body markdown-preview-view markdown-rendered" });
+      const body = card.createDiv({ cls: "Motes-card-body markdown-preview-view markdown-rendered" });
       // 预处理：给块级语法前后补空行，让 MarkdownRenderer 能正确识别
       // 代码块/表格/callout/标题/分隔线 这些不补空行的话渲染会出错
       const normalizedMd = normalizeForRender(textForMd);
@@ -3138,13 +3138,13 @@ export class MemoriaView extends ItemView implements HoverParent {
             frag.appendChild(child.cloneNode(true));
           }
           this.mdCache.set(cacheKey, frag);
-          if (this.mdCache.size > MemoriaView.MD_CACHE_MAX) {
+          if (this.mdCache.size > MotesView.MD_CACHE_MAX) {
             // 丢最老的一条（Map 保持插入顺序）
             const first = this.mdCache.keys().next();
             if (!first.done) this.mdCache.delete(first.value);
           }
         }).catch((err) => {
-          console.error("[Memoria] Failed to render markdown:", err);
+          console.error("[Motes] Failed to render markdown:", err);
         });
       }
       // 给任务列表复选框接入点击 → 修改原 md
@@ -3171,10 +3171,10 @@ export class MemoriaView extends ItemView implements HoverParent {
     // 5) 标签胶囊（过滤保留标签）
     const visibleTags = tags.filter((t) => !RESERVED_TAGS.has(t));
     if (visibleTags.length) {
-      const tagRow = card.createDiv({ cls: "memoria-card-tags" });
+      const tagRow = card.createDiv({ cls: "Motes-card-tags" });
       for (const t of visibleTags) {
         const pill = tagRow.createSpan({
-          cls: "memoria-tag-pill",
+          cls: "Motes-tag-pill",
           text: `#${t}`,
         });
         pill.addEventListener("click", () => {
@@ -3190,7 +3190,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     //   改到最后调用 —— 这样按钮能放到 card 的最后一个元素（tagRow 或 imgGrid）里做水平对齐，
     //   不会因为"body 后面还有图片/标签"而错位。
     if (textForMd.trim()) {
-      const body = card.querySelector(".memoria-card-body");
+      const body = card.querySelector(".Motes-card-body");
       if (body) this.applyCollapseIfNeeded(body, card);
     }
   }
@@ -3238,7 +3238,7 @@ export class MemoriaView extends ItemView implements HoverParent {
 
     boxes.forEach((box, i) => {
       box.disabled = false;
-      box.addClass("memoria-clickable");
+      box.addClass("Motes-clickable");
       box.addEventListener("click", (e) => {
         void (async () => {
         e.stopPropagation();
@@ -3257,7 +3257,7 @@ export class MemoriaView extends ItemView implements HoverParent {
         try {
           await this.store.editMemo(memo, newContent);
         } catch (err) {
-          console.error("[Memoria] 任务勾选失败:", err);
+          console.error("[Motes] 任务勾选失败:", err);
           new Notice(t("notice.checkFailed", { msg: (err as Error).message }));
         }
         })();
@@ -3273,8 +3273,8 @@ export class MemoriaView extends ItemView implements HoverParent {
     tables.forEach((tb) => {
       const parent = tb.parentElement;
       if (!parent) return;
-      if (parent.hasClass("memoria-table-wrap")) return;
-      const wrap = createDiv({ cls: "memoria-table-wrap" });
+      if (parent.hasClass("Motes-table-wrap")) return;
+      const wrap = createDiv({ cls: "Motes-table-wrap" });
       parent.insertBefore(wrap, tb);
       wrap.appendChild(tb);
     });
@@ -3355,7 +3355,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       if (!href) return;
       this.app.workspace.trigger("hover-link", {
         event: e,
-        source: VIEW_TYPE_MEMORIA,
+        source: VIEW_TYPE_Motes,
         hoverParent: this,
         targetEl: internal,
         linktext: href,
@@ -3367,7 +3367,7 @@ export class MemoriaView extends ItemView implements HoverParent {
    * v2.0.0: 搜索关键词高亮。
    *
    * 遍历 body 下所有**文本节点**（不碰 <a>、<code>、<pre> 内部），
-   * 对每个节点做关键词替换 → 用 <mark class="memoria-search-hit"> wrap。
+   * 对每个节点做关键词替换 → 用 <mark class="Motes-search-hit"> wrap。
    *
    * 为什么不在 MarkdownRenderer 之前改 md 源文本？
    *   因为会破坏 markdown 语法（比如关键词如果是 "代码"，替换后变 "<mark>代码</mark>"
@@ -3404,7 +3404,7 @@ export class MemoriaView extends ItemView implements HoverParent {
             );
           }
           const mark = activeDocument.createElement("mark");
-          mark.className = "memoria-search-hit";
+          mark.className = "Motes-search-hit";
           mark.textContent = m[0];
           frag.appendChild(mark);
           lastIdx = m.index + m[0].length;
@@ -3460,17 +3460,17 @@ export class MemoriaView extends ItemView implements HoverParent {
 
         // 触发折叠
         body.addClass("is-collapsed");
-        body.style.setProperty("--memoria-collapse-max", `${thresholdPx}px`);
+        body.style.setProperty("--Motes-collapse-max", `${thresholdPx}px`);
 
         // 创建按钮
         const btn = createEl("button", {
-          cls: "memoria-collapse-toggle",
+          cls: "Motes-collapse-toggle",
         });
         const label = btn.createSpan({
-          cls: "memoria-collapse-label",
+          cls: "Motes-collapse-label",
           text: t("card.collapseFull"),
         });
-        const iconSpan = btn.createSpan({ cls: "memoria-collapse-icon" });
+        const iconSpan = btn.createSpan({ cls: "Motes-collapse-icon" });
         setIcon(iconSpan, "chevron-down");
 
         // v1.3.6 定位策略：
@@ -3484,15 +3484,15 @@ export class MemoriaView extends ItemView implements HoverParent {
         //   是 imgGrid），让按钮跟卡片同宽，再用 block 级 margin-left: auto 贴右。
         const placeBtn = () => {
           const tagRow = card.querySelector(
-            ".memoria-card-tags"
+            ".Motes-card-tags"
           );
           if (tagRow) {
             // 标签行：appendChild 让按钮成为标签的最后一个 flex 子元素
-            // CSS .memoria-collapse-toggle { margin-left: auto } 推到行尾右对齐
+            // CSS .Motes-collapse-toggle { margin-left: auto } 推到行尾右对齐
             tagRow.appendChild(btn);
           } else {
             // 无标签时，直接挂卡片末尾（imgGrid 之后），跟卡片同宽 → block 级右对齐
-            // CSS .memoria-card > .memoria-collapse-toggle 处理这种情况
+            // CSS .Motes-card > .Motes-collapse-toggle 处理这种情况
             card.appendChild(btn);
           }
         };
@@ -3593,7 +3593,7 @@ export class MemoriaView extends ItemView implements HoverParent {
           try {
             await this.exportMemoAsPng(memo);
           } catch (err) {
-            console.error("[Memoria] 导出图片失败:", err);
+            console.error("[Motes] 导出图片失败:", err);
             new Notice(t("notice.exportFailed", { msg: (err as Error).message }));
           }
         })
@@ -3629,11 +3629,11 @@ export class MemoriaView extends ItemView implements HoverParent {
   private confirmAsync(message: string): Promise<boolean> {
     return new Promise((resolve) => {
       const backdrop = activeDocument.body.createDiv({
-        cls: "memoria-modal-backdrop",
+        cls: "Motes-modal-backdrop",
       });
-      const box = backdrop.createDiv({ cls: "memoria-modal memoria-confirm" });
-      box.createDiv({ cls: "memoria-modal-title", text: message });
-      const btns = box.createDiv({ cls: "memoria-modal-btns" });
+      const box = backdrop.createDiv({ cls: "Motes-modal Motes-confirm" });
+      box.createDiv({ cls: "Motes-modal-title", text: message });
+      const btns = box.createDiv({ cls: "Motes-modal-btns" });
       const cancel = btns.createEl("button", { text: t("input.cancel") });
       const ok = btns.createEl("button", { text: t("notice.confirmDeleteOk"), cls: "mod-warning" });
 
@@ -4646,16 +4646,16 @@ export class MemoriaView extends ItemView implements HoverParent {
       memo.time
     )}</text>
 
-  <!-- 右下角：羽毛笔 SVG 图标 + MEMORIA 水印（v1.2.5: 更贴近 MEMORIA） -->
-  <!-- MEMORIA 实测 12px 粗体+字距2，约 72px 宽；图标 17.5 + 间距 4 ≈ 94 -->
+  <!-- 右下角：羽毛笔 SVG 图标 + Motes 水印（v1.2.5: 更贴近 Motes） -->
+  <!-- Motes 实测 12px 粗体+字距2，约 72px 宽；图标 17.5 + 间距 4 ≈ 94 -->
   <g transform="translate(${WIDTH - PAD_X - 94}, ${timeY - 16}) scale(1.3)" fill="${muted}" opacity="0.85">
     <!-- 羽毛笔：主杆 + 羽片 + 笔尖，纯 path，100% 跨平台 -->
     <path d="M13.5 0.5 C11 2.5, 8 5, 5.5 8 C3.5 10.5, 2 12.5, 1.2 14 L3 14.5 L13.5 4 Z M5 6.5 L3.5 9 L5.5 9.2 Z M8 3.5 L6.5 6 L8.5 6.2 Z M10.5 1.2 L9 3.6 L11 3.8 Z M1 14.2 L0 15.5 L1 15.5 Z"/>
   </g>
-  <text x="${WIDTH - PAD_X}" y="${timeY}" font-size="12" fill="${muted}" text-anchor="end" letter-spacing="2" font-weight="600">MEMORIA</text>
+  <text x="${WIDTH - PAD_X}" y="${timeY}" font-size="12" fill="${muted}" text-anchor="end" letter-spacing="2" font-weight="600">Motes</text>
 </svg>`;
 
-    const baseName = `memoria-${memo.date}-${memo.time.replace(":", "")}`;
+    const baseName = `Motes-${memo.date}-${memo.time.replace(":", "")}`;
 
     // 尝试 PNG（纯 SVG，这次不会 taint）
     try {
@@ -4664,7 +4664,7 @@ export class MemoriaView extends ItemView implements HoverParent {
       new Notice(`✓ 已保存 ${baseName}.png`);
       return;
     } catch (err) {
-      console.warn("[Memoria] PNG 导出失败，降级为 SVG：", err);
+      console.warn("[Motes] PNG 导出失败，降级为 SVG：", err);
     }
 
     // 万一仍然失败，降级保存 SVG

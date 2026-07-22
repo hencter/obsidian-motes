@@ -2,7 +2,7 @@
 
 /** 单条 memo 记录 */
 export interface Memo {
-  /** 所在文件路径，如 "Memoria/2026.md" */
+  /** 所在文件路径，如 "Motes/2026.md" */
   file: string;
   /** 日期 yyyy-MM-dd */
   date: string;
@@ -30,7 +30,7 @@ export interface Memo {
   range: [number, number];
 }
 
-export interface MemoriaSettings {
+export interface MotesSettings {
   /** memo 文件存放的目录（相对 vault 根） */
   folder: string;
   /** 图片附件存放的目录（相对 vault 根） */
@@ -93,9 +93,9 @@ export interface BuddyData {
   seed: number;
 }
 
-export const DEFAULT_SETTINGS: MemoriaSettings = {
-  folder: "Memoria",
-  attachmentFolder: "Memoria/attachments",
+export const DEFAULT_SETTINGS: MotesSettings = {
+  folder: "Motes",
+  attachmentFolder: "Motes/attachments",
   clearAfterSave: true,
   pageSize: 50,
   showSidebarTags: false,
@@ -120,10 +120,10 @@ export const DEFAULT_SETTINGS: MemoriaSettings = {
   brandName: "Motes",
 };
 
-export const VIEW_TYPE_MEMORIA = "memoria-view";
-export const VIEW_TYPE_MEMORIA_STATS = "memoria-stats-view";
-export const VIEW_TYPE_MEMORIA_YEAR = "memoria-year-view";
-export const VIEW_TYPE_MEMORIA_SIDEBAR = "memoria-sidebar-view";
+export const VIEW_TYPE_Motes = "Motes-view";
+export const VIEW_TYPE_Motes_STATS = "Motes-stats-view";
+export const VIEW_TYPE_Motes_YEAR = "Motes-year-view";
+export const VIEW_TYPE_Motes_SIDEBAR = "Motes-sidebar-view";
 
 /** 保留标签：这些标签不会在侧栏的标签列表里显示，也不会出现在卡片底部胶囊 */
 export const PIN_TAG = "置顶";

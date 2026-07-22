@@ -27,7 +27,7 @@ import { Memo } from "./types";
 import { detectMood, Mood } from "./mood";
 
 /** localStorage key：最近展示过的 memo range[0] 列表（用 file:range[0] 作为 key） */
-const RECENT_SHOWN_KEY = "memoria:smart-review:recent";
+const RECENT_SHOWN_KEY = "Motes:smart-review:recent";
 const RECENT_SHOWN_MAX = 30; // 保留最近 30 条曾展示过的，超出 FIFO
 
 export interface SmartReviewOptions {
