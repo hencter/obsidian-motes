@@ -1479,14 +1479,7 @@ export class MemoriaView extends ItemView implements HoverParent {
     );
     const view = this.editorLeaf.view;
     if (view instanceof MarkdownView) {
-      // 用 iframe 隔离，避免 CSS 冲突
-      const iframe = activeDocument.createElement("iframe");
-      iframe.className = "embed-iframe is-controlled";
-      iframe.setAttribute("sandbox", "allow-forms allow-presentation allow-same-origin allow-scripts allow-modals");
-      this.editorHostEl.replaceChildren(iframe);
-      if (iframe.contentDocument) {
-        iframe.contentDocument.body.replaceChildren(view.containerEl);
-      }
+      this.editorHostEl.replaceChildren(view.containerEl);
     }
   }
 
