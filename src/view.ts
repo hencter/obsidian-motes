@@ -1431,6 +1431,7 @@ export class MemoriaView extends ItemView implements HoverParent {
   }
 
   private async setupNativeEditor(): Promise<void> {
+    if (this.editorLeaf) return;
     const folder = normalizePath(this.settings.folder);
     const draftPath = `${folder}/_draft.md`;
     await this.ensureDir(folder);
