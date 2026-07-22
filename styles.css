@@ -1971,28 +1971,16 @@
   max-height: 55vh;
   overflow: hidden !important;
 }
-.memoria-editor-host .cm-content {
-  padding: 0 4px !important;
-}
-.memoria-editor-host .inline-title,
-.memoria-editor-host .view-header,
-.memoria-editor-host .metadata-container,
-.memoria-editor-host .cm-gutters,
-.memoria-editor-host .cm-panels {
-  display: none !important;
-}
-.memoria-editor-host .workspace-leaf,
-.memoria-editor-host .workspace-leaf-content,
-.memoria-editor-host .markdown-source-view,
-.memoria-editor-host .cm-editor {
-  height: 100% !important;
-}
 .memoria-editor-host .cm-scroller {
   font-family: var(--font-text);
   font-size: var(--font-text-size, 14px);
   line-height: var(--line-height-normal, 1.6);
   padding: 0 !important;
   overflow-y: auto !important;
+}
+.memoria-editor-host .cm-sizer {
+  min-height: 0 !important;
+  border: none !important;
 }
 
 .memoria-input-hint {

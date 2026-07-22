@@ -608,12 +608,16 @@ export class MemoriaView extends ItemView implements HoverParent {
       if (editor) {
         const resize = debounce(() => {
           requestAnimationFrame(() => {
-            const cmContent = this.editorHostEl?.querySelector(".cm-content") as HTMLElement | null;
-            if (!cmContent) return;
-            const h = cmContent.scrollHeight;
+            const scroller = this.editorHostEl?.querySelector(".cm-scroller") as HTMLElement | null;
+            if (!scroller) return;
+            // 用 cm-scroller 内最后一个子元素位置测量真实内容高度
+            const sizer = scroller.querySelector(".cm-sizer") as HTMLElement | null;
+            const content = scroller.querySelector(".cm-contentContainer") as HTMLElement | null;
+            const el = sizer || content || scroller;
+            const realH = el.offsetHeight;
             const minH = this.settings.editorHeight || 200;
             const maxH = Math.min(window.innerHeight * 0.55, 600);
-            const target = Math.max(minH, Math.min(h + 12, maxH));
+            const target = Math.max(minH, Math.min(realH + 8, maxH));
             this.editorHostEl.style.height = `${target}px`;
           });
         }, 100);
