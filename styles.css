@@ -4734,30 +4734,28 @@
 .workspace-leaf-content[data-type="memoria-sidebar-view"] .view-content {
   padding: 0 !important;
   overflow-y: auto !important;
-  background: var(--background-secondary);
+  background: var(--background-primary);
 }
 .memoria-sidebar-view {
-  font-size: var(--font-ui-small);
+  font-size: 13px;
   color: var(--text-muted);
-  padding: var(--size-4-1) var(--size-4-3) var(--size-4-6);
-  padding-bottom: max(var(--safe-area-inset-bottom), var(--size-4-6));
+  padding: 16px 10px 24px;
+  padding-bottom: max(var(--safe-area-inset-bottom), 24px);
 }
-/* 内嵌侧栏样式泄漏覆盖 */
-.memoria-sidebar-view .memoria-sidebar-section {
-  padding: 12px 4px 4px;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-faint);
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-}
+/* 和内嵌侧栏保持一致的导航项样式 */
 .memoria-sidebar-view .memoria-nav-item {
-  padding: 4px 6px;
-  margin: 0;
-  border-radius: 4px;
-  font-size: 12px;
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  margin: 1px 2px;
+  border-radius: 6px;
+  font-size: 13px;
   color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background 0.12s, color 0.12s;
 }
 .memoria-sidebar-view .memoria-nav-item:hover {
   background: var(--background-modifier-hover);
@@ -4766,86 +4764,94 @@
 .memoria-sidebar-view .memoria-nav-item.active {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
-  font-weight: 600;
+  font-weight: 500;
 }
 .memoria-sidebar-view .memoria-nav-icon {
-  width: 14px;
-  height: 14px;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
-  opacity: 0.7;
+  justify-content: center;
+  opacity: 0.85;
 }
 .memoria-sidebar-view .memoria-nav-icon .svg-icon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 .memoria-sidebar-view .memoria-nav-count {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-faint);
   font-variant-numeric: tabular-nums;
 }
 .memoria-sidebar-view .memoria-stats {
   display: flex;
+  align-items: center;
   justify-content: space-around;
-  padding: 6px 4px 10px;
+  padding: 4px 4px 14px;
 }
 .memoria-sidebar-view .memoria-stat {
   text-align: center;
+  flex: 1;
 }
 .memoria-sidebar-view .memoria-stat-num {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--text-normal);
+  font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
 .memoria-sidebar-view .memoria-stat-label {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-faint);
-  margin-top: 2px;
+  margin-top: 4px;
+  letter-spacing: 0.4px;
 }
-/* 清除内嵌侧栏的卡片/阴影/边框泄漏 */
-.memoria-sidebar-view .memoria-overview,
-.memoria-sidebar-view .memoria-heatmap,
-.memoria-sidebar-view .memoria-calendar,
-.memoria-sidebar-view .memoria-daily-goal-row {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-.memoria-sidebar-view button {
-  box-shadow: none !important;
-  background: transparent !important;
-}
-.memoria-sidebar-view button:hover {
-  background: var(--background-modifier-hover) !important;
-}
-.memoria-sidebar-view .memoria-daily-goal-row {
-  margin: 6px 4px;
-  padding: 0;
-}
-.memoria-sidebar-view .memoria-daily-goal-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--background-modifier-border);
+/* 分区标题和内嵌侧栏一致 */
+.memoria-sidebar-view .memoria-sidebar-section {
+  padding: 14px 12px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
 .memoria-sidebar-view .memoria-section-collapsible {
   cursor: pointer;
   user-select: none;
+  display: flex;
+  align-items: center;
+  transition: color 0.12s;
+}
+.memoria-sidebar-view .memoria-section-collapsible:hover {
+  color: var(--text-muted);
 }
 .memoria-sidebar-view .memoria-section-arrow {
   display: inline-block;
-  width: 10px;
+  width: 12px;
   font-size: 10px;
 }
+/* 清除内嵌侧栏的卡片装饰泄漏 */
+.memoria-sidebar-view .memoria-overview {
+  background: transparent !important;
+  padding: 10px 6px 6px;
+}
 .memoria-sidebar-view .memoria-heatmap {
-  gap: 2px;
-  padding: 6px 4px;
+  gap: 3px;
+  padding: 8px 6px 8px;
 }
 .memoria-sidebar-view .memoria-heatmap-col {
-  gap: 2px;
+  gap: 3px;
 }
 .memoria-sidebar-view .memoria-heatmap-cell {
   border-radius: 2px;
+}
+.memoria-sidebar-view button {
+  box-shadow: none !important;
+}
+.memoria-sidebar-view .memoria-daily-goal-row {
+  margin: 0;
+  padding: 6px 8px;
 }
 
 
