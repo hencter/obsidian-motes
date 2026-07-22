@@ -64,7 +64,7 @@ export class MemoriaSidebarView extends ItemView {
     let imageCount = 0, linkCount = 0, noTagCount = 0;
     let pinnedCount = 0, starredCount = 0, onThisDayCount = 0;
     let todayCount = 0, weekCount = 0, todoCount = 0;
-    const todayStr = fmtDateLocal(new Date());
+    const todayStr = fmtDate(new Date());
     const todayMMDD = todayStr.slice(5);
     const weekMondayTs = (() => {
       const now = new Date();
@@ -210,7 +210,7 @@ export class MemoriaSidebarView extends ItemView {
       const col = grid.createDiv({ cls: "memoria-heatmap-col" });
       for (let d = 0; d < 7; d++) {
         const day = new Date(startSunday); day.setDate(startSunday.getDate() + w * 7 + d);
-        const key = fmtDateLocal(day);
+        const key = fmtDate(day);
         const count = dayMap.get(key) ?? 0;
         const level = count === 0 ? 0 : count < 2 ? 1 : count < 4 ? 2 : count < 7 ? 3 : 4;
         const cell = col.createDiv({ cls: `memoria-heatmap-cell level-${level}` });
@@ -223,7 +223,7 @@ export class MemoriaSidebarView extends ItemView {
 
   private renderDailyGoal(parent: HTMLElement, memos: Memo[]): void {
     const goal = Math.max(1, this.settings.dailyGoal || 5);
-    const todayStr = fmtDateLocal(new Date());
+    const todayStr = fmtDate(new Date());
     let todayCount = 0;
     for (const m of memos) if (m.date === todayStr) todayCount++;
     const pct = Math.min(100, Math.round((todayCount / goal) * 100));
