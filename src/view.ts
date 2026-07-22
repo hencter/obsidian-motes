@@ -612,7 +612,6 @@ export class MemoriaView extends ItemView implements HoverParent {
           this.inputEl.value = val;
           if (!this.editingMemo) this.saveDraft(val);
           this.syncInputCardContentState();
-          this.autoResizeEditor();
         });
         // 编辑器获得焦点 → 展开输入卡片
         this.editorHostEl.addEventListener("focusin", () => {
@@ -703,16 +702,6 @@ export class MemoriaView extends ItemView implements HoverParent {
     submitBtn.addEventListener("click", () => {
       void this.submitMemo();
     });
-  }
-
-  private autoResizeEditor(): void {
-    if (!this.editorHostEl) return;
-    const cmContent = this.editorHostEl.querySelector(".cm-content") as HTMLElement | null;
-    if (!cmContent) return;
-    const contentHeight = cmContent.scrollHeight;
-    const maxH = window.innerHeight * 0.45;
-    const h = Math.min(contentHeight + 32, maxH);
-    this.editorHostEl.style.minHeight = `${Math.max(120, h)}px`;
   }
 
   /** 在光标处插入文本。
