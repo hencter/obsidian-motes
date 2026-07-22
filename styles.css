@@ -1812,12 +1812,28 @@
   display: inline-flex;
 }
 
+@media (max-width: 960px) {
+  .memoria-search {
+    width: 160px;
+  }
+}
 @media (max-width: 860px) {
   .memoria-sidebar {
     width: 200px;
   }
   .memoria-search {
-    width: 140px;
+    width: 120px;
+  }
+}
+@media (max-width: 760px) {
+  .memoria-search {
+    width: 90px;
+  }
+  .memoria-topbar-title {
+    gap: 4px;
+  }
+  .memoria-brand {
+    font-size: 16px;
   }
 }
 
