@@ -1,7 +1,7 @@
 {
   "id": "motes",
   "name": "Motes",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "minAppVersion": "1.7.2",
   "description": "A flow-style note plugin with native editor, waterfall layout and flexible storage.",
   "author": "Hencter Lew（亦幸）",
@@ -9,4 +9,3 @@
   "fundingUrl": "https://github.com/hencter/obsidian-memoria",
   "isDesktopOnly": false
 }
-
