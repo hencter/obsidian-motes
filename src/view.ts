@@ -16,6 +16,9 @@ import {
   HoverPopover,
   normalizePath,
 } from "obsidian";
+import { Editor } from "@tiptap/core";
+import StarterKit from "@tiptap/starter-kit";
+import { Markdown } from "@tiptap/markdown";
 import { Memo, MotesSettings, RESERVED_TAGS, VIEW_TYPE_Motes, VIEW_TYPE_MOTES_STATS, VIEW_TYPE_MOTES_YEAR, VIEW_TYPE_MOTES_SIDEBAR } from "./types";
 import { MemoStore } from "./store";
 import { TagSuggest } from "./tag-suggest";
@@ -33,7 +36,6 @@ import { pickQuip } from "./buddy/quips";
 import { getFilter, setFilter, onFilterChange, Filter } from "./filter-state";
 import {
   replaceTextareaRange,
-  setTextareaValue,
   WrapHandler,
 } from "./textarea-utils";
 
@@ -93,8 +95,15 @@ export class MotesView extends ItemView implements HoverParent {
   private buddyJustHatched = false;
   /** v2.1.0-iter8: 选中包裹快捷键处理器（** == * ~~ `）*/
   private wrapHandler = new WrapHandler();
-  private editorLeaf!: WorkspaceLeaf;
   private editorHostEl!: HTMLElement;
+  private editorLeaf: WorkspaceLeaf | null = null;
+  private tiptapEditor: Editor | null = null;
+  private inlineEditor: Editor | null = null;
+  private inlineEditorLeaf: WorkspaceLeaf | null = null;
+  private inlineEditorHost: HTMLElement | null = null;
+  private inlineTagSuggest: TagSuggest | null = null;
+  private inlineEditingMemo: Memo | null = null;
+  private inlineDateTimeEl: HTMLInputElement | null = null;
   private quickTabsEl!: HTMLElement;
   // 内嵌侧栏状态（独立侧栏未打开时仍使用）
   private overviewMode: "heatmap" | "calendar" | "buddy" = "heatmap";
@@ -183,14 +192,19 @@ export class MotesView extends ItemView implements HoverParent {
       "keydown",
       (evt) => {
         const active = activeDocument.activeElement;
-        const insideView =
-          active instanceof HTMLElement && this.contentEl.contains(active);
+        const insideView = active?.instanceOf(HTMLElement) && this.contentEl.contains(active);
         if (!insideView) return;
+        const suggestionOpen = this.tagSuggest?.isOpen() || this.inlineTagSuggest?.isOpen();
+        if (suggestionOpen && evt.key === "Enter" && !evt.ctrlKey && !evt.metaKey) return;
         if (this.shouldSendOnKeydown(evt)) {
           evt.preventDefault();
           evt.stopPropagation();
           evt.stopImmediatePropagation();
-          void this.submitMemo();
+          if (this.inlineEditor?.isFocused || (active?.instanceOf(HTMLElement) && this.inlineEditorHost?.contains(active))) {
+            void this.saveInlineMemo();
+          } else {
+            void this.submitMemo();
+          }
         }
       },
       true // capture 阶段
@@ -212,7 +226,11 @@ export class MotesView extends ItemView implements HoverParent {
     this.workspaceLeafEl = null;
     if (this.unsubscribe) this.unsubscribe();
     if (this.filterUnsub) { this.filterUnsub(); this.filterUnsub = null; }
-    try { this.editorLeaf?.detach(); } catch { /* ignore */ }
+    this.tiptapEditor?.destroy();
+    this.tiptapEditor = null;
+    this.editorLeaf?.detach();
+    this.editorLeaf = null;
+    this.destroyInlineEditor();
     if (this.tagSuggest) {
       this.tagSuggest.destroy();
       this.tagSuggest = null;
@@ -599,17 +617,7 @@ export class MotesView extends ItemView implements HoverParent {
     // 等待 CSS 过渡帧再聚焦，让动画与键盘弹起更同步
     window.requestAnimationFrame(() => {
       window.requestAnimationFrame(() => {
-        this.inputEl?.focus();
-        // v2.3.3: 展开长草稿时把光标移到末尾（接着上次写）。
-        //   定位不再靠 JS scrollIntoView —— 改用 CSS 把 FAB 展开态的输入卡片
-        //   position: fixed 贴屏幕底部 + textarea 内部滚动，从根上避免"卡片被
-        //   键盘遮 / 滚动抖动 / ✕ 被滚出视口"三个问题（见 styles.css v2.3.3 注释）。
-        if (this.inputEl) {
-          const len = this.inputEl.value.length;
-          this.inputEl.setSelectionRange(len, len);
-          // textarea 内部滚到底部，让光标所在的最后一行可见
-          this.inputEl.scrollTop = this.inputEl.scrollHeight;
-        }
+        this.focusActiveEditor(true);
       });
     });
   }
@@ -621,44 +629,57 @@ export class MotesView extends ItemView implements HoverParent {
    *    供未来"失焦自动收起"等被动场景使用（当前主动收起一律 force=true）。
    *  v2.3.1: ✕ 按钮改为 force=true，修复"有内容点 ✕ 没反应"。 */
   private collapseFabInput(force = false): void {
-    if (!force && this.inputEl?.value.trim()) {
+    if (!force && this.getEditorValue().trim()) {
       // 有内容 —— 至少先 blur 让键盘收起，但卡片保持展开（用户能继续看）
-      this.inputEl.blur();
+      this.blurActiveEditor();
       return;
     }
     this.contentEl.removeClass("is-fab-expanded");
-    this.inputEl?.blur();
+    this.blurActiveEditor();
   }
 
   private buildInputCard(parent: HTMLElement): void {
     const inputCard = parent.createDiv({ cls: "motes-input-card" });
+    inputCard.addClass(`motes-editor-${this.settings.editorMode}`);
+    this.registerDomEvent(inputCard, "focusin", () => inputCard.addClass("is-focused"));
+    this.registerDomEvent(inputCard, "focusout", (event) => {
+      const next = event.relatedTarget;
+      if (!(next instanceof Node) || !inputCard.contains(next)) {
+        inputCard.removeClass("is-focused");
+      }
+    });
 
     this.inputEl = inputCard.createEl("textarea", {
       cls: "motes-input",
       attr: { rows: "1" },
     });
-    this.inputEl.addClass("motes-input-hidden");
 
-      this.editorHostEl = inputCard.createDiv({ cls: "motes-editor-host" });
-    // 设置初始高度
+    this.editorHostEl = inputCard.createDiv({ cls: "motes-editor-host" });
     const h = this.settings.editorHeight || 200;
-    this.editorHostEl.style.height = `${h}px`;
-    this.setupNativeEditor().then(() => {
-      const draft = this.loadDraft();
-      if (draft) this.setEditorValue(draft);
-      const editor = this.getEditor();
-      if (editor) {
-        this.registerDomEvent(this.editorHostEl, "input", () => {
-          const val = editor.getValue();
-          this.inputEl.value = val;
-          if (!this.editingMemo) this.saveDraft(val);
-          this.syncInputCardContentState();
-        });
-      }
-    });
+    this.editorHostEl.style.setProperty("--motes-editor-expanded-height", `${h}px`);
 
-    // 标签联想（仍然绑定 textarea，但编辑器输入同步到 textarea 后 TagSuggest 可工作）
-    this.tagSuggest = new TagSuggest(this.app, this.inputEl);
+    if (this.settings.editorMode === "tiptap") {
+      this.inputEl.setCssStyles({ display: "none" });
+      this.inputEl.setAttr("aria-hidden", "true");
+      this.inputEl.setAttr("tabindex", "-1");
+      this.setupTiptapEditor(inputCard);
+    } else if (this.settings.editorMode === "native") {
+      this.inputEl.setCssStyles({ display: "none" });
+      this.inputEl.setAttr("aria-hidden", "true");
+      this.inputEl.setAttr("tabindex", "-1");
+      void this.setupNativeEditor(inputCard);
+      this.tagSuggest = new TagSuggest(this.app, this.createTextareaSuggestTarget());
+    } else {
+      this.editorHostEl.addClass("motes-editor-host-hidden");
+      this.inputEl.addEventListener("input", () => {
+        if (!this.editingMemo) this.saveDraft(this.inputEl.value);
+        this.syncInputCardContentState();
+        this.autoResizeInput();
+      });
+      this.tagSuggest = new TagSuggest(this.app, this.createTextareaSuggestTarget());
+      const draft = this.loadDraft();
+      if (draft) this.inputEl.value = draft;
+    }
 
     const inputToolbar = inputCard.createDiv({ cls: "motes-input-toolbar" });
     const toolLeft = inputToolbar.createDiv({ cls: "motes-input-tools" });
@@ -682,21 +703,33 @@ export class MotesView extends ItemView implements HoverParent {
       attr: { "aria-label": t("toolbar.insertUL") },
     });
     setIcon(ulBtn, "list");
-    ulBtn.addEventListener("click", () => this.insertListAtCursor("- "));
+    ulBtn.addEventListener("click", () => {
+      if (this.settings.editorMode === "tiptap") {
+        this.tiptapEditor?.chain().focus().toggleBulletList().run();
+      } else {
+        this.insertAtCursor("- ");
+      }
+    });
 
     const olBtn = toolLeft.createEl("button", {
       cls: "motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertOL") },
     });
     setIcon(olBtn, "list-ordered");
-    olBtn.addEventListener("click", () => this.insertOrderedListAtCursor());
+    olBtn.addEventListener("click", () => {
+      if (this.settings.editorMode === "tiptap") {
+        this.tiptapEditor?.chain().focus().toggleOrderedList().run();
+      } else {
+        this.insertAtCursor("1. ");
+      }
+    });
 
     const taskBtn = toolLeft.createEl("button", {
       cls: "motes-tool-btn",
       attr: { "aria-label": t("toolbar.insertTask") },
     });
     setIcon(taskBtn, "square-check");
-    taskBtn.addEventListener("click", () => this.insertListAtCursor("- [ ] "));
+    taskBtn.addEventListener("click", () => this.insertAtCursor("- [ ] "));
 
     const addTableBtn = toolLeft.createEl("button", {
       cls: "motes-tool-btn",
@@ -739,6 +772,116 @@ export class MotesView extends ItemView implements HoverParent {
     });
   }
 
+  private setupTiptapEditor(inputCard: HTMLElement): void {
+    this.tiptapEditor = new Editor({
+      element: this.editorHostEl,
+      extensions: [StarterKit, Markdown],
+      autofocus: false,
+      editable: true,
+      injectCSS: true,
+      onUpdate: ({ editor }) => {
+        const md = editor.getMarkdown();
+        this.inputEl.value = md;
+        if (!this.editingMemo) this.saveDraft(md);
+        this.syncInputCardContentState();
+        this.tagSuggest?.refresh();
+        if (editor.isEmpty) this.refreshTiptapPlaceholder();
+      },
+      onBlur: () => {
+        if (!this.editingMemo) this.saveDraft(this.tiptapEditor?.getMarkdown() ?? "");
+      },
+    });
+    const draft = this.loadDraft();
+    if (draft) {
+      this.tiptapEditor.commands.setContent(draft, { contentType: "markdown" });
+      this.inputEl.value = draft;
+    }
+    this.refreshTiptapPlaceholder();
+    this.registerDomEvent(this.editorHostEl, "mousedown", () => this.tiptapEditor?.commands.focus());
+    this.tagSuggest = this.createTagSuggest(this.tiptapEditor);
+  }
+
+  private async setupNativeEditor(inputCard: HTMLElement): Promise<void> {
+    const folder = normalizePath(this.settings.folder);
+    const draftPath = `${folder}/_draft.md`;
+    if (!this.app.vault.getAbstractFileByPath(folder)) await this.app.vault.createFolder(folder);
+    let file = this.app.vault.getAbstractFileByPath(draftPath);
+    if (!(file instanceof TFile)) file = await this.app.vault.create(draftPath, "");
+    // WorkspaceLeaf construction is internal but is the only way to mount Obsidian's editor in an ItemView.
+    // @ts-expect-error Obsidian does not expose the constructor in its public typings.
+    this.editorLeaf = new WorkspaceLeaf(this.app);
+    await this.editorLeaf.openFile(file, { state: { mode: "source", source: false } });
+    if (!(this.editorLeaf.view instanceof MarkdownView)) return;
+    this.editorHostEl.replaceChildren(this.editorLeaf.view.containerEl);
+    const draft = this.loadDraft();
+    if (draft) this.editorLeaf.view.editor.setValue(draft);
+    this.inputEl.value = this.editorLeaf.view.editor.getValue();
+    this.registerDomEvent(this.editorHostEl, "input", () => {
+      const value = this.editorLeaf?.view instanceof MarkdownView ? this.editorLeaf.view.editor.getValue() : "";
+      this.inputEl.value = value;
+      if (!this.editingMemo) this.saveDraft(value);
+      this.syncInputCardContentState();
+    });
+    this.registerDomEvent(this.editorHostEl, "focusin", () => {
+      try {
+        this.app.workspace.setActiveLeaf(this.editorLeaf!);
+      } catch {
+        // The detached editor leaf can disappear while Obsidian reloads the view.
+      }
+    });
+  }
+
+  private async setupInlineNativeEditor(host: HTMLElement, memo: Memo): Promise<void> {
+    const folder = normalizePath(this.settings.folder);
+    const draftPath = `${folder}/_inline-draft.md`;
+    if (!this.app.vault.getAbstractFileByPath(folder)) await this.app.vault.createFolder(folder);
+    let file = this.app.vault.getAbstractFileByPath(draftPath);
+    if (!(file instanceof TFile)) file = await this.app.vault.create(draftPath, "");
+    if (this.inlineEditorHost !== host || this.inlineEditingMemo !== memo) return;
+    // Use a real MarkdownView so inline editing has Obsidian's complete CM6 behavior.
+    // @ts-expect-error WorkspaceLeaf construction is internal.
+    const leaf = new WorkspaceLeaf(this.app);
+    this.inlineEditorLeaf = leaf;
+    await leaf.openFile(file, { state: { mode: "source", source: false } });
+    if (this.inlineEditorHost !== host || this.inlineEditingMemo !== memo) {
+      leaf.detach();
+      return;
+    }
+    if (!(leaf.view instanceof MarkdownView)) return;
+    host.replaceChildren(leaf.view.containerEl);
+    leaf.view.editor.setValue(memo.content);
+    this.registerDomEvent(host, "focusin", () => {
+      try {
+        this.app.workspace.setActiveLeaf(leaf);
+      } catch {
+        // The transient leaf can disappear during an Obsidian reload.
+      }
+    });
+    leaf.view.editor.focus();
+  }
+
+  private getInlineNativeEditor() {
+    return this.inlineEditorLeaf?.view instanceof MarkdownView
+      ? this.inlineEditorLeaf.view.editor
+      : null;
+  }
+
+  private createTextareaSuggestTarget() {
+    return {
+      element: this.inputEl,
+      getTextBeforeCursor: () => this.inputEl.value.slice(0, this.inputEl.selectionStart ?? 0),
+      replaceQuery: (query: string, replacement: string) => {
+        const end = this.inputEl.selectionStart ?? this.inputEl.value.length;
+        replaceTextareaRange(this.inputEl, end - query.length - 1, end, replacement);
+      },
+      getAnchorPosition: () => {
+        const rect = this.editorHostEl.getBoundingClientRect();
+        return { left: rect.left, bottom: rect.bottom, width: rect.width };
+      },
+      focus: () => this.inputEl.focus(),
+    };
+  }
+
   /** 在光标处插入文本。
    *  v2.0.13: 修复 BUG —— 之前 `slice(0,start) + text + slice(end)` 会把选区
    *  替换掉，造成用户全选 + 点 # 等按钮时原文本全部消失。改为：有选区时把选区
@@ -746,24 +889,23 @@ export class MotesView extends ItemView implements HoverParent {
    *  注意：列表按钮走 insertListAtCursor / insertOrderedListAtCursor 已有专用逻辑，
    *  不会调到这里的选区分支；这里主要保护 # / 链接 / 引用 / 表格 等其他工具按钮。 */
   private insertAtCursor(text: string): void {
-    const el = this.inputEl;
-    const start = el.selectionStart ?? el.value.length;
-    const end = el.selectionEnd ?? el.value.length;
-    if (start !== end) {
-      // 有选区：把选中文本保留下来（插在 text 后面），不丢失用户内容
-      // v2.1.0-iter8: 用 replaceTextareaRange 保留 undo stack（修 Ctrl+Z 失效）
-      const selected = el.value.slice(start, end);
-      replaceTextareaRange(el, start, end, text + selected);
-    } else {
-      replaceTextareaRange(el, start, end, text);
+    if (this.settings.editorMode === "tiptap") {
+      this.tiptapEditor?.chain().focus().insertContent(text).run();
+      return;
     }
-    el.focus();
-    // v1.1.8: 插入内容后也要重新算一次高度
-    this.autoResizeInput();
-    // v2.0.13: 同步保存草稿（之前只在主 input 监听器里保存，按钮触发的修改没保存到草稿）
-    if (!this.editingMemo) this.saveDraft(el.value);
-    // v2.0.17: 同步输入卡片展开/收起态
-    this.syncInputCardContentState();
+    if (this.editorLeaf?.view instanceof MarkdownView) {
+      const editor = this.editorLeaf.view.editor;
+      editor.replaceSelection(text);
+      editor.focus();
+      this.inputEl.value = editor.getValue();
+      if (!this.editingMemo) this.saveDraft(this.inputEl.value);
+      this.syncInputCardContentState();
+      return;
+    }
+    const start = this.inputEl.selectionStart ?? this.inputEl.value.length;
+    const end = this.inputEl.selectionEnd ?? this.inputEl.value.length;
+    replaceTextareaRange(this.inputEl, start, end, text);
+    this.syncLegacyEditorFromTextarea();
   }
 
   /**
@@ -830,10 +972,9 @@ export class MotesView extends ItemView implements HoverParent {
    * 这样用户打到一半切去看笔记卡片（鼠标离开输入框）时，输入框不会意外塌下去把草稿挤走。
    */
   private syncInputCardContentState(): void {
-    if (!this.inputEl) return;
     const card = this.inputEl.closest(".Motes-input-card");
     if (!card) return;
-    const hasContent = this.inputEl.value.length > 0;
+    const hasContent = this.getEditorValue().trim().length > 0;
     card.toggleClass("has-content", hasContent);
   }
 
@@ -865,7 +1006,8 @@ export class MotesView extends ItemView implements HoverParent {
       const finalText = atLineStart ? wrapped : `\n${wrapped}`;
       // v2.1.0-iter8: 保留 undo stack
       replaceTextareaRange(el, start, end, finalText);
-      el.focus();
+      this.syncLegacyEditorFromTextarea();
+      this.focusActiveEditor();
       this.autoResizeInput();
       // v1.1.7: 草稿持久化
       if (!this.editingMemo) this.saveDraft(el.value);
@@ -907,7 +1049,8 @@ export class MotesView extends ItemView implements HoverParent {
       const finalText = atLineStart ? wrapped : `\n${wrapped}`;
       // v2.1.0-iter8: 保留 undo stack
       replaceTextareaRange(el, start, end, finalText);
-      el.focus();
+      this.syncLegacyEditorFromTextarea();
+      this.focusActiveEditor();
       this.autoResizeInput();
       if (!this.editingMemo) this.saveDraft(el.value);
       return;
@@ -1236,24 +1379,7 @@ export class MotesView extends ItemView implements HoverParent {
       .map(() => "| " + Array(cols).fill("  ").join(" | ") + " |");
 
     const lines = [header, sep, ...body];
-    const el = this.inputEl;
-    // 表格前后各补一个空行（方便 md 解析和用户继续编辑）
-    let prefix = "";
-    let suffix = "\n";
-    const val = el.value;
-    const start = el.selectionStart ?? val.length;
-    const beforeChar = val.slice(0, start);
-    // 如果前面不是开头且最后一个字符不是换行，补一个空行
-    if (beforeChar.length > 0 && !beforeChar.endsWith("\n\n")) {
-      prefix = beforeChar.endsWith("\n") ? "\n" : "\n\n";
-    }
-    const afterChar = val.slice(start);
-    if (afterChar && !afterChar.startsWith("\n")) {
-      suffix = "\n\n";
-    }
-
-    const text = prefix + lines.join("\n") + suffix;
-    this.insertAtCursor(text);
+    this.insertAtCursor(`\n${lines.join("\n")}\n`);
   }
 
   /** 用浏览器 file picker 选图片 */
@@ -1283,7 +1409,7 @@ export class MotesView extends ItemView implements HoverParent {
       const fileName = path.split("/").pop() ?? path;
       const ref = `![[${fileName}]]`;
       // 如果输入框非空且最后一个字符不是换行，先补一个换行
-      if (this.inputEl.value && !/\n$/.test(this.inputEl.value)) {
+      if (this.getEditorValue() && !/\n$/.test(this.getEditorValue())) {
         this.insertAtCursor("\n" + ref + "\n");
       } else {
         this.insertAtCursor(ref + "\n");
@@ -1358,7 +1484,7 @@ export class MotesView extends ItemView implements HoverParent {
         this.clearDraft();
       }
       if (!this.editingMemo && this.settings.clearAfterSave) {
-        this.inputEl.blur();
+        this.blurActiveEditor();
       }
       this.autoResizeInput();
       this.syncInputCardContentState();
@@ -1444,47 +1570,74 @@ export class MotesView extends ItemView implements HoverParent {
     }
   }
 
-  private getEditor() {
-    const view = this.editorLeaf?.view;
-    if (view instanceof MarkdownView) return view.editor;
-    return null;
+  private getEditorValue(): string {
+    if (this.settings.editorMode === "tiptap") return this.tiptapEditor?.getMarkdown() ?? "";
+    if (this.editorLeaf?.view instanceof MarkdownView) return this.editorLeaf.view.editor.getValue();
+    return this.inputEl?.value ?? "";
   }
 
-  private getEditorValue(): string {
-    const editor = this.getEditor();
-    return editor ? editor.getValue() : this.inputEl?.value ?? "";
+  private focusActiveEditor(toEnd = false): void {
+    if (this.settings.editorMode === "tiptap") {
+      this.tiptapEditor?.commands.focus(toEnd ? "end" : undefined);
+      return;
+    }
+    if (this.editorLeaf?.view instanceof MarkdownView) {
+      const editor = this.editorLeaf.view.editor;
+      editor.focus();
+      if (toEnd) editor.setCursor(editor.lastLine(), editor.getLine(editor.lastLine()).length);
+      return;
+    }
+    this.inputEl.focus();
+    if (toEnd) this.inputEl.setSelectionRange(this.inputEl.value.length, this.inputEl.value.length);
+  }
+
+  private blurActiveEditor(): void {
+    if (this.settings.editorMode === "tiptap") this.tiptapEditor?.commands.blur();
+    else if (this.editorLeaf?.view instanceof MarkdownView) this.editorLeaf.view.editor.blur();
+    else this.inputEl.blur();
+  }
+
+  private createTagSuggest(editor: Editor): TagSuggest {
+    return new TagSuggest(this.app, {
+      element: editor.view.dom,
+      getTextBeforeCursor: () => this.getTiptapTextBeforeCursor(editor),
+      replaceQuery: (query, replacement) => this.replaceTiptapQuery(editor, query, replacement),
+      getAnchorPosition: () => this.getTiptapCursorPosition(editor),
+      focus: () => editor.commands.focus(),
+    });
+  }
+
+  private getTiptapTextBeforeCursor(editor: Editor): string {
+    return editor.state.doc.textBetween(0, editor.state.selection.from, "\n", "\n");
+  }
+
+  private replaceTiptapQuery(editor: Editor, query: string, replacement: string): void {
+    const { from } = editor.state.selection;
+    const start = from - query.length - 1;
+    if (start < 1) return;
+    editor.chain().focus().deleteRange({ from: start, to: from }).insertContent(replacement).run();
+  }
+
+  private getTiptapCursorPosition(editor: Editor): { left: number; bottom: number; width: number } {
+    const coords = editor.view.coordsAtPos(editor.state.selection.from);
+    return { left: coords.left, bottom: coords.bottom, width: 160 };
   }
 
   private setEditorValue(text: string): void {
-    const editor = this.getEditor();
-    if (editor) editor.setValue(text);
     this.inputEl.value = text;
+    if (this.settings.editorMode === "tiptap") {
+      this.tiptapEditor?.commands.setContent(text, { contentType: "markdown" });
+    } else if (this.editorLeaf?.view instanceof MarkdownView) {
+      this.editorLeaf.view.editor.setValue(text);
+    }
   }
 
-  private async setupNativeEditor(): Promise<void> {
-    if (this.editorLeaf) return;
-    const folder = normalizePath(this.settings.folder);
-    const draftPath = `${folder}/_draft.md`;
-    const dir = this.app.vault.getAbstractFileByPath(folder);
-    if (!dir) await this.app.vault.createFolder(folder);
-    const existing = this.app.vault.getAbstractFileByPath(draftPath);
-    if (!(existing instanceof TFile)) {
-      await this.app.vault.create(draftPath, "");
+  private syncLegacyEditorFromTextarea(): void {
+    if (this.editorLeaf?.view instanceof MarkdownView) {
+      this.editorLeaf.view.editor.setValue(this.inputEl.value);
     }
-    // @ts-expect-error WorkspaceLeaf constructor is internal
-    this.editorLeaf = new WorkspaceLeaf(this.app);
-    await this.editorLeaf.openFile(
-      this.app.vault.getAbstractFileByPath(draftPath) as TFile,
-      { state: { mode: "source", source: false } }
-    );
-    const view = this.editorLeaf.view;
-    if (view instanceof MarkdownView) {
-      this.editorHostEl.replaceChildren(view.containerEl);
-      // 编辑器获得焦点时激活 leaf，确保快捷键生效
-      this.editorHostEl.addEventListener("focusin", () => {
-        try { this.app.workspace.setActiveLeaf(this.editorLeaf); } catch { /* ignore */ }
-      });
-    }
+    if (!this.editingMemo) this.saveDraft(this.inputEl.value);
+    this.syncInputCardContentState();
   }
 
   private isMobileSidebarLayout(): boolean {
@@ -1639,7 +1792,7 @@ export class MotesView extends ItemView implements HoverParent {
         break;
       case "i":
         e.preventDefault();
-        this.inputEl.focus();
+        this.focusActiveEditor();
         break;
       case "Escape":
         if (this.vimSelectedIdx >= 0) {
@@ -1657,19 +1810,101 @@ export class MotesView extends ItemView implements HoverParent {
    *  v1.6.0: 同步把 memo 的时间填入 datetime-local 输入框，允许编辑时一并修改
    */
   private enterEditMode(memo: Memo): void {
-    if (this.getEditorValue().trim()) this.saveDraft(this.getEditorValue());
+    this.destroyInlineEditor();
     this.editingMemo = memo;
     this.setEditorValue(memo.content);
-    if (this.editDateTimeEl) {
-      this.editDateTimeEl.value = `${memo.date}T${memo.time}`;
-    }
-    if (this.settings.mobileInputStyle === "fab") {
-      this.contentEl.addClass("is-fab-expanded");
-    }
-    const editor = this.getEditor();
-    if (editor) editor.focus();
+    if (this.editDateTimeEl) this.editDateTimeEl.value = `${memo.date}T${memo.time}`;
     this.updateEditBanner();
-    this.autoResizeInput();
+    this.focusActiveEditor();
+  }
+
+  private startInlineMemoEdit(memo: Memo): void {
+    if (this.inlineEditingMemo === memo) return;
+    this.destroyInlineEditor();
+    this.inlineEditingMemo = memo;
+    this.renderAll();
+    window.requestAnimationFrame(() => {
+      this.inlineEditor?.commands.focus("end");
+      this.getInlineNativeEditor()?.focus();
+    });
+  }
+
+  private renderInlineMemoEditor(card: HTMLElement, memo: Memo): void {
+    card.addClass("is-inline-editing");
+    const head = card.createDiv({ cls: "motes-card-head motes-inline-edit-head" });
+    this.inlineDateTimeEl = head.createEl("input", {
+      cls: "motes-inline-edit-time",
+      type: "datetime-local",
+      attr: { step: "60", "aria-label": t("input.editTimeTitle") },
+    });
+    this.inlineDateTimeEl.value = `${memo.date}T${memo.time}`;
+    head.createSpan({ cls: "motes-inline-edit-hint", text: "Ctrl/Cmd + Enter 保存" });
+    const host = card.createDiv({ cls: "motes-inline-editor" });
+    const actions = card.createDiv({ cls: "motes-inline-edit-actions" });
+    const cancel = actions.createEl("button", { cls: "motes-cancel-btn", text: t("input.cancel") });
+    const save = actions.createEl("button", { cls: "motes-submit-btn", attr: { "aria-label": t("input.submit") } });
+    setIcon(save, "check");
+
+    if (this.settings.editorMode === "tiptap") {
+      this.inlineEditor = new Editor({
+        element: host,
+        extensions: [StarterKit, Markdown],
+        content: memo.content,
+        contentType: "markdown",
+        injectCSS: true,
+        onUpdate: () => this.inlineTagSuggest?.refresh(),
+      });
+      this.inlineTagSuggest = this.createTagSuggest(this.inlineEditor);
+    } else {
+      this.inlineEditorHost = host;
+      void this.setupInlineNativeEditor(host, memo);
+    }
+    cancel.addEventListener("click", () => this.cancelInlineMemoEdit());
+    save.addEventListener("click", () => void this.saveInlineMemo());
+  }
+
+  private async saveInlineMemo(): Promise<void> {
+    const memo = this.inlineEditingMemo;
+    if (!memo) return;
+    const content = (this.inlineEditor?.getMarkdown() ?? this.getInlineNativeEditor()?.getValue() ?? "").trim();
+    if (!content) return;
+    const dateTime = this.inlineDateTimeEl?.value ?? "";
+    this.destroyInlineEditor();
+    try {
+      if (dateTime && dateTime !== `${memo.date}T${memo.time}`) {
+        const updatedAt = new Date(dateTime);
+        if (isNaN(updatedAt.getTime())) {
+          new Notice(t("notice.invalidTime"));
+          return;
+        }
+        await this.store.editMemoDateTime(memo, updatedAt, content);
+        new Notice(t("notice.updatedWithTime"));
+      } else {
+        await this.store.editMemo(memo, content);
+        new Notice(t("notice.updated"));
+      }
+    } catch (error) {
+      console.error(error);
+      new Notice(t("notice.saveFailed", { msg: (error as Error).message }));
+      this.renderAll();
+    }
+  }
+
+  private cancelInlineMemoEdit(): void {
+    this.destroyInlineEditor();
+    this.renderAll();
+  }
+
+  private destroyInlineEditor(): void {
+    this.inlineTagSuggest?.destroy();
+    this.inlineTagSuggest = null;
+    this.inlineEditor?.destroy();
+    this.inlineEditor = null;
+    this.inlineEditorLeaf?.detach();
+    this.inlineEditorLeaf = null;
+    this.inlineEditorHost = null;
+    this.inlineEditingMemo = null;
+    this.inlineDateTimeEl = null;
   }
 
   /** 退出编辑模式，恢复新建笔记状态
@@ -1688,7 +1923,7 @@ export class MotesView extends ItemView implements HoverParent {
     // v2.2.0: 移动端 FAB 模式下，退出编辑且无草稿时收回 FAB 入口
     if (
       this.settings.mobileInputStyle === "fab" &&
-      !this.inputEl.value.trim()
+      !this.getEditorValue().trim()
     ) {
       this.collapseFabInput(true);
     }
@@ -1700,31 +1935,41 @@ export class MotesView extends ItemView implements HoverParent {
   private updateEditBanner(): void {
     if (!this.editBannerEl) return;
     const inputCard = this.inputEl.closest(".Motes-input-card");
+    let placeholder: string;
     if (this.editingMemo) {
       this.editBannerEl.removeClass("motes-hidden");
       this.editDateTimeEl?.removeClass("motes-hidden");
       inputCard?.addClass("is-editing");
-      this.inputEl.setAttr(
-        "placeholder",
-        t("input.editPlaceholder", {
-          date: this.editingMemo.date,
-          time: this.editingMemo.time,
-        })
-      );
+      placeholder = t("input.editPlaceholder", {
+        date: this.editingMemo.date,
+        time: this.editingMemo.time,
+      });
     } else {
       this.editBannerEl.addClass("motes-hidden");
       this.editDateTimeEl?.addClass("motes-hidden");
       inputCard?.removeClass("is-editing");
-      // v2.0.13: 如果当前按某个标签筛选，placeholder 提示用户保存时会自动加该标签
       if (this.filter.tag) {
-        this.inputEl.setAttr(
-          "placeholder",
-          t("input.placeholderWithTag", { tag: this.filter.tag })
-        );
+        placeholder = t("input.placeholderWithTag", { tag: this.filter.tag });
       } else {
-        this.inputEl.setAttr("placeholder", t("input.placeholder"));
+        placeholder = t("input.placeholder");
       }
     }
+    this.inputEl.setAttr("placeholder", placeholder);
+    this.refreshTiptapPlaceholder();
+  }
+
+  private refreshTiptapPlaceholder(): void {
+    const pmEl = this.editorHostEl?.querySelector(".ProseMirror");
+    if (!pmEl) return;
+    const placeholder = this.editingMemo
+      ? t("input.editPlaceholder", {
+          date: this.editingMemo.date,
+          time: this.editingMemo.time,
+        })
+      : this.filter.tag
+        ? t("input.placeholderWithTag", { tag: this.filter.tag })
+        : t("input.placeholder");
+    pmEl.setAttribute("data-placeholder", placeholder);
   }
 
   // ====================== 渲染 ======================
@@ -2997,6 +3242,11 @@ export class MotesView extends ItemView implements HoverParent {
         (this.editingMemo === memo ? " is-editing" : "") +
         moodCls,
     });
+    card.dataset.memoKey = `${memo.file}:${memo.range[0]}`;
+    if (this.inlineEditingMemo === memo) {
+      this.renderInlineMemoEditor(card, memo);
+      return;
+    }
     // 双击卡片进入编辑模式
     card.addEventListener("dblclick", (e) => {
       // 避免双击图片/链接时误触
@@ -3086,7 +3336,7 @@ export class MotesView extends ItemView implements HoverParent {
     setIcon(menuBtn, "more-horizontal");
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      this.showMemoMenu(e, memo);
+      this.showMemoMenu(e, memo, () => this.enterEditMode(memo));
     });
 
     // 1) 先把所有 #tag 剥离
@@ -3537,7 +3787,7 @@ export class MotesView extends ItemView implements HoverParent {
     };
   }
 
-  private showMemoMenu(evt: MouseEvent, memo: Memo): void {
+  private showMemoMenu(evt: MouseEvent, memo: Memo, onEdit?: () => void): void {
     const menu = new Menu();
     menu.addItem((item) =>
       item
@@ -3564,7 +3814,7 @@ export class MotesView extends ItemView implements HoverParent {
       item
         .setTitle(t("card.edit"))
         .setIcon("pencil")
-        .onClick(() => this.enterEditMode(memo))
+        .onClick(() => onEdit?.() ?? this.enterEditMode(memo))
     );
     // v1.2.1: 菜单里的"引用"已删除 —— 卡片右上角已有常驻"引用"按钮，避免重复
     menu.addItem((item) =>
@@ -3708,19 +3958,14 @@ export class MotesView extends ItemView implements HoverParent {
    * 显式 blur + 微延时 focus 可以重置这个状态。
    */
   private restoreInputFocus(): void {
-    if (!this.inputEl) return;
     try {
-      this.inputEl.blur();
+      this.blurActiveEditor();
     } catch {
       // Best effort only; the element may already be detached.
     }
     window.setTimeout(() => {
       try {
-        // 不强抢焦点，只是"激活"一次 textarea 让它后续能正常响应
-        this.inputEl.setSelectionRange(
-          this.inputEl.value.length,
-          this.inputEl.value.length
-        );
+        this.tiptapEditor?.view.dom.blur();
       } catch {
         // Best effort only; the view may close before this timer runs.
       }
@@ -3761,18 +4006,13 @@ export class MotesView extends ItemView implements HoverParent {
 
     const block = `> [!quote] ${memo.date} ${memo.time}\n${quoted}\n\n`;
 
-    // 如果输入框已有内容，追加；否则直接填入
-    // v2.1.0-iter8: 用 setTextareaValue 保留 undo（用户能 Ctrl+Z 撤销引用插入）
-    if (this.inputEl.value.trim()) {
-      const trimmed = this.inputEl.value.replace(/\s+$/, "");
-      setTextareaValue(this.inputEl, trimmed + "\n\n" + block);
+    const current = this.getEditorValue();
+    if (current.trim()) {
+      this.setEditorValue(current.replace(/\s+$/, "") + "\n\n" + block);
     } else {
-      setTextareaValue(this.inputEl, block);
+      this.setEditorValue(block);
     }
-    this.inputEl.focus();
-    // 光标移到末尾
-    const pos = this.inputEl.value.length;
-    this.inputEl.setSelectionRange(pos, pos);
+    this.focusActiveEditor(true);
     // v1.1.8: 引用块很可能多行，重算高度
     this.autoResizeInput();
     // v2.0.17: 引用一定使输入框有内容 → 保持展开态
@@ -4851,12 +5091,3 @@ function normalizeForRender(raw: string): string {
 
   return out.join("\n");
 }
-
-
-
-
-
-
-
-
-

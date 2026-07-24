@@ -77,6 +77,8 @@ export interface MotesSettings {
   waterfallLayout: boolean;
   /** v3.0.0: 编辑器初始高度 (px) */
   editorHeight: number;
+  /** 顶部编辑器实现。native 使用 Obsidian 内置 CodeMirror。 */
+  editorMode: "native" | "tiptap" | "textarea";
   /** v3.0.0: 品牌标题，空字符串则不显示 */
   brandName: string;
 }
@@ -117,6 +119,7 @@ export const DEFAULT_SETTINGS: MotesSettings = {
   storageMode: "yearly",
   waterfallLayout: false,
   editorHeight: 200,
+  editorMode: "native",
   brandName: "Motes",
 };
 

@@ -419,8 +419,8 @@
 /* 快捷筛选 Tab 栏 */
 .motes-quick-tabs {
   display: flex;
-  gap: 2px;
-  padding: 10px 24px 6px;
+  gap: 6px;
+  padding: 9px 24px;
   flex-shrink: 0;
   overflow-x: auto;
   border-bottom: 1px solid var(--background-modifier-border);
@@ -432,29 +432,21 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border: none;
+  padding: 7px 12px;
+  border: 1px solid transparent;
   background: transparent;
-  color: var(--text-faint);
+  color: var(--text-muted);
   font-size: 12px;
-  font-weight: 500;
-  border-radius: 6px 6px 0 0;
+  font-weight: 550;
+  border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.15s, background 0.15s;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
   box-shadow: none;
   position: relative;
 }
 .motes-quick-tab::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: transparent;
-  border-radius: 2px 2px 0 0;
-  transition: background 0.15s;
+  display: none;
 }
 .motes-quick-tab:hover {
   color: var(--text-normal);
@@ -462,10 +454,9 @@
 }
 .motes-quick-tab.is-active {
   color: var(--interactive-accent);
-  background: transparent;
-}
-.motes-quick-tab.is-active::after {
-  background: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--interactive-accent) 22%, transparent);
+  font-weight: 650;
 }
 .motes-quick-tab-icon {
   display: flex;
@@ -485,7 +476,8 @@
 
 /* 输入卡片 */
 .motes-input-card {
-  margin: 16px 24px 0;
+  /* The list's vertical scrollbar occupies 16px on desktop. Match its content edge. */
+  margin: 16px 40px 0 24px;
   padding: 14px 0 10px;
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
@@ -500,6 +492,11 @@
   border-color: var(--interactive-accent);
   box-shadow: 0 0 0 3px
     color-mix(in srgb, var(--interactive-accent) 15%, transparent);
+}
+.motes-input-card.is-focused {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
 }
 
 /* v2.0.17: 输入卡片"渐进式披露"动画
@@ -723,6 +720,13 @@
   flex: 1;
   overflow-y: auto;
   padding: 18px 24px 64px;
+}
+
+/* Keep the composer aligned with list cards when the list has a vertical scrollbar. */
+@media (max-width: 680px) {
+  .motes-input-card {
+    margin: 0 8px 8px;
+  }
 }
 
 /* 瀑布流布局 */
@@ -1968,59 +1972,158 @@
 .motes-editor-host {
   margin: 0;
   padding: 0;
-  height: 280px !important;
-  max-height: 45vh !important;
-  overflow: hidden !important;
+  min-height: 56px;
+  max-height: min(var(--motes-editor-expanded-height, 200px), 55vh);
+  overflow-y: auto;
+  transition: min-height 0.18s ease;
 }
 .motes-input-card:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .motes-editor-host {
-  height: 56px !important;
+  min-height: 56px;
 }
 .motes-input-card.is-focused .motes-editor-host,
 .motes-input-card.has-content .motes-editor-host,
 .motes-input-card.is-editing .motes-editor-host {
-  height: 280px !important;
+  min-height: min(var(--motes-editor-expanded-height, 200px), 55vh);
 }
-/* 隐藏编辑器多余的 chrome，保留 CodeMirror 渲染样式 */
-.motes-editor-host * {
-  max-height: none !important;
+/* Tiptap / ProseMirror flomo-style editor */
+.motes-editor-host .tiptap,
+.motes-editor-host .ProseMirror {
+  outline: none;
+  border: none;
+  padding: 8px 4px;
+  font-family: var(--font-text);
+  font-size: var(--font-text-size, 14px);
+  line-height: var(--line-height-normal, 1.6);
+  color: var(--text-normal);
+  min-height: 40px;
+  overflow: visible;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  box-sizing: border-box;
 }
-.motes-editor-host .inline-title {
-  display: none !important;
+.motes-editor-host .tiptap p,
+.motes-editor-host .ProseMirror p {
+  margin: 0 0 4px 0;
 }
-.motes-editor-host .view-header,
-.motes-editor-host .view-header-nav-buttons,
-.motes-editor-host .view-header-title-container {
-  display: none !important;
-  visibility: hidden !important;
+.motes-editor-host .tiptap p.is-editor-empty:first-child::before,
+.motes-editor-host .ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--text-faint);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }
-.motes-editor-host .metadata-container,
-.motes-editor-host .cm-panels {
-  display: none !important;
+.motes-editor-host .tiptap ul,
+.motes-editor-host .ProseMirror ul {
+  padding-left: 20px;
+  margin: 4px 0;
 }
+.motes-editor-host .tiptap ol,
+.motes-editor-host .ProseMirror ol {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+.motes-editor-host .tiptap li,
+.motes-editor-host .ProseMirror li {
+  margin-bottom: 2px;
+}
+.motes-editor-host .tiptap code,
+.motes-editor-host .ProseMirror code {
+  background: var(--background-modifier-hover);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.9em;
+}
+.motes-editor-host .tiptap pre,
+.motes-editor-host .ProseMirror pre {
+  background: var(--background-modifier-hover);
+  border-radius: 4px;
+  padding: 10px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.motes-editor-host .tiptap pre code,
+.motes-editor-host .ProseMirror pre code {
+  background: none;
+  padding: 0;
+}
+.motes-editor-host .tiptap blockquote,
+.motes-editor-host .ProseMirror blockquote {
+  border-left: 3px solid var(--background-modifier-border);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: var(--text-muted);
+}
+.motes-editor-host .tiptap hr,
+.motes-editor-host .ProseMirror hr {
+  border: none;
+  border-top: 1px solid var(--background-modifier-border);
+  margin: 12px 0;
+}
+.motes-editor-host-hidden {
+  display: none;
+}
+/* Obsidian native editor mode: retain the host's compact, chrome-free embedding. */
 .motes-editor-host .workspace-leaf,
 .motes-editor-host .workspace-leaf-content,
-.motes-editor-host .markdown-source-view {
+.motes-editor-host .markdown-source-view,
+.motes-editor-host .cm-editor {
+  height: 100%;
+  padding: 0;
+  background: transparent;
+}
+.motes-editor-host .view-header,
+.motes-editor-host .metadata-container,
+.motes-editor-host .cm-gutters {
+  display: none;
+}
+.motes-editor-host .cm-scroller {
+  padding: 0;
+  overflow-y: auto;
+}
+/* Native CodeMirror height guardrails. See v2.4.0 fixes 627e796, 3bdc13e and 82b971f. */
+.motes-input-card.motes-editor-native .motes-editor-host {
+  height: var(--motes-editor-expanded-height, 200px) !important;
+  min-height: 0;
+  max-height: 55vh !important;
+  overflow: hidden !important;
+  transition: height 0.18s ease;
+}
+.motes-input-card.motes-editor-native:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .motes-editor-host {
+  height: 56px !important;
+}
+.motes-input-card.motes-editor-native .workspace-leaf,
+.motes-input-card.motes-editor-native .workspace-leaf-content,
+.motes-input-card.motes-editor-native .markdown-source-view,
+.motes-input-card.motes-editor-native .cm-editor {
   height: 100% !important;
   max-height: 100% !important;
   padding: 0 !important;
 }
-.motes-editor-host .cm-editor {
+.motes-input-card.motes-editor-native .cm-editor {
   background: transparent !important;
-  height: 100% !important;
-  max-height: 100% !important;
 }
-.motes-editor-host .cm-scroller {
+.motes-input-card.motes-editor-native .inline-title,
+.motes-input-card.motes-editor-native .view-header,
+.motes-input-card.motes-editor-native .view-header-nav-buttons,
+.motes-input-card.motes-editor-native .view-header-title-container,
+.motes-input-card.motes-editor-native .metadata-container,
+.motes-input-card.motes-editor-native .cm-panels {
+  display: none !important;
+  visibility: hidden !important;
+}
+.motes-input-card.motes-editor-native .cm-scroller {
   font-family: var(--font-text);
   font-size: var(--font-text-size, 14px);
   line-height: var(--line-height-normal, 1.6);
   padding: 0 !important;
   overflow-y: auto !important;
 }
-.motes-editor-host .cm-sizer {
+.motes-input-card.motes-editor-native .cm-sizer {
   min-height: 0 !important;
   padding: 0 !important;
 }
-.motes-editor-host .cm-content {
+.motes-input-card.motes-editor-native .cm-content {
   min-height: 0 !important;
   max-height: 100% !important;
   height: auto !important;
@@ -2028,15 +2131,87 @@
   padding-bottom: 0 !important;
   box-sizing: border-box !important;
 }
-.motes-editor-host .cm-active.cm-line {
+.motes-input-card.motes-editor-native .cm-active.cm-line {
   height: auto !important;
   min-height: 0 !important;
 }
-.motes-editor-host .cm-content::after {
+.motes-input-card.motes-editor-native .cm-content::after,
+.motes-input-card.motes-editor-native .cm-gutters {
   display: none !important;
 }
-.motes-editor-host .cm-gutters {
+.motes-card.is-inline-editing {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+}
+.motes-inline-edit-head {
+  align-items: center;
+}
+.motes-inline-edit-time {
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+}
+.motes-inline-edit-hint {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-size: 11px;
+}
+.motes-inline-editor .ProseMirror {
+  min-height: 96px;
+  outline: none;
+  padding: 6px 0;
+  font-family: var(--font-text);
+  font-size: var(--font-text-size, 14px);
+  line-height: var(--line-height-normal, 1.6);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.motes-inline-editor {
+  min-height: 160px;
+  max-height: 45vh;
+  overflow: hidden;
+}
+.motes-inline-editor .view-header,
+.motes-inline-editor .view-header-nav-buttons,
+.motes-inline-editor .view-header-title-container,
+.motes-inline-editor .inline-title,
+.motes-inline-editor .metadata-container,
+.motes-inline-editor .cm-panels,
+.motes-inline-editor .cm-gutters {
   display: none !important;
+}
+.motes-inline-editor .workspace-leaf,
+.motes-inline-editor .workspace-leaf-content,
+.motes-inline-editor .markdown-source-view,
+.motes-inline-editor .cm-editor {
+  height: 100% !important;
+  max-height: 100% !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+.motes-inline-editor .cm-scroller {
+  padding: 0 !important;
+  overflow-y: auto !important;
+}
+.motes-inline-editor .cm-sizer,
+.motes-inline-editor .cm-content,
+.motes-inline-editor .cm-active.cm-line {
+  min-height: 0 !important;
+}
+.motes-inline-editor .cm-content {
+  padding: 0 4px !important;
+}
+.motes-inline-editor .ProseMirror p {
+  margin: 0 0 4px;
+}
+.motes-inline-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
 }
 .motes-sidebar-hidden {
   display: none !important;
@@ -2044,20 +2219,13 @@
 .motes-input-hidden {
   display: none !important;
 }
-/* CodeMirror 实时编辑器 */
+/* Tiptap 编辑器在移动端保持较小的起始高度。 */
 .motes-editor-host {
   margin: 0;
   padding: 0;
-  min-height: 80px;
-  max-height: 55vh;
-  overflow: hidden !important;
-}
-.motes-editor-host .cm-scroller {
-  font-family: var(--font-text);
-  font-size: var(--font-text-size, 14px);
-  line-height: var(--line-height-normal, 1.6);
-  padding: 0 !important;
-  overflow-y: auto !important;
+  min-height: 56px;
+  max-height: min(var(--motes-editor-expanded-height, 200px), 55vh);
+  overflow-y: auto;
 }
 
 .motes-input-hint {
@@ -4932,15 +5100,197 @@
   padding: 6px 8px;
 }
 
+/* Compact navigation treatment for the sidebar embedded beside the memo stream. */
+.motes-sidebar {
+  box-sizing: border-box;
+  width: 224px;
+  padding: 12px 8px 16px;
+  background: var(--background-secondary);
+}
+.motes-stats {
+  padding: 2px 4px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+.motes-stat-num {
+  font-size: 20px;
+}
+.motes-stat-label {
+  margin-top: 2px;
+  font-size: 10px;
+  letter-spacing: 0.2px;
+}
+.motes-overview {
+  margin: 10px 2px 0;
+  padding: 8px 6px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+}
+.motes-calendar {
+  padding: 0;
+}
+.motes-cal-head {
+  padding: 0 2px 6px;
+}
+.motes-cal-grid {
+  gap: 1px;
+}
+.motes-cal-cell {
+  min-height: 24px;
+}
+.motes-sidebar-section {
+  padding: 14px 10px 5px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+.motes-nav-item {
+  gap: 8px;
+  padding: 6px 10px;
+  margin: 1px 0;
+  border-radius: 7px;
+  font-size: 13px;
+}
+.motes-nav-item.active {
+  background: color-mix(in srgb, var(--interactive-accent) 16%, transparent);
+  color: var(--interactive-accent);
+  font-weight: 600;
+}
+.motes-nav-item.active .motes-nav-count {
+  color: var(--interactive-accent);
+  opacity: 0.8;
+}
+.motes-nav-count {
+  font-size: 10px;
+}
 
+/* Desktop and mobile: keep embedded Obsidian CodeMirror inside the Motes input host. */
+.motes-input-card.motes-editor-native .motes-editor-host {
+  height: var(--motes-editor-expanded-height, 200px) !important;
+  min-height: 0;
+  max-height: 55vh !important;
+  overflow: hidden !important;
+  transition: height 0.18s ease;
+}
+.motes-input-card.motes-editor-native:not(.is-focused):not(.has-content):not(.is-editing):not(.dragging) .motes-editor-host {
+  height: 56px !important;
+}
+.motes-input-card.motes-editor-native .inline-title,
+.motes-input-card.motes-editor-native .view-header,
+.motes-input-card.motes-editor-native .view-header-nav-buttons,
+.motes-input-card.motes-editor-native .view-header-title-container,
+.motes-input-card.motes-editor-native .metadata-container,
+.motes-input-card.motes-editor-native .cm-panels,
+.motes-input-card.motes-editor-native .cm-gutters {
+  display: none !important;
+  visibility: hidden !important;
+}
+.motes-input-card.motes-editor-native .workspace-leaf,
+.motes-input-card.motes-editor-native .workspace-leaf-content,
+.motes-input-card.motes-editor-native .markdown-source-view,
+.motes-input-card.motes-editor-native .cm-editor {
+  height: 100% !important;
+  max-height: 100% !important;
+  padding: 0 !important;
+}
+.motes-input-card.motes-editor-native .cm-editor {
+  background: transparent !important;
+}
+.motes-input-card.motes-editor-native .cm-scroller {
+  font-family: var(--font-text);
+  font-size: var(--font-text-size, 14px);
+  line-height: var(--line-height-normal, 1.6);
+  padding: 0 !important;
+  overflow-y: auto !important;
+}
+.motes-input-card.motes-editor-native .cm-sizer,
+.motes-input-card.motes-editor-native .cm-content,
+.motes-input-card.motes-editor-native .cm-active.cm-line {
+  min-height: 0 !important;
+}
+.motes-input-card.motes-editor-native .cm-sizer {
+  padding: 0 !important;
+}
+.motes-input-card.motes-editor-native .cm-content {
+  max-height: 100% !important;
+  height: auto !important;
+  padding: 0 4px !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box !important;
+}
+.motes-input-card.motes-editor-native .cm-content::after {
+  display: none !important;
+}
 
+/* Inline native editor must size to the memo card, not to Obsidian's workspace pane. */
+.motes-inline-editor {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-height: 55vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.motes-inline-editor .view-header,
+.motes-inline-editor .view-header-nav-buttons,
+.motes-inline-editor .view-header-title-container,
+.motes-inline-editor .inline-title,
+.motes-inline-editor .metadata-container,
+.motes-inline-editor .cm-panels,
+.motes-inline-editor .cm-gutters {
+  display: none !important;
+  visibility: hidden !important;
+}
+.motes-inline-editor .workspace-leaf,
+.motes-inline-editor .workspace-leaf-content,
+.motes-inline-editor .markdown-source-view,
+.motes-inline-editor .cm-editor,
+.motes-inline-editor .cm-scroller,
+.motes-inline-editor .cm-sizer {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  flex: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+.motes-inline-editor .cm-scroller {
+  overflow: visible !important;
+}
+.motes-inline-editor .cm-content {
+  min-height: 0 !important;
+  padding: 0 4px !important;
+}
+.motes-inline-editor .markdown-source-view.mod-cm6 .cm-sizer,
+.motes-inline-editor .markdown-source-view.mod-cm6 .cm-contentContainer,
+.motes-inline-editor .markdown-source-view.mod-cm6 .cm-content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
 
-
-
-
-
-
-
-
-
-
+/* The compose editor should use the complete input-card width as well. */
+.motes-input-card.motes-editor-native .markdown-source-view.mod-cm6 .cm-sizer {
+  width: calc(100% - 48px) !important;
+  max-width: none !important;
+  margin-left: 24px !important;
+  margin-right: 24px !important;
+  box-sizing: border-box !important;
+}
+.motes-input-card.motes-editor-native .markdown-source-view.mod-cm6 .cm-contentContainer,
+.motes-input-card.motes-editor-native .markdown-source-view.mod-cm6 .cm-content {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 680px) {
+  .motes-input-card.motes-editor-native .markdown-source-view.mod-cm6 .cm-sizer {
+    width: calc(100% - 32px) !important;
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+  }
+}

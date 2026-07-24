@@ -25,6 +25,11 @@
     "obsidian": "latest",
     "tslib": "2.8.1",
     "typescript": "5.7.2"
+  },
+  "dependencies": {
+    "@tiptap/core": "^3.28.0",
+    "@tiptap/markdown": "^3.28.0",
+    "@tiptap/pm": "^3.28.0",
+    "@tiptap/starter-kit": "^3.28.0"
   }
 }
-

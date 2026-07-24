@@ -4,13 +4,20 @@
 //          + 当前 Motes 的标签（已包含在内）
 
 import { App, getAllTags, setIcon } from "obsidian";
-import { replaceTextareaRange } from "./textarea-utils";
+
+export interface TagSuggestTarget {
+  element: HTMLElement;
+  getTextBeforeCursor(): string;
+  replaceQuery(query: string, replacement: string): void;
+  getAnchorPosition(): { left: number; bottom: number; width: number };
+  focus(): void;
+}
 
 export class TagSuggest {
   private dropdown: HTMLElement | null = null;
   private items: string[] = [];
   private active = 0;
-  private rangeStart = 0; // 触发位置（# 字符所在的索引）
+  private query = "";
 
   /** v1.4.11: 标签全扫缓存。
    *   原实现：每按一个键 → 遍历 vault 所有 md → metadataCache.getFileCache → getAllTags。
@@ -22,11 +29,11 @@ export class TagSuggest {
   private static CACHE_TTL_MS = 30_000;
   private metaChangeRef: { unref: () => void } | null = null;
 
-  constructor(private app: App, private textarea: HTMLTextAreaElement) {
-    this.textarea.addEventListener("input", this.handleInput);
-    this.textarea.addEventListener("keydown", this.handleKeydown, true);
-    this.textarea.addEventListener("blur", this.handleBlur);
-    this.textarea.addEventListener("scroll", () => this.close());
+  constructor(private app: App, private target: TagSuggestTarget) {
+    this.target.element.addEventListener("input", this.handleInput);
+    this.target.element.addEventListener("keydown", this.handleKeydown, true);
+    this.target.element.addEventListener("blur", this.handleBlur);
+    this.target.element.addEventListener("scroll", () => this.close());
     // v1.4.11: 监听 metadataCache 变化让缓存失效。
     //   用 app.metadataCache.on("changed", cb) 返回的 ref，在 destroy 时 offref。
     const ref = this.app.metadataCache.on("changed", () => {
@@ -38,9 +45,9 @@ export class TagSuggest {
   }
 
   destroy(): void {
-    this.textarea.removeEventListener("input", this.handleInput);
-    this.textarea.removeEventListener("keydown", this.handleKeydown, true);
-    this.textarea.removeEventListener("blur", this.handleBlur);
+    this.target.element.removeEventListener("input", this.handleInput);
+    this.target.element.removeEventListener("keydown", this.handleKeydown, true);
+    this.target.element.removeEventListener("blur", this.handleBlur);
     if (this.metaChangeRef) {
       this.metaChangeRef.unref();
       this.metaChangeRef = null;
@@ -56,7 +63,7 @@ export class TagSuggest {
       this.close();
       return;
     }
-    this.rangeStart = trigger.start;
+    this.query = trigger.query;
     const all = this.collectAllTags();
     this.items = this.match(all, trigger.query);
     if (this.items.length === 0) {
@@ -66,6 +73,14 @@ export class TagSuggest {
     this.active = 0;
     this.render();
   };
+
+  refresh(): void {
+    this.handleInput();
+  }
+
+  isOpen(): boolean {
+    return this.dropdown !== null;
+  }
 
   private handleBlur = (): void => {
     // 延迟，给 mousedown 一个机会触发选择
@@ -107,8 +122,8 @@ export class TagSuggest {
    * 返回 { start: # 字符位置, query: # 后到光标的字符 }
    */
   private detectTrigger(): { start: number; query: string } | null {
-    const pos = this.textarea.selectionStart ?? 0;
-    const text = this.textarea.value;
+    const text = this.target.getTextBeforeCursor();
+    const pos = text.length;
     // 向前找最近的 # 字符
     let i = pos - 1;
     while (i >= 0) {
@@ -234,24 +249,20 @@ export class TagSuggest {
   /** 把下拉定位到 textarea 当前光标下方 */
   private position(): void {
     if (!this.dropdown) return;
-    const rect = this.textarea.getBoundingClientRect();
-    // 简化：定位到 textarea 左下，避免计算光标坐标
-    const top = rect.bottom + 4;
-    const left = rect.left + 4;
+    const anchor = this.target.getAnchorPosition();
+    const top = anchor.bottom + 4;
+    const left = anchor.left;
     this.dropdown.style.top = `${top}px`;
     this.dropdown.style.left = `${left}px`;
-    this.dropdown.style.minWidth = `${Math.min(rect.width, 280)}px`;
+    this.dropdown.style.minWidth = `${Math.min(Math.max(anchor.width, 160), 280)}px`;
   }
 
   private applySelected(): void {
     if (!this.dropdown || !this.items.length) return;
     const chosen = this.items[this.active];
-    const pos = this.textarea.selectionStart ?? 0;
-    // 替换 [rangeStart, pos) 为 #chosen + 空格
-    // v2.1.0-iter8: 用 replaceTextareaRange 保留 undo（之前 Ctrl+Z 不工作就是这里搞的）
     const insert = `#${chosen} `;
-    replaceTextareaRange(this.textarea, this.rangeStart, pos, insert);
-    this.textarea.focus();
+    this.target.replaceQuery(this.query, insert);
+    this.target.focus();
     this.close();
   }
 

@@ -2,6 +2,7 @@
 
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type MotesPlugin from "./main";
+import type { MotesSettings } from "./types";
 import { t } from "./i18n";
 
 export class MotesSettingTab extends PluginSettingTab {
@@ -335,6 +336,22 @@ export class MotesSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();
           this.plugin.store.notifyChange();
         })
+      );
+
+    new Setting(containerEl)
+      .setName(t("settings.editorMode.name"))
+      .setDesc(t("settings.editorMode.desc"))
+      .addDropdown((d) =>
+        d
+          .addOption("native", t("settings.editorMode.native"))
+          .addOption("tiptap", t("settings.editorMode.tiptap"))
+          .addOption("textarea", t("settings.editorMode.textarea"))
+          .setValue(this.plugin.settings.editorMode)
+          .onChange(async (v) => {
+            this.plugin.settings.editorMode = v as MotesSettings["editorMode"];
+            await this.plugin.saveSettings();
+            this.plugin.store.notifyChange();
+          })
       );
 
     new Setting(containerEl)
